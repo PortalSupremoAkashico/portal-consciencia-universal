@@ -644,7 +644,7 @@ async function hashPassword(senha) {
 function entrarPortal(user) {
   saveStoredUser(user);
   sessionStorage.setItem('akashic_auth_token', user.email);
-  window.location.href = '/consulta';
+  window.location.href = '/planos';
 }
 
 // ── LOGIN ──
