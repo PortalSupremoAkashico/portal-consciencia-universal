@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meu Histórico — Portal Akáshico</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-deep: #070510;
+      --bg-card: rgba(18,13,38,.92);
+      --border: rgba(147,109,255,.18);
+      --text: #ede9ff;
+      --muted: #9b94c4;
+      --accent: #a78bfa;
+      --accent-bright: #c4b5fd;
+      --accent-dark: #6d28d9;
+      --gold: #f0c96b;
+      --ok: #86efac;
+      --danger: #fca5a5;
+      --radius: 20px;
+      --radius-sm: 12px;
+      --font-display: 'Cinzel', serif;
+      --font-body: 'Inter', sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font-body); color: var(--text); background: var(--bg-deep); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+
+    #universeCanvas { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+
+    .container { width: min(1000px, calc(100% - 24px)); margin: 0 auto; padding: 24px 0 0; position: relative; z-index: 1; }
+
+    .site-header { text-align: center; padding: 32px 20px 20px; }
+    .header-badge { display: inline-block; font-family: var(--font-display); font-size: .65rem; letter-spacing: .18em; color: var(--gold); border: 1px solid rgba(240,201,107,.3); border-radius: 20px; padding: 4px 14px; margin-bottom: 10px; text-transform: uppercase; }
+    .site-header h1 { font-family: var(--font-display); font-size: clamp(1.2rem,3vw,1.8rem); font-weight: 600; letter-spacing: .08em; background: linear-gradient(135deg,#e0d4ff,#a78bfa,#c4b5fd); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+    .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); backdrop-filter: blur(20px); margin-bottom: 16px; overflow: hidden; }
+    .card-body { padding: 24px 28px; }
+    @media(max-width:600px){ .card-body { padding: 18px 16px; } }
+
+    .nav-link { display: inline-flex; align-items: center; gap: 6px; font-size: .8rem; color: rgba(196,181,253,.72); text-decoration: none; padding: 8px 14px; border: 1px solid rgba(196,181,253,.15); border-radius: 20px; transition: all .2s; }
+    .nav-link:hover { color: var(--accent-bright); border-color: rgba(196,181,253,.6); }
+
+    /* Tabs */
+    .tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+    .tab { padding: 9px 20px; font-family: var(--font-display); font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; border: 1px solid rgba(196,181,253,.2); border-radius: 20px; background: rgba(255,255,255,.03); color: rgba(196,181,253,.72); cursor: pointer; transition: all .2s; }
+    .tab.active { background: rgba(109,40,217,.35); border-color: var(--accent); color: #fff; }
+    .tab:hover:not(.active) { background: rgba(139,92,246,.12); color: var(--accent-bright); }
+
+    /* Consulta card */
+    .consulta-item { background: rgba(139,92,246,.06); border: 1px solid rgba(196,181,253,.1); border-radius: var(--radius-sm); margin-bottom: 12px; overflow: hidden; transition: border-color .2s; }
+    .consulta-item:hover { border-color: rgba(196,181,253,.25); }
+    .consulta-header { display: flex; justify-content: space-between; align-items: flex-start; padding: 14px 16px; cursor: pointer; gap: 12px; }
+    .consulta-pergunta { font-size: .9rem; color: var(--accent-bright); font-weight: 500; flex: 1; line-height: 1.5; }
+    .consulta-meta { font-size: .72rem; color: rgba(196,181,253,.72); white-space: nowrap; text-align: right; }
+    .consulta-tags { display: flex; gap: 6px; margin-top: 4px; flex-wrap: wrap; }
+    .tag { font-size: .68rem; padding: 2px 8px; border-radius: 20px; background: rgba(139,92,246,.15); border: 1px solid rgba(196,181,253,.15); color: rgba(196,181,253,.72); }
+    .consulta-body { display: none; padding: 0 16px 16px; }
+    .consulta-body.open { display: block; }
+    .section-label { font-family: var(--font-display); font-size: .65rem; letter-spacing: .14em; color: var(--gold); text-transform: uppercase; margin: 14px 0 6px; }
+    .section-text { font-size: .85rem; color: rgba(237,233,255,.8); line-height: 1.75; white-space: pre-wrap; }
+    .chevron { font-size: .75rem; color: rgba(196,181,253,.72); transition: transform .2s; flex-shrink: 0; }
+    .chevron.open { transform: rotate(180deg); }
+
+    /* Mentoria */
+    .mentoria-msg { padding: 10px 14px; border-radius: 10px; margin-bottom: 8px; font-size: .85rem; line-height: 1.7; }
+    .mentoria-msg.user { background: rgba(109,40,217,.18); border: 1px solid rgba(196,181,253,.15); color: var(--text); }
+    .mentoria-msg.mentor { background: rgba(18,13,38,.8); border: 1px solid rgba(147,109,255,.15); color: rgba(237,233,255,.9); }
+    .mentoria-role { font-size: .68rem; color: rgba(196,181,253,.72); margin-bottom: 4px; letter-spacing: .08em; text-transform: uppercase; }
+
+    .empty { text-align: center; padding: 60px 20px; color: rgba(196,181,253,.72); font-size: .88rem; }
+    .spinner { width: 36px; height: 36px; border: 3px solid rgba(196,181,253,.15); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 16px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  
+    /* ── Hover intenso em todos os botões ── */
+    button:hover:not(:disabled) {
+      background: rgba(139,92,246,0.32) !important;
+      border-color: rgba(196,181,253,0.85) !important;
+      color: #fff !important;
+      box-shadow: 0 0 28px rgba(139,92,246,0.55), 0 0 56px rgba(139,92,246,0.22) !important;
+      transform: translateY(-2px) scale(1.03) !important;
+    }
+    button:active:not(:disabled) {
+      transform: translateY(0) scale(1) !important;
+      box-shadow: 0 0 14px rgba(139,92,246,0.35) !important;
+    }
+    /* Links estilizados como botão */
+    a.btn-primary:hover, a.btn-secondary:hover, a[class*="btn"]:hover {
+      background: rgba(139,92,246,0.32) !important;
+      border-color: rgba(196,181,253,0.85) !important;
+      color: #fff !important;
+      box-shadow: 0 0 28px rgba(139,92,246,0.55), 0 0 56px rgba(139,92,246,0.22) !important;
+      transform: translateY(-2px) scale(1.03) !important;
+    }
+    /* Botão principal dourado */
+    .btn-blink:hover:not(:disabled), .btn-solid:hover:not(:disabled) {
+      background: linear-gradient(135deg, rgba(240,201,107,0.35), rgba(240,201,107,0.2)) !important;
+      border-color: rgba(240,201,107,0.95) !important;
+      box-shadow: 0 0 32px rgba(240,201,107,0.6), 0 0 64px rgba(240,201,107,0.25) !important;
+      transform: translateY(-2px) scale(1.04) !important;
+    }
+    /* Botão voltar */
+    
+    /* Auth buttons */
+    .auth-btn-full:hover:not(:disabled) {
+      background: rgba(139,92,246,0.32) !important;
+      border-color: rgba(196,181,253,0.85) !important;
+      box-shadow: 0 0 28px rgba(139,92,246,0.55) !important;
+      transform: translateY(-2px) scale(1.02) !important;
+    }
+    /* Tab buttons */
+    .tab-btn:hover {
+      background: rgba(139,92,246,0.2) !important;
+      border-color: rgba(196,181,253,0.5) !important;
+      color: #fff !important;
+    }
+    /* Links de rodapé/footer */
+    .footer-links a:hover, footer a:hover {
+      color: rgba(196,181,253,1) !important;
+      text-shadow: 0 0 12px rgba(196,181,253,0.6) !important;
+    }
+    /* Transição suave em todos os botões */
+    button, a[class*="btn"], .tab-btn, .btn-voltar, .auth-btn-full {
+      transition: all 0.22s ease !important;
+    }
+    
+    /* ══════════════════════════════════════════
+       MELHORIAS VISUAIS — CSS PURO / LEVE
+    ══════════════════════════════════════════ */
+
+    /* 1. ANIMAÇÃO DE ENTRADA DOS CARDS */
+    @keyframes cardReveal {
+      from { opacity: 0; transform: translateY(18px) scale(0.985); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .card[style*="display:none"], .card[style*="display: none"] { animation: none; }
+    #ritualCard:not([style*="display:none"]),
+    #abertura-consulta:not([style*="display:none"]),
+    #protocolo,
+    #consulta { animation: cardReveal 0.55s cubic-bezier(0.22,1,0.36,1) both; }
+
+    /* 2. BORDA ANIMADA NOS CARDS — energia circulando */
+    @keyframes borderGlow {
+      0%,100% { opacity: 0.4; }
+      50%      { opacity: 1; }
+    }
+    .card::after {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      border-radius: inherit;
+      padding: 1px;
+      background: linear-gradient(135deg,
+        rgba(196,181,253,0) 0%,
+        rgba(196,181,253,0.6) 25%,
+        rgba(240,201,107,0.5) 50%,
+        rgba(196,181,253,0.6) 75%,
+        rgba(196,181,253,0) 100%
+      );
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+      animation: borderGlow 3.5s ease-in-out infinite;
+    }
+    .card:hover::after { opacity: 1; animation-duration: 1.5s; }
+
+    /* 3. TÍTULOS DE SEÇÃO COM BRILHO DOURADO */
+    @keyframes titleShimmer {
+      0%,100% { text-shadow: 0 0 8px rgba(240,201,107,0.3), 0 0 20px rgba(240,201,107,0.1); }
+      50%      { text-shadow: 0 0 16px rgba(240,201,107,0.7), 0 0 40px rgba(240,201,107,0.3), 0 0 80px rgba(196,181,253,0.15); }
+    }
+    .section-title {
+      animation: titleShimmer 4s ease-in-out infinite;
+    }
+
+    /* 4. PANEL-MARK (Revelação, Futuro, etc.) — brilho na ativação */
+    @keyframes markAppear {
+      from { opacity: 0; letter-spacing: .3em; filter: blur(4px); }
+      to   { opacity: 1; letter-spacing: .12em; filter: blur(0); }
+    }
+    .panel-mark:not(:empty) {
+      animation: markAppear 0.6s cubic-bezier(0.22,1,0.36,1) both;
+    }
+
+    /* 5. TEXTO DA LEITURA — materialização suave */
+    @keyframes textMaterialize {
+      from { opacity: 0; transform: translateY(6px); filter: blur(2px); }
+      to   { opacity: 1; transform: translateY(0); filter: blur(0); }
+    }
+    .reading-content p,
+    .reading-content li,
+    .reading-text p {
+      animation: textMaterialize 0.4s ease both;
+    }
+
+    /* 6. SEPARADOR ENTRE SEÇÕES */
+    .ak-divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 28px 0;
+      opacity: 0.6;
+    }
+    .ak-divider::before,
+    .ak-divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(196,181,253,0.5), transparent);
+    }
+    @keyframes dividerPulse {
+      0%,100% { transform: scale(1); opacity: 0.7; }
+      50%      { transform: scale(1.25); opacity: 1; }
+    }
+    .ak-divider-star {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(240,201,107,0.9), rgba(240,201,107,0.2));
+      box-shadow: 0 0 8px rgba(240,201,107,0.6);
+      animation: dividerPulse 2.5s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+
+    /* 7. PARTÍCULAS AO CLICAR — botão principal */
+    @keyframes particle {
+      0%   { opacity: 1; transform: translate(0,0) scale(1); }
+      100% { opacity: 0; transform: translate(var(--px),var(--py)) scale(0); }
+    }
+    .ak-particle {
+      position: fixed;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      animation: particle 0.7s ease-out forwards;
+    }
+
+    /* 8. INDICADOR DE PROGRESSO DA LEITURA */
+    @keyframes progressFill {
+      from { width: 0%; }
+    }
+    #readingProgress {
+      position: sticky;
+      top: 0;
+      height: 3px;
+      background: rgba(18,13,38,0.8);
+      z-index: 100;
+      overflow: hidden;
+      border-radius: 0 0 3px 3px;
+    }
+    #readingProgressBar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #a78bfa, #f0c96b, #a78bfa);
+      background-size: 200% 100%;
+      border-radius: 3px;
+      transition: width 0.3s ease;
+      animation: progressFill 0.3s ease;
+    }
+    @keyframes progressShimmer {
+      0%   { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    #readingProgressBar.active {
+      animation: progressShimmer 2s linear infinite;
+      background-size: 200% 100%;
+    }
+
+    /* 9. ABAS — transição suave ao trocar */
+    @keyframes tabActivate {
+      from { opacity: 0.6; transform: scale(0.97); }
+      to   { opacity: 1;   transform: scale(1); }
+    }
+    .tab-btn.active {
+      animation: tabActivate 0.3s ease both;
+    }
+
+    /* 10. BOTÃO ENVIAR — pulso dourado ao streaming */
+    @keyframes sendPulse {
+      0%,100% { box-shadow: 0 0 0 0 rgba(240,201,107,0); }
+      50%      { box-shadow: 0 0 0 8px rgba(240,201,107,0.15); }
+    }
+    .btn-send:not(:disabled):hover {
+      animation: sendPulse 1.5s ease-in-out infinite;
+    }
+
+    
+    button {
+      border: 1px solid rgba(147, 109, 255, 0.3) !important;
+      box-shadow: 0 0 8px rgba(139,92,246,0.08);
+      transition: all .25s ease;
+    }
+    button:hover:not(:disabled) {
+      border-color: rgba(196,181,253,0.75) !important;
+      box-shadow: 0 0 18px rgba(139,92,246,0.35), 0 0 36px rgba(139,92,246,0.15) !important;
+      transform: translateY(-1px) scale(1.02) !important;
+    }
+
+    </style>
+</head>
+<body>
+<svg style="display:none;" aria-hidden="true">
+  <defs>
+    <symbol id="sym-estrela" viewBox="-20 -20 40 40">
+      <polygon points="0,-16 3,-3 16,0 3,3 0,16 -3,3 -16,0 -3,-3" fill="rgba(240,201,107,0.2)" stroke="rgba(240,201,107,0.95)" stroke-width="2.2"/>
+      <polygon points="0,-10 2,-2 10,0 2,2 0,10 -2,2 -10,0 -2,-2" fill="rgba(240,201,107,0.1)" stroke="rgba(240,201,107,0.55)" stroke-width="1"/>
+      <circle cx="0" cy="0" r="3.5" fill="rgba(255,252,220,0.9)" stroke="#f0c96b" stroke-width="1"/>
+      <circle cx="0" cy="0" r="1.2" fill="white"/>
+    </symbol>
+  </defs>
+</svg>
+
+
+<canvas id="universeCanvas"></canvas>
+
+<audio id="ambientAudio" loop preload="none" src="/soul-frequencies.mp3"></audio>
+
+<div class="container">
+  <header class="site-header">
+    <div class="header-badge">Portal Akáshico</div>
+    <h1>Meu Histórico</h1>
+  </header>
+
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+    <a href="/perfil" class="nav-link" onclick="sessionStorage.setItem('akashic_auth_token',(JSON.parse(localStorage.getItem('akashic_user')||'{}')).email||'')"><svg width="18" height="18" viewBox="-26 -20 52 40" style="display:inline-block;vertical-align:middle;"><path d="M8,-14 L-12,0 L8,14" fill="none" stroke="rgba(196,181,253,0.9)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="-12" y1="0" x2="14" y2="0" stroke="rgba(196,181,253,0.55)" stroke-width="1.5" stroke-linecap="round"/></svg> Voltar</a>
+    <span id="userGreeting" style="font-size:.82rem;color:rgba(196,181,253,.72);"></span>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <div class="tab active" id="tabConsultas" onclick="switchTab('consultas')"><svg width="18" height="18" viewBox="-20 -20 40 40" style="display:inline-block;vertical-align:middle;"><polygon points="0,-16 3,-3 16,0 3,3 0,16 -3,3 -16,0 -3,-3" fill="rgba(240,201,107,0.2)" stroke="rgba(240,201,107,0.95)" stroke-width="2.2"/><polygon points="0,-10 2,-2 10,0 2,2 0,10 -2,2 -10,0 -2,-2" fill="rgba(240,201,107,0.1)" stroke="rgba(240,201,107,0.55)" stroke-width="1"/><circle cx="0" cy="0" r="3.5" fill="rgba(255,252,220,0.9)" stroke="#f0c96b" stroke-width="1"/><circle cx="0" cy="0" r="1.2" fill="white"/></svg> Consultas</div>
+    <div class="tab" id="tabMentoria" onclick="switchTab('mentoria')"><svg width="28" height="18" viewBox="-36 -28 72 56" style="display:inline-block;vertical-align:middle;"><path d="M-26,0 Q-26,-20 -13,-20 Q0,-20 0,0 Q0,20 13,20 Q26,20 26,0 Q26,-20 13,-20 Q0,-20 0,0 Q0,20 -13,20 Q-26,20 -26,0" fill="none" stroke="rgba(240,201,107,0.9)" stroke-width="2.4" stroke-linecap="round"/><circle cx="-26" cy="0" r="7" fill="rgba(60,20,120,0.7)" stroke="rgba(196,181,253,0.85)" stroke-width="1.5"/><ellipse cx="-29" cy="-3" rx="3" ry="2" fill="rgba(245,240,255,0.2)"/><circle cx="-26" cy="0" r="2.5" fill="rgba(196,181,253,0.85)"/><circle cx="26" cy="0" r="7" fill="rgba(140,80,0,0.7)" stroke="rgba(240,201,107,0.85)" stroke-width="1.5"/><ellipse cx="23" cy="-3" rx="3" ry="2" fill="rgba(255,252,200,0.2)"/><circle cx="26" cy="0" r="2.5" fill="rgba(255,248,160,0.9)"/><circle cx="0" cy="0" r="5" fill="rgba(240,201,107,0.18)" stroke="rgba(240,201,107,0.8)" stroke-width="1.4"/><circle cx="0" cy="0" r="2" fill="white"/></svg> Mentoria</div>
+    <div class="tab" id="tabMapas" onclick="switchTab('mapas')">⟡ Mapa Akáshico</div>
+  </div>
+
+  <!-- Conteúdo -->
+  <div id="contentConsultas">
+    <div class="card">
+      <div class="card-body">
+        <div id="consultasList">
+          <div style="text-align:center;padding:40px 20px;">
+            <div class="spinner"></div>
+            <div style="color:rgba(196,181,253,.72);font-size:.85rem;">Carregando consultas...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="contentMapas" style="display:none;">
+    <div class="card">
+      <div class="card-body">
+        <div id="mapasList">
+          <div style="text-align:center;padding:40px 20px;">
+            <div class="spinner"></div>
+            <div style="color:rgba(196,181,253,.72);font-size:.85rem;">Carregando mapas...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="contentMentoria" style="display:none;">
+    <div class="card">
+      <div class="card-body">
+        <div id="mentoriaList">
+          <div style="text-align:center;padding:40px 20px;">
+            <div class="spinner"></div>
+            <div style="color:rgba(196,181,253,.72);font-size:.85rem;">Carregando histórico de mentoria...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Fundo cósmico (igual ao portal) ──
+(function(){
+  const canvas=document.getElementById('universeCanvas');
+  const ctx=canvas.getContext('2d');
+  let W,H,stars=[],nebulae=[],spaceships=[],starClusters=[],t=0;
+  function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;init();}
+  function rand(a,b){return a+Math.random()*(b-a);}
+  function init(){
+    stars=[];
+    const count=Math.floor((W*H)/700);
+    for(let i=0;i<count;i++){const spd=rand(0.3,1.2);stars.push({x:rand(0,W),y:rand(0,H),r:rand(0.4,2),alpha:rand(0.4,1),speed:rand(0.0004,0.001),phase:rand(0,Math.PI*2),color:Math.random()<0.2?`hsl(${rand(200,280)},85%,92%)`:'#fff',dx:spd*0.7,dy:spd*0.2,isBright:false});}
+    const bc=Math.floor((W*H)/90000);
+    for(let i=0;i<bc;i++){const spd=rand(0.2,0.8);stars.push({x:rand(0,W),y:rand(0,H),r:rand(2.5,6),alpha:1,speed:rand(0.0005,0.0015),phase:rand(0,Math.PI*2),color:'#fff',dx:spd*0.5,dy:spd*0.15,isBright:true});}
+    nebulae=[];
+    const cols=[[120,70,200],[60,100,255],[200,80,160],[30,120,220]];
+    for(let i=0;i<8;i++){const[r,g,b]=cols[i%cols.length];nebulae.push({x:rand(0,W),y:rand(0,H),rx:rand(W*.2,W*.45),ry:rand(H*.15,H*.35),alpha:rand(0.06,0.14),angle:rand(0,Math.PI),r,g,b,driftX:rand(-0.03,0.03),driftY:rand(-0.02,0.02),rotSpeed:rand(-0.00005,0.00005),pulseSpeed:rand(0.0003,0.0008),pulsePhase:rand(0,Math.PI*2)});}
+    spaceships=[];starClusters=[];
+  }
+  function loop(ts){t=ts;ctx.clearRect(0,0,W,H);
+    const bg=ctx.createRadialGradient(W*.5,H*.4,0,W*.5,H*.5,Math.max(W,H)*.8);bg.addColorStop(0,'#0d0820');bg.addColorStop(0.4,'#060314');bg.addColorStop(1,'#020108');ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+    nebulae.forEach(n=>{const pulse=Math.sin(t*n.pulseSpeed+n.pulsePhase)*0.4+0.8;ctx.save();ctx.translate(n.x,n.y);ctx.rotate(n.angle);const g=ctx.createRadialGradient(0,0,0,0,0,n.rx),a=n.alpha*pulse;g.addColorStop(0,`rgba(${n.r},${n.g},${n.b},${a})`);g.addColorStop(1,`rgba(${n.r},${n.g},${n.b},0)`);ctx.scale(1,n.ry/n.rx);ctx.beginPath();ctx.arc(0,0,n.rx,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();ctx.restore();n.x+=n.driftX;n.y+=n.driftY;n.angle+=n.rotSpeed;});
+    stars.forEach(s=>{s.x+=s.dx;s.y+=s.dy;if(s.x<-2)s.x=W+2;if(s.x>W+2)s.x=-2;if(s.y<-2)s.y=H+2;if(s.y>H+2)s.y=-2;if(s.isBright){ctx.shadowBlur=20;ctx.shadowColor='rgba(255,255,255,1)';ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle='#fff';ctx.globalAlpha=1;ctx.fill();ctx.shadowBlur=0;}else{const fl=Math.sin(t*s.speed*1000+s.phase)*0.35+0.65;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle=s.color;ctx.globalAlpha=s.alpha*fl;ctx.fill();ctx.globalAlpha=1;}});
+    const v=ctx.createRadialGradient(W*.5,H*.5,H*.2,W*.5,H*.5,Math.max(W,H)*.75);v.addColorStop(0,'transparent');v.addColorStop(1,'rgba(2,1,8,0.72)');ctx.fillStyle=v;ctx.fillRect(0,0,W,H);
+    requestAnimationFrame(loop);
+  }
+  window.addEventListener('resize',resize);resize();requestAnimationFrame(loop);
+})();
+
+// ── Storage ──
+const STORAGE_KEY_USER = 'akashic_user';
+function getUser() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY_USER)||'{}'); } catch { return {}; } }
+
+// ── Tabs ──
+function switchTab(tab) {
+  document.getElementById('contentConsultas').style.display = tab === 'consultas' ? '' : 'none';
+  document.getElementById('contentMentoria').style.display  = tab === 'mentoria'  ? '' : 'none';
+  document.getElementById('contentMapas').style.display     = tab === 'mapas'     ? '' : 'none';
+  document.getElementById('tabConsultas').className = 'tab' + (tab === 'consultas' ? ' active' : '');
+  document.getElementById('tabMentoria').className  = 'tab' + (tab === 'mentoria'  ? ' active' : '');
+  document.getElementById('tabMapas').className    = 'tab' + (tab === 'mapas'     ? ' active' : '');
+}
+
+// ── Toggle de seção da consulta ──
+function toggleConsulta(id) {
+  const body    = document.getElementById('body-' + id);
+  const chevron = document.getElementById('chev-' + id);
+  const isOpen  = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  chevron.classList.toggle('open', !isOpen);
+}
+
+
+// ── Carrega Mapas Akáshicos ──
+const SECOES_MAPA = [
+  { key: 'essencia',     titulo: 'Essência da Alma' },
+  { key: 'missao',       titulo: 'Missão Espiritual' },
+  { key: 'bloqueios',    titulo: 'Bloqueios Akáshicos' },
+  { key: 'amor',         titulo: 'Linha do Amor' },
+  { key: 'prosperidade', titulo: 'Linha da Prosperidade' },
+  { key: 'ancestral',    titulo: 'Linha Familiar e Ancestral' },
+  { key: 'mentores',     titulo: 'Conselho dos Mentores' },
+  { key: 'ritual',       titulo: 'Ritual Personalizado' }
+];
+
+async function loadMapas(email) {
+  const el = document.getElementById('mapasList');
+  try {
+    const resp = await fetch(`/api/mapas?email=${encodeURIComponent(email)}`);
+    const data = await resp.json();
+
+    if (!data.success || !data.mapas || data.mapas.length === 0) {
+      el.innerHTML = '<div class="empty">Nenhum Mapa Akáshico gerado ainda.<br>Acesse Mapa Akáshico no seu perfil para gerar o seu.</div>';
+      return;
+    }
+
+    el.innerHTML = data.mapas.map((m, i) => {
+      const dataFmt = m.created_at ? new Date(m.created_at).toLocaleString('pt-BR') : '—';
+      let dados = {};
+      try { dados = JSON.parse(m.dados || '{}'); } catch {}
+
+      const secoesHtml = SECOES_MAPA.map(s => {
+        const texto = dados[s.key] || '';
+        if (!texto) return '';
+        const paragrafos = texto.split(/\n+/).filter(p => p.trim()).map(p => `<p style="margin-bottom:10px;color:rgba(226,224,240,.85);font-size:.88rem;line-height:1.8;">${p}</p>`).join('');
+        return `
+          <div style="margin-bottom:18px;">
+            <div style="font-family:var(--font-display);font-size:.65rem;letter-spacing:.14em;color:var(--gold-dim);margin-bottom:6px;">${s.titulo.toUpperCase()}</div>
+            ${paragrafos}
+          </div>`;
+      }).join('');
+
+      return `
+        <div class="consulta-item">
+          <div class="consulta-header" onclick="toggleMapa(${i})" style="cursor:pointer;">
+            <div>
+              <div style="font-family:var(--font-display);font-size:.7rem;letter-spacing:.1em;color:var(--gold-dim);">MAPA AKÁSHICO</div>
+              <div style="font-size:.82rem;color:rgba(196,181,253,.72);margin-top:2px;">${dataFmt}</div>
+            </div>
+            <span id="mapaChev-${i}" style="color:rgba(196,181,253,.72);transition:transform .2s;">▾</span>
+          </div>
+          <div class="consulta-body" id="mapaBody-${i}">
+            <div style="margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--border);display:flex;justify-content:flex-end;">
+              <button onclick="apagarMapa('${m.id}', ${i})" style="padding:7px 14px;font-size:.72rem;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);color:rgba(239,68,68,.7);border-radius:10px;cursor:pointer;font-family:var(--font-display);letter-spacing:.06em;">
+                🗑 Excluir este mapa
+              </button>
+            </div>
+            ${secoesHtml}
+          </div>
+        </div>`;
+    }).join('');
+  } catch(e) {
+    el.innerHTML = '<div class="empty">Erro ao carregar os mapas.</div>';
+  }
+}
+
+function toggleMapa(i) {
+  const body = document.getElementById(`mapaBody-${i}`);
+  const chev = document.getElementById(`mapaChev-${i}`);
+  const isOpen = body.classList.contains('open');
+  document.querySelectorAll('[id^="mapaBody-"]').forEach(b => b.classList.remove('open'));
+  document.querySelectorAll('[id^="mapaChev-"]').forEach(c => c.textContent = '▾');
+  if (!isOpen) { body.classList.add('open'); if(chev) chev.textContent = '▴'; }
+}
+
+async function apagarMapa(id, idx) {
+  const user = JSON.parse(sessionStorage.getItem('akashic_user') || localStorage.getItem('akashic_user') || 'null');
+  if (!user?.email) return alert('Sessão expirada.');
+  mostrarConfirm('Excluir este Mapa Akáshico permanentemente?', async function() {
+    const resp = await fetch('/api/mapas', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'apagar_um', email: user.email, id })
+    });
+    const data = await resp.json();
+    if (data.success) await loadMapas(user.email);
+    else alert('Erro ao excluir.');
+  });
+}
+
+// ── Carrega consultas ──
+async function loadConsultas(email) {
+  const el = document.getElementById('consultasList');
+  try {
+    const resp = await fetch(`/api/consultas?email=${encodeURIComponent(email)}`);
+    const data = await resp.json();
+
+    if (!data.success || !data.consultas || data.consultas.length === 0) {
+      el.innerHTML = '<div class="empty">Nenhuma consulta registrada ainda.<br>Faça sua primeira consulta no Portal.</div>';
+      return;
+    }
+
+    el.innerHTML = data.consultas.map((c, i) => {
+      const data_fmt = c.created_at ? new Date(c.created_at).toLocaleString('pt-BR') : '—';
+      const sections = [
+        { key: 'revelation',          label: '<svg width="18" height="18" viewBox="-20 -20 40 40" style="display:inline-block;vertical-align:middle;"><polygon points="0,-16 3,-3 16,0 3,3 0,16 -3,3 -16,0 -3,-3" fill="rgba(240,201,107,0.2)" stroke="rgba(240,201,107,0.95)" stroke-width="2.2"/><polygon points="0,-10 2,-2 10,0 2,2 0,10 -2,2 -10,0 -2,-2" fill="rgba(240,201,107,0.1)" stroke="rgba(240,201,107,0.55)" stroke-width="1"/><circle cx="0" cy="0" r="3.5" fill="rgba(255,252,220,0.9)" stroke="#f0c96b" stroke-width="1"/><circle cx="0" cy="0" r="1.2" fill="white"/><\/svg> Revelação' },
+        { key: 'earth_future',         label: '<svg width="32" height="20" viewBox="-42 -32 84 64" style="display:inline-block;vertical-align:middle;"><circle cx="4" cy="5" r="36" fill="rgba(0,0,0,0.4)" filter="url(#msh)"/><defs><filter id="msh" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="2.5"/><\/filter><radialGradient id="mgP" cx="34%" cy="28%" r="70%"><stop offset="0%" stop-color="#f0e8ff"/><stop offset="25%" stop-color="#9050e0"/><stop offset="70%" stop-color="#3a0890"/><stop offset="100%" stop-color="#080318"/><\/radialGradient><radialGradient id="mgG" cx="34%" cy="28%" r="70%"><stop offset="0%" stop-color="#fffde8"/><stop offset="25%" stop-color="#f0c030"/><stop offset="70%" stop-color="#7a4000"/><stop offset="100%" stop-color="#120800"/><\/radialGradient><\/defs><path d="M-26,0 Q-26,-20 -13,-20 Q0,-20 0,0 Q0,20 13,20 Q26,20 26,0 Q26,-20 13,-20 Q0,-20 0,0 Q0,20 -13,20 Q-26,20 -26,0" fill="none" stroke="rgba(240,201,107,0.9)" stroke-width="2.4" stroke-linecap="round"/><circle cx="-26" cy="0" r="8" fill="url(#mgP)"/><circle cx="-26" cy="0" r="3" fill="rgba(196,181,253,0.7)"/><circle cx="26" cy="0" r="8" fill="url(#mgG)"/><circle cx="26" cy="0" r="3" fill="rgba(255,250,180,0.8)"/><circle cx="0" cy="0" r="5" fill="rgba(240,201,107,0.2)" stroke="rgba(240,201,107,0.85)" stroke-width="1.5"/><circle cx="0" cy="0" r="2" fill="white"/><circle cx="0" cy="-24" r="2" fill="rgba(196,181,253,0.6)"/><circle cx="0" cy="24" r="1.8" fill="rgba(240,201,107,0.5)"/><\/svg> Futuro' },
+        { key: 'evolution',  label: '⎈ Mentores' },
+        { key: 'technology_future',    label: '⟡ Evolução' },
+        { key: 'warning',              label: '<svg width="18" height="18" viewBox="-26 -30 52 56" style="display:inline-block;vertical-align:middle;"><polygon points="0,-28 24,22 -24,22" fill="rgba(160,90,0,0.25)" stroke="rgba(240,160,60,0.9)" stroke-width="2.2"/><line x1="0" y1="-14" x2="0" y2="6" stroke="rgba(240,160,60,0.95)" stroke-width="2.8" stroke-linecap="round"/><circle cx="0" cy="14" r="3.2" fill="rgba(240,160,60,0.95)"/><\/svg> Advertência' },
+        { key: 'action',               label: '↟ Ação' }
+      ];
+
+      const sectionsHtml = sections
+        .filter(s => c[s.key])
+        .map(s => `
+          <div class="section-label">${s.label}</div>
+          <div class="section-text">${escapeHtml(c[s.key])}</div>
+        `).join('');
+
+      return `
+        <div class="consulta-item">
+          <div class="consulta-header" onclick="toggleConsulta('${i}')">
+            <div>
+              <div class="consulta-pergunta">"${escapeHtml((c.pergunta||'').slice(0,120))}${(c.pergunta||'').length>120?'…':''}"</div>
+              <div class="consulta-tags">
+                ${c.tema  ? `<span class="tag">${escapeHtml(c.tema)}</span>` : ''}
+                ${c.estado ? `<span class="tag">${escapeHtml(c.estado)}</span>` : ''}
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+              <div class="consulta-meta">${data_fmt}</div>
+              <div class="chevron" id="chev-${i}">▾</div>
+            </div>
+          </div>
+          <div class="consulta-body" id="body-${i}">
+            <div style="border-top:1px solid rgba(196,181,253,.08);margin-bottom:12px;"></div>
+            <div style="text-align:right;margin-bottom:10px;">
+              <button onclick="event.stopPropagation();apagarConsulta('${c.id}',${i})" style="padding:4px 12px;font-size:.7rem;background:rgba(252,165,165,0.08);border:1px solid rgba(252,165,165,0.2);color:rgba(252,165,165,0.6);border-radius:16px;cursor:pointer;transition:all .2s;"
+                onmouseover="this.style.background='rgba(252,165,165,0.18)';this.style.color='#fca5a5'"
+                onmouseout="this.style.background='rgba(252,165,165,0.08)';this.style.color='rgba(252,165,165,0.6)'">
+                🗑 Excluir esta consulta
+              </button>
+            </div>
+            <div class="section-label" style="margin-top:0;"><svg width="18" height="18" viewBox="-20 -20 40 40" style="display:inline-block;vertical-align:middle;"><polygon points="0,-16 3,-3 16,0 3,3 0,16 -3,3 -16,0 -3,-3" fill="rgba(240,201,107,0.2)" stroke="rgba(240,201,107,0.95)" stroke-width="2.2"/><polygon points="0,-10 2,-2 10,0 2,2 0,10 -2,2 -10,0 -2,-2" fill="rgba(240,201,107,0.1)" stroke="rgba(240,201,107,0.55)" stroke-width="1"/><circle cx="0" cy="0" r="3.5" fill="rgba(255,252,220,0.9)" stroke="#f0c96b" stroke-width="1"/><circle cx="0" cy="0" r="1.2" fill="white"/><\/svg> Pergunta completa</div>
+            <div class="section-text">${escapeHtml(c.pergunta||'')}</div>
+            ${sectionsHtml}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+  } catch (err) {
+    el.innerHTML = `<div class="empty">Erro ao carregar consultas.<br>${err.message}</div>`;
+  }
+}
+
+// ── Carrega histórico de mentoria do Supabase ──
+// ── Modal de confirmação ──
+function mostrarConfirm(msg, onConfirm) {
+  document.getElementById('confirmMsg').textContent = msg;
+  document.getElementById('confirmBtn').onclick = function() { fecharConfirm(); onConfirm(); };
+  document.getElementById('confirmModal').style.display = 'flex';
+}
+function fecharConfirm() {
+  document.getElementById('confirmModal').style.display = 'none';
+}
+
+// ── Apagar consulta individual ──
+async function apagarConsulta(id, idx) {
+  mostrarConfirm('Excluir esta consulta permanentemente? Esta ação não pode ser desfeita.', async function() {
+    try {
+      const resp = await fetch('/api/consultas', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'apagar_consulta', id })
+      });
+      const data = await resp.json();
+      if (data.success) {
+        const item = document.querySelector(`#body-${idx}`)?.closest('.consulta-item');
+        if (item) item.remove();
+        const list = document.getElementById('consultasList');
+        if (list && !list.querySelector('.consulta-item')) {
+          list.innerHTML = '<div class="empty">Nenhuma consulta registrada ainda.<br>Faça sua primeira consulta no Portal.</div>';
+        }
+      } else {
+        alert('Erro ao excluir: ' + (data.error || 'Tente novamente.'));
+      }
+    } catch(e) { alert('Erro: ' + e.message); }
+  });
+}
+
+// ── Apagar todas as consultas ──
+async function apagarTodasConsultas() {
+  const user = JSON.parse(sessionStorage.getItem('akashic_user') || localStorage.getItem('akashic_user') || 'null');
+  if (!user?.email) return alert('Sessão expirada. Faça login novamente.');
+  mostrarConfirm('Apagar TODO o histórico de consultas? Esta ação é irreversível e não pode ser desfeita.', async function() {
+    try {
+      const resp = await fetch('/api/consultas', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'apagar_consulente', email: user.email })
+      });
+      const data = await resp.json();
+      if (data.success) {
+        document.getElementById('consultasList').innerHTML = '<div class="empty">Histórico apagado.<br>Faça sua primeira consulta no Portal.</div>';
+      } else { alert('Erro: ' + (data.error || 'Tente novamente.')); }
+    } catch(e) { alert('Erro: ' + e.message); }
+  });
+}
+
+// ── Apagar sessão de mentoria por pergunta ──
+async function apagarSessaoMentoria(pergunta) {
+  if (!pergunta) return alert('Não foi possível identificar a sessão.');
+  const user = JSON.parse(sessionStorage.getItem('akashic_user') || localStorage.getItem('akashic_user') || 'null');
+  if (!user?.email) return alert('Sessão expirada. Faça login novamente.');
+  mostrarConfirm('Apagar esta sessão de mentoria permanentemente? Esta ação não pode ser desfeita.', async function() {
+    try {
+      const resp = await fetch('/api/mentorias', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'apagar_sessao', email: user.email, consulta_pergunta: pergunta })
+      });
+      const data = await resp.json();
+      if (data.success) {
+        await loadMentoria(user.email);
+    loadMapas(user.email);
+      } else { alert('Erro ao apagar. Tente novamente.'); }
+    } catch(e) { alert('Erro: ' + e.message); }
+  });
+}
+
+// ── Apagar todo o histórico de mentoria ──
+async function apagarTodasMentorias() {
+  const user = JSON.parse(sessionStorage.getItem('akashic_user') || localStorage.getItem('akashic_user') || 'null');
+  if (!user?.email) return alert('Sessão expirada. Faça login novamente.');
+  mostrarConfirm('Apagar TODO o histórico de mentoria? Esta ação é irreversível.', async function() {
+    try {
+      const resp = await fetch('/api/mentorias', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'apagar', email: user.email })
+      });
+      const data = await resp.json();
+      if (data.success) {
+        document.getElementById('mentoriaList').innerHTML = '<div class="empty">Histórico de mentoria apagado.</div>';
+      } else { alert('Erro: ' + (data.error || 'Tente novamente.')); }
+    } catch(e) { alert('Erro: ' + e.message); }
+  });
+}
+
+async function loadMentoria(email) {
+  const el = document.getElementById('mentoriaList');
+  try {
+    const resp = await fetch(`/api/mentorias?email=${encodeURIComponent(email)}`);
+    const data = await resp.json();
+
+    if (!data.success || !data.messages || data.messages.length === 0) {
+      el.innerHTML = '<div class="empty">Nenhuma sessão de mentoria registrada ainda.</div>';
+      return;
+    }
+
+    // Agrupa mensagens por sessão (consulta_pergunta ou consulta_tema)
+    const sessoes = [];
+    const mapaIdx = {};
+    data.messages.forEach(m => {
+      const key = m.consulta_pergunta || m.consulta_tema || 'Sessão livre';
+      if (mapaIdx[key] === undefined) {
+        mapaIdx[key] = sessoes.length;
+        sessoes.push({ tema: m.consulta_tema || '—', pergunta: m.consulta_pergunta || '', key, msgs: [] });
+      }
+      sessoes[mapaIdx[key]].msgs.push(m);
+    });
+
+    let html = '';
+    sessoes.forEach((s, si) => {
+      const bodyId = `mBody-${si}`;
+      const chevId = `mChev-${si}`;
+
+      // Monta as mensagens da sessão
+      const msgsHtml = s.msgs.map(m => `
+        <div class="mentoria-msg ${m.role === 'user' ? 'user' : 'mentor'}">
+          <div class="mentoria-role">${m.role === 'user' ? 'Você' : 'Mentor Akáshico'}</div>
+          ${escapeHtml(m.content)}
+        </div>`).join('');
+
+      html += `
+        <div class="consulta-item" style="margin-bottom:10px;">
+          <div class="consulta-header" onclick="toggleMentoria(${si})" style="cursor:pointer;">
+            <div>
+              <div class="consulta-pergunta">"${escapeHtml((s.pergunta||s.tema).slice(0,120))}${(s.pergunta||s.tema).length>120?'…':''}"</div>
+              <div class="consulta-tags"><span class="tag">${escapeHtml(s.tema)}</span><span class="tag">${s.msgs.length} mensagens</span></div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+              <div class="chevron" id="${chevId}">▾</div>
+            </div>
+          </div>
+          <div class="consulta-body" id="${bodyId}">
+            <div style="border-top:1px solid rgba(196,181,253,.08);margin-bottom:12px;"></div>
+            <div style="text-align:right;margin-bottom:10px;">
+              <button onclick="event.stopPropagation();apagarSessaoMentoria('${escapeHtml(s.key)}')" style="padding:4px 12px;font-size:.7rem;background:rgba(252,165,165,0.08);border:1px solid rgba(252,165,165,0.2);color:rgba(252,165,165,0.6);border-radius:16px;cursor:pointer;transition:all .2s;"
+                onmouseover="this.style.background='rgba(252,165,165,0.18)';this.style.color='#fca5a5'"
+                onmouseout="this.style.background='rgba(252,165,165,0.08)';this.style.color='rgba(252,165,165,0.6)'">
+                🗑 Apagar mentoria
+              </button>
+            </div>
+            ${msgsHtml}
+          </div>
+        </div>`;
+    });
+
+    el.innerHTML = html;
+
+  } catch (err) {
+    el.innerHTML = `<div class="empty">Erro ao carregar mentoria.<br>${err.message}</div>`;
+  }
+}
+
+function toggleMentoria(i) {
+  const body = document.getElementById(`mBody-${i}`);
+  const chev = document.getElementById(`mChev-${i}`);
+  if (!body) return;
+  const isOpen = body.classList.contains('open');
+  // Fecha todos
+  document.querySelectorAll('[id^="mBody-"]').forEach(b => b.classList.remove('open'));
+  document.querySelectorAll('[id^="mChev-"]').forEach(c => c.textContent = '▾');
+  // Abre este se estava fechado
+  if (!isOpen) {
+    body.classList.add('open');
+    if (chev) chev.textContent = '▴';
+  }
+}
+
+// ── Som ambiente ──
+(function(){
+  const audio = document.getElementById('ambientAudio');
+  let playing = false;
+  const SOM_MUDO_SVG = '<svg width="18" height="18" viewBox="-28 -24 56 48" style="display:inline-block;vertical-align:middle;"><polygon points="-18,-12 -18,12 -6,12 8,22 8,-22 -6,-12" fill="rgba(196,181,253,0.65)" stroke="rgba(196,181,253,0.5)" stroke-width="1"/><line x1="12" y1="-12" x2="22" y2="12" stroke="rgba(255,100,100,0.9)" stroke-width="2.5" stroke-linecap="round"/><line x1="22" y1="-12" x2="12" y2="12" stroke="rgba(255,100,100,0.9)" stroke-width="2.5" stroke-linecap="round"/><\/svg>';
+  const SOM_ATIVO_SVG = '<svg width="18" height="18" viewBox="-28 -28 56 56" style="display:inline-block;vertical-align:middle;"><polygon points="-18,-12 -18,12 -6,12 8,22 8,-22 -6,-12" fill="rgba(196,181,253,0.85)" stroke="rgba(196,181,253,0.5)" stroke-width="1"/><path d="M12,-14 Q22,0 12,14" fill="none" stroke="rgba(240,201,107,0.9)" stroke-width="2.2" stroke-linecap="round"/><path d="M18,-22 Q34,0 18,22" fill="none" stroke="rgba(240,201,107,0.55)" stroke-width="1.5" stroke-linecap="round"/><\/svg>';
+  function updateBtns(ativo) { document.querySelectorAll('.btn-som-inject').forEach(b => { b.innerHTML = ativo ? SOM_ATIVO_SVG : SOM_MUDO_SVG; }); }
+  function fadeIn(){ let v=0; const t=setInterval(()=>{ v=Math.min(0.35,v+0.015); audio.volume=v; if(v>=0.35)clearInterval(t); },100); }
+  function tryPlay(){ if(!audio.src||audio.src===window.location.href){audio.src='/soul-frequencies.mp3';}
+  audio.volume=0; audio.play().then(()=>{ fadeIn(); updateBtns(true); playing=true; }).catch(()=>{ updateBtns(false); }); }
+  window.toggleSound = function(){ if(playing){ audio.pause(); updateBtns(false); playing=false; } else { tryPlay(); } };
+  function injetarBotoes() {
+    document.querySelectorAll('.card, .sacred-panel').forEach(card => {
+      if (card.querySelector('.btn-som-inject')) return;
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'text-align:right;margin-top:10px;';
+      const btn = document.createElement('button');
+      btn.className = 'btn-som-inject';
+      btn.style.cssText = 'font-size:.7rem;padding:2px 7px;border-radius:20px;background:rgba(18,13,38,.6);border:1px solid rgba(196,181,253,.15);color:rgba(196,181,253,.72);cursor:pointer;transition:all .2s;line-height:1.4;';
+      btn.innerHTML = SOM_MUDO_SVG;
+      btn.onclick = window.toggleSound;
+      wrap.appendChild(btn);
+      (card.querySelector('.card-body') || card).appendChild(wrap);
+    });
+  }
+  document.addEventListener('DOMContentLoaded', () => { injetarBotoes(); tryPlay(); });
+})();
+
+function escapeHtml(str) {
+  return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Init ──
+document.addEventListener('DOMContentLoaded', function() {
+  const user = getUser();
+  if (!user.email) {
+    window.location.href = '/';
+    return;
+  }
+  const firstName = (user.nome||'').trim().split(/\s+/)[0] || 'consulente';
+  document.getElementById('userGreeting').textContent = firstName;
+
+  loadConsultas(user.email);
+  loadMentoria(user.email);
+    loadMapas(user.email);
+});
+</script>
+      <div style="font-size:.83rem;color:rgba(196,181,253,.7);line-height:1.8;">
+        <p style="margin-bottom:12px;">Suas consultas e conversas de mentoria são armazenadas com segurança em servidores na região de São Paulo para personalizar e enriquecer suas próximas sessões.</p>
+        <p style="margin-bottom:12px;">Seus dados <strong style="color:#c4b5fd;">não são compartilhados com terceiros</strong> nem utilizados para fins publicitários.</p>
+        <p style="margin-bottom:12px;">As senhas são protegidas com criptografia SHA-256 e nunca trafegam em texto aberto.</p>
+        <p>Você pode solicitar a exclusão de todos os seus dados a qualquer momento entrando em contato pelo e-mail do portal ou diretamente no atendimento.</p>
+      </div>
+    </div>
+  </div>
+  <footer style="text-align:center;padding:12px 16px 16px;font-size:.72rem;color:rgba(155,148,196,.45);position:relative;z-index:1;">
+    <div style="margin-bottom:8px;">© 2026 Portal dos Registros Akáshicos</div>
+    <div style="display:flex;justify-content:center;gap:16px;flex-wrap:wrap;">
+      <span style="cursor:pointer;color:rgba(196,181,253,.72);text-decoration:underline;text-underline-offset:3px;" onmouseover="this.style.color='#c4b5fd'" onmouseout="this.style.color='rgba(196,181,253,.72)'" onclick="document.getElementById('privacyModal').style.display='flex'">Privacidade</span>
+      <span style="color:rgba(155,148,196,.2);">·</span>
+      <span style="cursor:pointer;color:rgba(196,181,253,.72);text-decoration:underline;text-underline-offset:3px;" onmouseover="this.style.color='#c4b5fd'" onmouseout="this.style.color='rgba(196,181,253,.72)'" onclick="document.getElementById('termosModal').style.display='flex'">Termos de Uso</span>
+      <span style="color:rgba(155,148,196,.2);">·</span>
+      <a href="mailto:portalsupremoakashico@gmail.com" style="color:rgba(196,181,253,.72);text-decoration:underline;text-underline-offset:3px;" onmouseover="this.style.color='#c4b5fd'" onmouseout="this.style.color='rgba(196,181,253,.72)'">Contato</a>
+      <span style="color:rgba(155,148,196,.2);">·</span>
+      <span style="cursor:pointer;color:rgba(196,181,253,.72);text-decoration:underline;text-underline-offset:3px;" onmouseover="this.style.color='#c4b5fd'" onmouseout="this.style.color='rgba(196,181,253,.72)'" onclick="document.getElementById('segurancaModal').style.display='flex'">Segurança</span>
+    </div>
+  </footer>
+  <div id="privacyModal" onclick="if(event.target===this)this.style.display='none'" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(7,5,16,.92);backdrop-filter:blur(8px);align-items:center;justify-content:center;"><div style="background:rgba(18,13,38,.98);border:1px solid rgba(196,181,253,.2);border-radius:20px;padding:28px;max-width:500px;width:calc(100% - 32px);max-height:82vh;overflow-y:auto;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;"><div style="font-family:'Cinzel',serif;font-size:.8rem;letter-spacing:.12em;color:rgba(240,201,107,.8);"><svg width="20" height="22" viewBox="-24 -38 48 72" style="display:inline-block;vertical-align:middle;"><rect x="-20" y="-6" width="40" height="36" rx="6" fill="rgba(160,100,0,0.35)" stroke="rgba(240,201,107,0.9)" stroke-width="2"/><rect x="-14" y="-6" width="28" height="24" rx="4" fill="rgba(50,22,0,0.55)"/><path d="M-14,-6 Q-14,-32 0,-32 Q14,-32 14,-6" fill="none" stroke="rgba(240,201,107,0.95)" stroke-width="2.6" stroke-linecap="round"/><circle cx="0" cy="10" r="8" fill="rgba(240,180,40,0.3)" stroke="rgba(240,200,50,0.85)" stroke-width="1.6"/><circle cx="0" cy="10" r="3.5" fill="rgba(255,240,140,0.85)"/><line x1="0" y1="10" x2="0" y2="18" stroke="rgba(180,110,0,0.8)" stroke-width="1.8" stroke-linecap="round"/></svg> POLÍTICA DE PRIVACIDADE</div><span onclick="document.getElementById('privacyModal').style.display='none'" style="cursor:pointer;color:rgba(196,181,253,.72);font-size:1.2rem;"><svg width="16" height="16" viewBox="-18 -18 36 36" style="display:inline-block;vertical-align:middle;"><line x1="-10" y1="-10" x2="10" y2="10" stroke="rgba(196,181,253,0.8)" stroke-width="2.4" stroke-linecap="round"/><line x1="10" y1="-10" x2="-10" y2="10" stroke="rgba(196,181,253,0.8)" stroke-width="2.4" stroke-linecap="round"/></svg></span></div><div style="font-size:.84rem;color:rgba(196,181,253,.75);line-height:1.85;"><p style="margin-bottom:12px;"><strong style="color:#c4b5fd;">Responsável:</strong> Portal Supremo dos Registros Akáshicos<br><a href="mailto:portalsupremoakashico@gmail.com" style="color:#a78bfa;">portalsupremoakashico@gmail.com</a></p><p style="margin-bottom:12px;"><strong style="color:#c4b5fd;">Dados coletados:</strong> nome, e-mail, data de nascimento, sexo e conteúdo das consultas.</p><p style="margin-bottom:12px;"><strong style="color:#c4b5fd;">Finalidade:</strong> personalizar leituras e sessões de mentoria, preservar seu histórico e garantir o funcionamento do portal.</p><p style="margin-bottom:12px;"><strong style="color:#c4b5fd;">Base legal (LGPD):</strong> consentimento do titular (Art. 7º, I) e legítimo interesse para prestação do serviço (Art. 7º, IX).</p><p style="margin-bottom:12px;"><strong style="color:#c4b5fd;">Armazenamento:</strong> servidores na região de São Paulo, Brasil. Dados retidos enquanto a conta estiver ativa ou por até 2 anos após a última sessão.</p><p style="margin-bottom:12px;"><strong style="color:#c4b5fd;">Compartilhamento:</strong> nenhum dado é vendido ou compartilhado com terceiros para fins publicitários.</p><p style="margin-bottom:12px;"><strong style="color:#c4b5fd;">Dados sensíveis:</strong> conteúdo emocional e espiritual tratado com sigilo absoluto, usado exclusivamente para prestação do serviço.</p><p style="margin-bottom:12px;"><strong style="color:#c4b5fd;">Cookies:</strong> apenas cookies técnicos essenciais (sessão e preferências). Sem rastreamento ou publicidade.</p><p style="margin-bottom:12px;"><strong style="color:#c4b5fd;">Senhas:</strong> protegidas com SHA-256. Nenhuma senha trafega em texto aberto.</p><p style="margin-bottom:12px;"><strong style="color:#c4b5fd;">Direitos do titular:</strong> acesso, correção, exportação ou exclusão dos dados a qualquer momento. Respondemos em até 15 dias úteis.</p><p style="margin-bottom:12px;"><strong style="color:#c4b5fd;">Exclusão de dados:</strong> na sessão <strong style="color:#c4b5fd;">Meu Histórico</strong> você pode excluir consultas e mentorias individuais da memória.</p><p><strong style="color:#c4b5fd;">Público-alvo:</strong> destinado exclusivamente a maiores de 18 anos.</p><p style="margin-top:12px;font-size:.75rem;color:rgba(196,181,253,.65);">Última atualização: maio de 2026</p></div></div></div>
+
+  <div id="termosModal" onclick="if(event.target===this)this.style.display='none'" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(7,5,16,.92);backdrop-filter:blur(8px);align-items:center;justify-content:center;"><div style="background:rgba(18,13,38,.98);border:1px solid rgba(196,181,253,.2);border-radius:20px;padding:28px;max-width:500px;width:calc(100% - 32px);max-height:82vh;overflow-y:auto;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;"><div style="font-family:'Cinzel',serif;font-size:.8rem;letter-spacing:.12em;color:rgba(240,201,107,.8);"><svg width="18" height="18" viewBox="-20 -20 40 40" style="display:inline-block;vertical-align:middle;"><polygon points="0,-16 3,-3 16,0 3,3 0,16 -3,3 -16,0 -3,-3" fill="rgba(240,201,107,0.2)" stroke="rgba(240,201,107,0.95)" stroke-width="2.2"/><polygon points="0,-10 2,-2 10,0 2,2 0,10 -2,2 -10,0 -2,-2" fill="rgba(240,201,107,0.1)" stroke="rgba(240,201,107,0.55)" stroke-width="1"/><circle cx="0" cy="0" r="3.5" fill="rgba(255,252,220,0.9)" stroke="#f0c96b" stroke-width="1"/><circle cx="0" cy="0" r="1.2" fill="white"/></svg> TERMOS DE USO</div><span onclick="document.getElementById('termosModal').style.display='none'" style="cursor:pointer;color:rgba(196,181,253,.72);font-size:1.2rem;"><svg width="16" height="16" viewBox="-18 -18 36 36" style="display:inline-block;vertical-align:middle;"><line x1="-10" y1="-10" x2="10" y2="10" stroke="rgba(196,181,253,0.8)" stroke-width="2.4" stroke-linecap="round"/><line x1="10" y1="-10" x2="-10" y2="10" stroke="rgba(196,181,253,0.8)" stroke-width="2.4" stroke-linecap="round"/></svg></span></div><div style="font-size:.84rem;color:rgba(196,181,253,.75);line-height:1.85;"><p style="margin-bottom:10px;color:rgba(196,181,253,.65);font-size:.75rem;">Última atualização: maio de 2026</p><p style="margin-bottom:12px;"><strong style="color:#c4b5fd;">1. Natureza do serviço</strong><br>O Portal Supremo dos Registros Akáshicos é um serviço de autoconhecimento e reflexão simbólica. As leituras têm caráter intuitivo e filosófico — não constituem diagnóstico médico, psiquiátrico, jurídico ou financeiro.</p><p style="margin-bottom:12px;"><strong style="color:#c4b5fd;">2. Uso adequado</strong><br>Destinado a maiores de 18 anos. Ao criar conta, o usuário declara ter 18 anos ou mais. Proibido o uso para fins ilegais ou que violem direitos de terceiros.</p><p style="margin-bottom:12px;"><strong style="color:#c4b5fd;">3. Responsabilidade</strong><br>As respostas geradas são de natureza simbólica. O portal não se responsabiliza por decisões baseadas exclusivamente nas leituras. Em situações de crise, busque apoio profissional especializado.</p><p style="margin-bottom:12px;"><strong style="color:#c4b5fd;">4. Propriedade intelectual</strong><br>Todo o conteúdo — textos, sistemas e interface — é de propriedade exclusiva do portal. O conteúdo gerado é de uso pessoal. Proibida a reprodução comercial sem autorização.</p><p style="margin-bottom:12px;"><strong style="color:#c4b5fd;">5. Cancelamento</strong><br>Você pode solicitar o encerramento da conta e exclusão dos dados a qualquer momento pelo e-mail <a href="mailto:portalsupremoakashico@gmail.com" style="color:#a78bfa;">portalsupremoakashico@gmail.com</a>.</p><p style="margin-bottom:12px;"><strong style="color:#c4b5fd;">6. Privacidade</strong><br>Dados protegidos conforme LGPD (Lei nº 13.709/2018). Consulte a Política de Privacidade completa no rodapé.</p><p><strong style="color:#c4b5fd;">7. Contato</strong><br><a href="mailto:portalsupremoakashico@gmail.com" style="color:#a78bfa;">portalsupremoakashico@gmail.com</a></p></div></div></div>
+
+  <div id="segurancaModal" onclick="if(event.target===this)this.style.display='none'" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(7,5,16,.92);backdrop-filter:blur(8px);align-items:center;justify-content:center;"><div style="background:rgba(18,13,38,.98);border:1px solid rgba(196,181,253,.2);border-radius:20px;padding:28px;max-width:500px;width:calc(100% - 32px);max-height:82vh;overflow-y:auto;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;"><div style="font-family:'Cinzel',serif;font-size:.8rem;letter-spacing:.12em;color:rgba(240,201,107,.8);"><svg width="22" height="22" viewBox="-32 -42 64 80" style="display:inline-block;vertical-align:middle;"><path d="M0,-38 L28,-22 L28,6 Q28,30 0,36 Q-28,30 -28,6 L-28,-22 Z" fill="rgba(107,33,200,0.22)" stroke="rgba(196,181,253,0.9)" stroke-width="2.2"/><path d="M0,-26 L18,-14 L18,4 Q18,20 0,24 Q-18,20 -18,4 L-18,-14 Z" fill="rgba(240,201,107,0.08)" stroke="rgba(240,201,107,0.6)" stroke-width="1.4"/><polygon points="0,-12 4,0 12,0 6,8 8,18 0,12 -8,18 -6,8 -12,0 -4,0" fill="rgba(240,201,107,0.65)" stroke="rgba(255,215,50,0.85)" stroke-width="1"/></svg> SEGURANÇA</div><span onclick="document.getElementById('segurancaModal').style.display='none'" style="cursor:pointer;color:rgba(196,181,253,.72);font-size:1.2rem;"><svg width="16" height="16" viewBox="-18 -18 36 36" style="display:inline-block;vertical-align:middle;"><line x1="-10" y1="-10" x2="10" y2="10" stroke="rgba(196,181,253,0.8)" stroke-width="2.4" stroke-linecap="round"/><line x1="10" y1="-10" x2="-10" y2="10" stroke="rgba(196,181,253,0.8)" stroke-width="2.4" stroke-linecap="round"/></svg></span></div><div style="font-size:.84rem;color:rgba(196,181,253,.75);line-height:1.85;"><p style="margin-bottom:12px;"><strong style="color:#c4b5fd;">🔐 Senhas protegidas</strong><br>Criptografia SHA-256. Nem os administradores têm acesso à sua senha.</p><p style="margin-bottom:12px;"><strong style="color:#c4b5fd;">🌐 Conexão segura</strong><br>HTTPS com certificado SSL ativo em todas as páginas.</p><p style="margin-bottom:12px;"><strong style="color:#c4b5fd;">🗄 Armazenamento no Brasil</strong><br>Servidores em São Paulo, dentro das normas da LGPD.</p><p style="margin-bottom:12px;"><strong style="color:#c4b5fd;">🚫 Sem acesso de terceiros</strong><br>Suas consultas e mentorias são exclusivamente suas.</p><p style="margin-bottom:12px;"><strong style="color:#c4b5fd;"><svg width="18" height="18" viewBox="-26 -30 52 56" style="display:inline-block;vertical-align:middle;"><polygon points="0,-28 24,22 -24,22" fill="rgba(160,90,0,0.25)" stroke="rgba(240,160,60,0.9)" stroke-width="2.2"/><line x1="0" y1="-14" x2="0" y2="6" stroke="rgba(240,160,60,0.95)" stroke-width="2.8" stroke-linecap="round"/><circle cx="0" cy="14" r="3.2" fill="rgba(240,160,60,0.95)"/></svg> Boas práticas</strong><br>Use senha única e faça logout em dispositivos públicos.</p><p><strong style="color:#c4b5fd;">📧 Reporte um problema</strong><br><a href="mailto:portalsupremoakashico@gmail.com" style="color:#a78bfa;">portalsupremoakashico@gmail.com</a></p></div></div></div>
+
+<script>
+(function(){
+  const cv = document.getElementById('soberanaHeaderCanvas');
+  if (!cv) return;
+  const ctx = cv.getContext('2d');
+  const CX=45,CY=45,R=30; let t=0;
+  function sphere(){
+    const g=ctx.createRadialGradient(CX-8,CY-11,2,CX,CY,R);
+    g.addColorStop(0,'#f0e8ff');g.addColorStop(0.18,'#b080ff');g.addColorStop(0.5,'#5010b0');g.addColorStop(0.8,'#2d0a6e');g.addColorStop(1,'#080318');
+    ctx.beginPath();ctx.arc(CX,CY,R,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();
+    const hi=ctx.createRadialGradient(CX-8,CY-11,1,CX-5,CY-7,9);hi.addColorStop(0,'rgba(245,240,255,0.36)');hi.addColorStop(1,'rgba(245,240,255,0)');
+    ctx.beginPath();ctx.ellipse(CX-6,CY-8,8,5,-0.3,0,Math.PI*2);ctx.fillStyle=hi;ctx.fill();
+  }
+  function grid(){
+    ctx.save();ctx.beginPath();ctx.arc(CX,CY,R,0,Math.PI*2);ctx.clip();
+    ctx.strokeStyle='rgba(255,255,255,0.1)';ctx.lineWidth=0.5;ctx.setLineDash([]);
+    ctx.beginPath();ctx.ellipse(CX,CY,R*0.85,R*0.2,0,0,Math.PI*2);ctx.stroke();
+    ctx.beginPath();ctx.ellipse(CX,CY,R*0.19,R,0,0,Math.PI*2);ctx.stroke();
+    ctx.restore();
+  }
+  function orbit(a,rx,ry,col,lw,dash){
+    ctx.save();ctx.translate(CX,CY);ctx.rotate(a);ctx.beginPath();ctx.ellipse(0,0,rx,ry,0,0,Math.PI*2);
+    ctx.strokeStyle=col;ctx.lineWidth=lw;ctx.setLineDash(dash||[]);ctx.stroke();ctx.setLineDash([]);ctx.restore();
+  }
+  function dot(a,rx,ry,da,r,col,glow){
+    ctx.save();ctx.translate(CX,CY);ctx.rotate(a);
+    const ox=Math.cos(da)*rx,oy=Math.sin(da)*ry;
+    if(glow){const g=ctx.createRadialGradient(ox,oy,0,ox,oy,r*3);g.addColorStop(0,col);g.addColorStop(1,'rgba(0,0,0,0)');ctx.beginPath();ctx.arc(ox,oy,r*3,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();}
+    ctx.beginPath();ctx.arc(ox,oy,r,0,Math.PI*2);ctx.fillStyle=col;ctx.fill();ctx.restore();
+  }
+  function cruz(side){
+    const sy=side==='top'?-1:1,py=CY+sy*R,col=side==='top'?'rgba(240,201,107,0.95)':'rgba(196,181,253,0.8)';
+    ctx.strokeStyle=col;ctx.lineWidth=side==='top'?1.6:1.2;ctx.lineCap='round';ctx.setLineDash([]);
+    ctx.beginPath();ctx.moveTo(CX-5,py);ctx.lineTo(CX+5,py);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(CX,py-4);ctx.lineTo(CX,py+4);ctx.stroke();
+  }
+  function center(){
+    const pulse=0.7+0.3*Math.sin(t*2.5),r1=5*pulse;
+    const g1=ctx.createRadialGradient(CX,CY,0,CX,CY,r1);g1.addColorStop(0,'rgba(255,252,200,0.5)');g1.addColorStop(1,'rgba(240,201,107,0)');
+    ctx.beginPath();ctx.arc(CX,CY,r1,0,Math.PI*2);ctx.fillStyle=g1;ctx.fill();
+    ctx.beginPath();ctx.arc(CX,CY,4,0,Math.PI*2);ctx.strokeStyle='rgba(240,201,107,0.9)';ctx.lineWidth=1.2;ctx.stroke();
+    const gc=ctx.createRadialGradient(CX-1,CY-1,0,CX,CY,3);gc.addColorStop(0,'rgba(255,252,200,0.95)');gc.addColorStop(1,'rgba(240,180,40,0.85)');
+    ctx.beginPath();ctx.arc(CX,CY,3,0,Math.PI*2);ctx.fillStyle=gc;ctx.fill();
+    ctx.beginPath();ctx.arc(CX,CY,1.2,0,Math.PI*2);ctx.fillStyle='white';ctx.fill();
+  }
+  function frame(){
+    ctx.clearRect(0,0,90,90);
+    const haloR=R+13+3*Math.sin(t*1.2);
+    const hg=ctx.createRadialGradient(CX,CY,R+4,CX,CY,haloR);hg.addColorStop(0,'rgba(139,92,246,0.25)');hg.addColorStop(1,'rgba(139,92,246,0)');
+    ctx.beginPath();ctx.arc(CX,CY,haloR,0,Math.PI*2);ctx.fillStyle=hg;ctx.fill();
+    ctx.save();ctx.shadowColor='rgba(0,0,0,0.7)';ctx.shadowBlur=7;ctx.shadowOffsetX=3;ctx.shadowOffsetY=4;
+    ctx.beginPath();ctx.arc(CX,CY,R,0,Math.PI*2);ctx.fillStyle='rgba(0,0,0,0.01)';ctx.fill();ctx.restore();
+    sphere();grid();
+    const rx=R+4,ry=8;
+    orbit(0,rx,ry,'rgba(240,201,107,0.9)',1.8,null);
+    orbit(Math.PI/3,rx,ry,'rgba(196,181,253,0.8)',1.4,null);
+    orbit(-Math.PI*0.3,rx,ry,'rgba(196,181,253,0.5)',0.9,null);
+    orbit(Math.PI/6,rx,ry,'rgba(196,181,253,0.25)',0.6,[2,2]);
+    dot(0,rx,ry,t*2.8,3.5,'#f0c96b',true);
+    dot(0,rx,ry,t*2.8+Math.PI,2.5,'rgba(240,201,107,0.55)',false);
+    dot(Math.PI/3,rx,ry,t*2.2+1.0,3,'#c4b5fd',true);
+    dot(Math.PI/3,rx,ry,t*2.2+Math.PI,2,'rgba(196,181,253,0.5)',false);
+    dot(-Math.PI*0.3,rx,ry,-t*1.8+0.8,2,'#f0c96b',false);
+    const s1x=CX+24*Math.cos(-t*1.6+Math.PI/4),s1y=CY+24*Math.sin(-t*1.6+Math.PI/4)*0.5;
+    const sg=ctx.createRadialGradient(s1x,s1y,0,s1x,s1y,3);sg.addColorStop(0,'rgba(196,181,253,0.8)');sg.addColorStop(1,'rgba(196,181,253,0)');
+    ctx.beginPath();ctx.arc(s1x,s1y,3,0,Math.PI*2);ctx.fillStyle=sg;ctx.fill();
+    ctx.beginPath();ctx.arc(s1x,s1y,1.2,0,Math.PI*2);ctx.fillStyle='#c4b5fd';ctx.fill();
+    const s2x=CX+26*Math.cos(t*1.4-Math.PI/5),s2y=CY+26*Math.sin(t*1.4-Math.PI/5)*0.45;
+    const sg2=ctx.createRadialGradient(s2x,s2y,0,s2x,s2y,2.5);sg2.addColorStop(0,'rgba(240,201,107,0.75)');sg2.addColorStop(1,'rgba(240,201,107,0)');
+    ctx.beginPath();ctx.arc(s2x,s2y,2.5,0,Math.PI*2);ctx.fillStyle=sg2;ctx.fill();
+    ctx.beginPath();ctx.arc(s2x,s2y,1,0,Math.PI*2);ctx.fillStyle='#f0c96b';ctx.fill();
+    cruz('top');cruz('bottom');center();
+    t+=0.022;requestAnimationFrame(frame);
+  }
+  frame();
+})();
+</script>
+// ── Performance: pausa quando aba oculta ──
+(function(){
+  let hidden = false;
+  document.addEventListener('visibilitychange', () => {
+    hidden = document.hidden;
+    const audio = document.getElementById('ambientAudio');
+    if (audio && hidden && !audio.paused) {
+      audio._wasPlaying = true; audio.pause();
+    } else if (audio && !hidden && audio._wasPlaying) {
+      audio._wasPlaying = false; audio.play().catch(()=>{});
+    }
+  });
+  window._tabHidden = () => hidden;
+})();
+<!-- Modal de confirmação -->
+<div id="confirmModal" onclick="if(event.target===this)fecharConfirm()" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(7,5,16,0.92);backdrop-filter:blur(8px);align-items:center;justify-content:center;">
+  <div style="background:rgba(18,13,38,0.98);border:1px solid rgba(252,165,165,0.25);border-radius:20px;padding:28px 24px;max-width:380px;width:calc(100% - 32px);text-align:center;">
+    <div style="font-size:2rem;margin-bottom:12px;">🗑</div>
+    <div id="confirmMsg" style="font-size:.88rem;color:rgba(196,181,253,0.85);line-height:1.7;margin-bottom:20px;"></div>
+    <div style="display:flex;gap:10px;justify-content:center;">
+      <button onclick="fecharConfirm()" style="padding:9px 22px;font-size:.78rem;background:rgba(196,181,253,0.08);border:1px solid rgba(196,181,253,0.2);color:rgba(196,181,253,0.7);border-radius:20px;cursor:pointer;transition:all .2s;">Cancelar</button>
+      <button id="confirmBtn" style="padding:9px 22px;font-size:.78rem;background:rgba(252,165,165,0.15);border:1px solid rgba(252,165,165,0.4);color:#fca5a5;border-radius:20px;cursor:pointer;transition:all .2s;">Excluir</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>
