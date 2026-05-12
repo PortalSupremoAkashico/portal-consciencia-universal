@@ -181,10 +181,10 @@ async function gerarSonho() {
   }, 2500);
 
   try {
-    const resp = await fetch('/api/sonho', {
+    const resp = await fetch('/api/espiritualidade', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nome: user.nome || 'Alma', sexo: user.sexo || '', sonho, emocao })
+      body: JSON.stringify({ tipo: 'sonho', nome: user.nome || 'Alma', sexo: user.sexo || '', sonho, emocao })
     });
 
     if (!resp.ok) throw new Error('Erro na API');
