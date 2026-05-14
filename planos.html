@@ -685,26 +685,14 @@ sel('mensal');
   </script>
 
 
+
 <style id="gold-buttons-global">
-/* ── Bordas amarelas em todos os botões ── */
-button:not([disabled]):not(.tab),
-a[class*="btn"],
-input[type="submit"],
-input[type="button"],
-.btn-ouvir, .btn-ouvir-med, .btn-ouvir-sonho,
-.ouvir-btn, .ouvir-secao,
-[onclick*="ouvir"], [onclick*="Ouvir"] {
-  border-color: rgba(240,201,107,.4) !important;
-  animation: btnPulseGold 2s ease-in-out infinite !important;
-}
-button:not([disabled]):not(.tab):hover,
-a[class*="btn"]:hover,
-input[type="submit"]:hover,
-.btn-ouvir:hover, .btn-ouvir-med:hover, .btn-ouvir-sonho:hover {
-  animation: btnPulseGoldHover .8s ease-in-out infinite !important;
-  border-color: #f0c96b !important;
-  color: #f0c96b !important;
-}
+@keyframes btnPulseGold { 0%,100%{box-shadow:0 0 4px rgba(240,201,107,.15);border-color:rgba(240,201,107,.35);}50%{box-shadow:0 0 14px rgba(240,201,107,.45);border-color:rgba(240,201,107,.75);} }
+@keyframes btnPulseGoldHover { 0%,100%{box-shadow:0 0 8px rgba(240,201,107,.4),0 0 0 1px rgba(240,201,107,.5);border-color:rgba(240,201,107,.6);}50%{box-shadow:0 0 22px rgba(240,201,107,.8),0 0 0 2px rgba(240,201,107,.9);border-color:#f0c96b;} }
+button:not([disabled]) { animation:btnPulseGold 2s ease-in-out infinite !important; border-color:rgba(240,201,107,.4) !important; }
+button:not([disabled]):hover { animation:btnPulseGoldHover .8s ease-in-out infinite !important; border-color:#f0c96b !important; color:#f0c96b !important; }
+a[class*="btn"], .plan-btn, .escolher-btn { animation:btnPulseGold 2s ease-in-out infinite !important; border-color:rgba(240,201,107,.4) !important; }
+a[class*="btn"]:hover, .plan-btn:hover, .escolher-btn:hover { animation:btnPulseGoldHover .8s ease-in-out infinite !important; border-color:#f0c96b !important; color:#f0c96b !important; }
 </style>
 </body>
 </html>
