@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tarô Akáshico — Portal dos Registros Akáshicos</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#05040f; --gold:#f0c96b; --gold-dim:rgba(240,201,107,.6);
+  --accent:#a78bfa; --text:#ede9ff; --muted:rgba(196,181,253,.6);
+  --fd:'Cinzel',serif; --fb:'Inter',sans-serif; --fg:'Cormorant Garamond',serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--fb);color:var(--text);background:var(--bg);min-height:100vh;overflow-x:hidden;}
+canvas#universeCanvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;}
+main{position:relative;z-index:2;max-width:960px;margin:0 auto;padding:20px 20px 80px;}
+
+@keyframes btnPulseGold{0%,100%{box-shadow:0 0 6px rgba(240,201,107,.35);border-color:rgba(240,201,107,.6);}50%{box-shadow:0 0 18px rgba(240,201,107,.65);border-color:#f0c96b;}}
+@keyframes btnPulseGoldHover{0%,100%{box-shadow:0 0 12px rgba(240,201,107,.6),0 0 0 2px rgba(240,201,107,.5);border-color:#f0c96b;}50%{box-shadow:0 0 28px rgba(240,201,107,.9),0 0 0 2px #f0c96b;border-color:#fff8d0;}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes flipCard{0%{transform:rotateY(90deg) scale(.95);opacity:0}100%{transform:rotateY(0) scale(1);opacity:1}}
+@keyframes glow{0%,100%{filter:drop-shadow(0 0 6px rgba(240,201,107,.3))}50%{filter:drop-shadow(0 0 18px rgba(240,201,107,.7))}}
+
+.back-link{display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-size:.78rem;text-decoration:none;font-family:var(--fd);letter-spacing:.06em;padding:6px 14px;border:1px solid rgba(240,201,107,.35);border-radius:20px;transition:all .2s;margin-bottom:24px;animation:btnPulseGold 2s ease-in-out infinite;}
+.back-link:hover{color:var(--gold);border-color:#f0c96b;}
+
+.hero{text-align:center;padding:16px 0 28px;}
+.hero-label{font-family:var(--fd);font-size:.62rem;letter-spacing:.25em;color:var(--gold-dim);text-transform:uppercase;margin-bottom:10px;}
+.hero h1{font-family:var(--fd);font-size:clamp(1.6rem,4vw,2.4rem);font-weight:400;color:var(--gold);margin-bottom:6px;}
+.hero p{font-size:.9rem;color:var(--muted);max-width:480px;margin:0 auto;line-height:1.7;}
+
+/* Telas */
+.tela{display:none;animation:fadeIn .5s ease;}
+.tela.ativa{display:block;}
+
+/* Tiragens */
+.tiragens-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-top:24px;}
+.tiragem-card{background:rgba(14,12,28,.9);border:1px solid rgba(240,201,107,.3);border-radius:16px;padding:22px 18px;cursor:pointer;transition:all .25s;text-align:center;animation:btnPulseGold 2s ease-in-out infinite;}
+.tiragem-card:hover{border-color:#f0c96b;box-shadow:0 0 24px rgba(240,201,107,.25);transform:translateY(-2px);}
+.tiragem-icon{font-size:1.8rem;margin-bottom:8px;}
+.tiragem-nome{font-family:var(--fd);font-size:.75rem;letter-spacing:.1em;color:var(--gold);margin-bottom:6px;}
+.tiragem-desc{font-size:.78rem;color:var(--muted);line-height:1.6;}
+
+/* Pergunta */
+.form-card{background:rgba(14,12,28,.92);border:1px solid rgba(196,181,253,.12);border-radius:18px;padding:24px 28px;margin-top:20px;}
+.form-label{font-family:var(--fd);font-size:.62rem;letter-spacing:.15em;color:var(--gold-dim);text-transform:uppercase;margin-bottom:8px;display:block;}
+textarea.pergunta{width:100%;padding:12px 16px;background:rgba(255,255,255,.05);border:1px solid rgba(240,201,107,.3);border-radius:12px;color:var(--text);font-family:var(--fb);font-size:.88rem;outline:none;resize:none;min-height:80px;transition:border-color .2s;}
+textarea.pergunta:focus{border-color:var(--gold);}
+.btn-principal{width:100%;margin-top:14px;padding:14px;background:linear-gradient(135deg,rgba(109,40,217,.4),rgba(167,139,250,.2));border:2px solid rgba(240,201,107,.5);border-radius:14px;color:var(--text);font-family:var(--fd);font-size:.82rem;letter-spacing:.1em;cursor:pointer;transition:all .25s;animation:btnPulseGold 2s ease-in-out infinite;}
+.btn-principal:hover{animation:btnPulseGoldHover .8s ease-in-out infinite;background:linear-gradient(135deg,rgba(109,40,217,.6),rgba(167,139,250,.3));}
+
+/* Baralho */
+.baralho-wrap{text-align:center;margin-top:28px;}
+.baralho-instrucao{font-size:.88rem;color:var(--muted);margin-bottom:20px;line-height:1.8;}
+.baralho-pilha{display:inline-block;position:relative;cursor:pointer;transition:transform .2s;}
+.baralho-pilha:hover{transform:scale(1.05);filter:drop-shadow(0 0 20px rgba(240,201,107,.4));}
+.carta-dorso{width:110px;height:180px;border-radius:12px;background:linear-gradient(135deg,#0a0520,#1a0840);border:2px solid rgba(240,201,107,.5);display:flex;align-items:center;justify-content:center;box-shadow:0 0 30px rgba(109,40,217,.4),4px 4px 0 rgba(0,0,0,.4);position:relative;animation:glow 2s ease-in-out infinite;}
+.carta-dorso::before{content:'';position:absolute;inset:6px;border:1px solid rgba(240,201,107,.2);border-radius:7px;}
+.carta-dorso-inner{font-size:2rem;position:relative;z-index:1;}
+.pilha-sombra{position:absolute;width:110px;height:180px;background:linear-gradient(135deg,#080318,#150830);border:2px solid rgba(240,201,107,.2);border-radius:12px;}
+.cartas-restantes{font-family:var(--fd);font-size:.68rem;color:var(--gold-dim);margin-top:14px;letter-spacing:.1em;}
+
+/* Posições */
+.posicoes-grid{display:flex;flex-wrap:wrap;gap:16px;justify-content:center;margin-top:28px;}
+.posicao-item{display:flex;flex-direction:column;align-items:center;gap:8px;}
+.posicao-label{font-family:var(--fd);font-size:.55rem;letter-spacing:.1em;color:var(--gold-dim);text-align:center;text-transform:uppercase;max-width:100px;}
+.slot-vazio{width:90px;height:148px;border-radius:10px;border:1px dashed rgba(240,201,107,.2);display:flex;align-items:center;justify-content:center;background:rgba(14,12,28,.6);}
+.slot-vazio span{font-size:1.2rem;color:rgba(240,201,107,.15);}
+.carta-virada{width:90px;height:148px;border-radius:10px;overflow:hidden;animation:flipCard .4s ease;cursor:pointer;border:1px solid rgba(240,201,107,.3);box-shadow:0 0 14px rgba(109,40,217,.3);}
+.carta-virada:hover{border-color:var(--gold);box-shadow:0 0 20px rgba(240,201,107,.4);}
+.carta-virada img{width:100%;height:100%;object-fit:cover;}
+.carta-virada.invertida{transform:rotate(180deg);}
+.carta-virada.invertida{border-color:rgba(248,113,113,.4);box-shadow:0 0 14px rgba(248,113,113,.2);}
+.invertida-tag{font-size:.5rem;color:#f87171;font-family:var(--fd);letter-spacing:.06em;margin-top:2px;}
+
+/* Spinner */
+.spinner-wrap{display:none;flex-direction:column;align-items:center;gap:16px;padding:40px;text-align:center;}
+.spinner-wrap.ativo{display:flex;animation:fadeIn .4s ease;}
+.spinner-text{font-family:var(--fd);font-size:.9rem;letter-spacing:.12em;color:var(--text);}
+
+/* Interpretação */
+.interp-wrap{background:rgba(14,12,28,.92);border:1px solid rgba(196,181,253,.12);border-radius:18px;padding:24px 28px;margin-top:20px;animation:fadeIn .6s ease;}
+.interp-titulo{font-family:var(--fd);font-size:1.2rem;color:var(--gold);margin-bottom:6px;text-align:center;}
+.interp-pergunta{font-size:.82rem;color:var(--muted);font-style:italic;text-align:center;margin-bottom:22px;}
+.interp-carta{margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid rgba(196,181,253,.08);}
+.interp-carta:last-of-type{border-bottom:none;}
+.interp-carta-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;}
+.interp-carta-nome{font-family:var(--fd);font-size:.75rem;color:var(--gold);letter-spacing:.08em;}
+.interp-carta-pos{font-size:.68rem;color:var(--muted);margin-left:auto;}
+.interp-texto{font-family:var(--fg);font-size:1.05rem;line-height:1.9;color:rgba(237,233,255,.9);}
+.interp-sintese{margin-top:24px;padding:18px;background:rgba(240,201,107,.05);border:1px solid rgba(240,201,107,.2);border-radius:14px;}
+.interp-sintese-label{font-family:var(--fd);font-size:.62rem;letter-spacing:.15em;color:var(--gold-dim);margin-bottom:10px;}
+.interp-acao{margin-top:16px;padding:16px;background:rgba(109,40,217,.1);border:1px solid rgba(167,139,250,.2);border-radius:14px;}
+.interp-acao-label{font-family:var(--fd);font-size:.62rem;letter-spacing:.15em;color:var(--accent);margin-bottom:8px;}
+
+.btn-nova{display:block;text-align:center;margin-top:24px;padding:12px;background:transparent;border:1px solid rgba(240,201,107,.3);border-radius:14px;color:var(--gold-dim);font-family:var(--fd);font-size:.75rem;letter-spacing:.08em;cursor:pointer;transition:all .2s;animation:btnPulseGold 2s ease-in-out infinite;}
+.btn-nova:hover{animation:btnPulseGoldHover .8s ease-in-out infinite;color:var(--gold);}
+
+.info{font-size:.75rem;color:rgba(196,181,253,.4);text-align:center;margin-top:14px;font-style:italic;}
+</style>
+</head>
+<body>
+<canvas id="universeCanvas"></canvas>
+<main>
+  <a href="/perfil" class="back-link">← Voltar</a>
+
+  <div class="hero">
+    <div style="font-size:0;margin-bottom:16px;"><canvas id="soberanaCanvas" width="100" height="100" style="display:block;margin:0 auto;"></canvas></div>
+    <div class="hero-label">Portal dos Registros Akáshicos</div>
+    <h1>🎴 Tarô Akáshico</h1>
+    <p>Os Guardiões Aureon e Nyrael revelam através das cartas o que sua alma precisa ver.</p>
+  </div>
+
+  <!-- TELA 1: Escolha da tiragem -->
+  <div class="tela ativa" id="tela-tiragem">
+    <div style="text-align:center;font-family:var(--fd);font-size:.62rem;letter-spacing:.2em;color:var(--gold-dim);margin-bottom:8px;">ESCOLHA SUA TIRAGEM</div>
+    <div class="tiragens-grid">
+      <div class="tiragem-card" onclick="escolherTiragem('unica')">
+        <div class="tiragem-icon">✦</div>
+        <div class="tiragem-nome">Carta do Dia</div>
+        <div class="tiragem-desc">Uma única carta revela a mensagem dos Registros para este momento.</div>
+      </div>
+      <div class="tiragem-card" onclick="escolherTiragem('tres')">
+        <div class="tiragem-icon">⟡ ✦ ⟡</div>
+        <div class="tiragem-nome">Passado · Presente · Futuro</div>
+        <div class="tiragem-desc">Três cartas revelam o fio que conecta sua jornada no tempo.</div>
+      </div>
+      <div class="tiragem-card" onclick="escolherTiragem('cruz')">
+        <div class="tiragem-icon">☩</div>
+        <div class="tiragem-nome">Cruz Akáshica</div>
+        <div class="tiragem-desc">Cinco cartas: centro, desafio, base, caminho e resultado.</div>
+      </div>
+      <div class="tiragem-card" onclick="escolherTiragem('amor')">
+        <div class="tiragem-icon">♡</div>
+        <div class="tiragem-nome">Leitura de Amor</div>
+        <div class="tiragem-desc">Seis cartas revelando os dois lados, conexão, obstáculos e potencial.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TELA 2: Pergunta -->
+  <div class="tela" id="tela-pergunta">
+    <div class="form-card">
+      <label class="form-label" id="label-pergunta">Formule sua intenção ou pergunta</label>
+      <textarea class="pergunta" id="perguntaInput" placeholder="O que deseja revelar? Pode deixar em branco para uma leitura livre..." rows="3"></textarea>
+      <button class="btn-principal" onclick="irParaBaralho()">✦ Consultar os Registros</button>
+    </div>
+  </div>
+
+  <!-- TELA 3: Baralho -->
+  <div class="tela" id="tela-baralho">
+    <div class="baralho-wrap">
+      <p class="baralho-instrucao" id="instrucao-baralho">
+        Respire fundo. Concentre-se na sua intenção.<br>
+        Clique no baralho para revelar <span id="instrucao-qtd"></span>
+      </p>
+      <div class="baralho-pilha" id="baralho" onclick="puxarCarta()">
+        <div class="pilha-sombra" style="top:6px;left:6px;"></div>
+        <div class="pilha-sombra" style="top:3px;left:3px;"></div>
+        <div class="carta-dorso">
+          <div class="carta-dorso-inner">⟡</div>
+        </div>
+      </div>
+      <div class="cartas-restantes" id="cartasRestantes"></div>
+    </div>
+    <div id="posicoes-container" class="posicoes-grid"></div>
+    <div class="info" id="info-clique" style="display:none;">Clique em qualquer carta para ver detalhes</div>
+    <div style="text-align:center;margin-top:24px;">
+      <button class="btn-principal" id="btn-interpretar" style="display:none;max-width:380px;margin:0 auto;" onclick="interpretarTodas()">
+        ✦ Receber a Interpretação dos Registros
+      </button>
+    </div>
+  </div>
+
+  <!-- TELA 4: Spinner -->
+  <div class="tela" id="tela-spinner">
+    <div class="spinner-wrap ativo">
+      <canvas id="atomoTaroCanvas" width="120" height="120"></canvas>
+      <div class="spinner-text" id="spinnerText">Os Registros se abrem...</div>
+      <div style="font-size:.82rem;color:var(--muted);font-style:italic;">Aureon e Nyrael consultam os Guardiões</div>
+    </div>
+  </div>
+
+  <!-- TELA 5: Interpretação -->
+  <div class="tela" id="tela-interpretacao">
+    <div id="interp-conteudo"></div>
+    <button class="btn-nova" onclick="novaLeitura()">↺ Nova Leitura</button>
+  </div>
+</main>
+
+<script>
+// ═══════════════════════════════════════
+// USUÁRIO
+// ═══════════════════════════════════════
+var user = JSON.parse(localStorage.getItem('akashic_user') || sessionStorage.getItem('akashic_user') || '{}');
+if (!user.email) window.location.href = '/login';
+
+// ═══════════════════════════════════════
+// BARALHO AKÁSHICO
+// URL das cartas no Supabase Storage
+// ═══════════════════════════════════════
+var SUPABASE_CARTAS = 'https://opykejeaxehvzogrrwto.supabase.co/storage/v1/object/public/cartas-taro';
+
+var ARCANOS_MAIORES = [
+  { id:'00', nome:'O Louco Akáshico',        img: SUPABASE_CARTAS + '/00-louco.png',
+    normal:'A alma inicia uma nova jornada com fé absoluta no universo. Os Registros revelam um momento de salto quântico onde a confiança na Inteligência Divina é o único guia necessário. Novas possibilidades se abrem sem que a mente possa compreendê-las ainda.',
+    invertida:'Impulsividade sem discernimento. Os Registros indicam que a alma age antes de consultar sua sabedoria interna. Um momento de pausa e conexão com os Guardiões é necessário antes de qualquer novo passo.' },
+  { id:'01', nome:'O Mago dos Registros',     img: SUPABASE_CARTAS + '/01-mago.png',
+    normal:'Todo o poder do universo está disponível para você. Os Registros mostram uma alma com todos os recursos para manifestar sua realidade. Ação consciente alinhada com a Vontade Superior cria milagres.',
+    invertida:'Poder sendo mal utilizado ou talentos desperdiçados. Os Guardiões alertam para desconexão entre o que a alma deseja e o que está criando. Reconecte-se com sua intenção mais pura.' },
+  { id:'02', nome:'A Sacerdotisa Akáshica',   img: SUPABASE_CARTAS + '/02-sacerdotisa.png',
+    normal:'O véu entre os mundos está fino. Os Registros pedem que você confie na intuição acima da razão agora. Segredos serão revelados em sonhos e meditação. Não aja ainda — observe e permita que a sabedoria emerge.',
+    invertida:'Desconexão do mundo interior. A alma está ignorando sinais importantes dos Registros. Cultive o silêncio.' },
+  { id:'03', nome:'A Imperatriz dos Jardins', img: SUPABASE_CARTAS + '/03-imperatriz.png',
+    normal:'Abundância, fertilidade e criação fluem dos Registros para sua realidade. Florescimento em todas as áreas — amor, finanças, projetos. Permita-se receber com graça.',
+    invertida:'Bloqueio no fluxo de abundância. Os Guardiões revelam crenças limitantes sobre merecer receber. Trabalhe a relação com o dar e receber.' },
+  { id:'04', nome:'O Imperador Akáshico',     img: SUPABASE_CARTAS + '/04-imperador.png',
+    normal:'Estrutura, autoridade e estabilidade são os presentes dos Registros agora. Momento de estabelecer fundações sólidas e exercer liderança com sabedoria.',
+    invertida:'Rigidez excessiva ou abuso de autoridade. Aprenda a governar com o coração.' },
+  { id:'05', nome:'O Hierofante Akáshico',    img: SUPABASE_CARTAS + '/05-hierofante.png',
+    normal:'Os Registros revelam a importância da sabedoria transmitida. Um professor ou ensinamento transformador entra em cena. Há conhecimento ancestral disponível.',
+    invertida:'Dogmatismo ou rebeldia espiritual. Questione, mas não descarte toda sabedoria acumulada.' },
+  { id:'06', nome:'Os Amantes Akáshicos',     img: SUPABASE_CARTAS + '/06-enamorados.png',
+    normal:'Uma escolha fundamental do coração. Os Registros revelam uma conexão de alma — com uma pessoa, propósito ou caminho. O amor exige escolha consciente.',
+    invertida:'Desequilíbrio em relacionamentos. A alma está dividida. Trabalhe a integração interna antes de buscar conexão externa.' },
+  { id:'07', nome:'O Carro Akáshico',         img: SUPABASE_CARTAS + '/07-carro.png',
+    normal:'Vitória após desafios. Os Registros mostram uma alma que aprendeu a guiar forças opostas. A verdadeira vitória vem do domínio de si mesmo.',
+    invertida:'Falta de direção ou conflito interno. Clarifique sua intenção antes de agir.' },
+  { id:'08', nome:'A Justiça Akáshica',       img: SUPABASE_CARTAS + '/08-justica.png',
+    normal:'A lei do karma opera com perfeição. Os Registros revelam que cada ação encontra seu reflexo exato. Momento de acertos e equilíbrio.',
+    invertida:'Desequilíbrio kármico. Os Guardiões pedem honestidade radical sobre responsabilidades passadas.' },
+  { id:'09', nome:'O Eremita Akáshico',       img: SUPABASE_CARTAS + '/09-eremita.png',
+    normal:'Período sagrado de recolhimento. Os Registros pedem afastamento do ruído do mundo para encontrar sua luz interna. Verdades profundas emergem no silêncio.',
+    invertida:'Isolamento excessivo. A alma se afastou tanto que perdeu o fio com o mundo. Hora de compartilhar sua luz.' },
+  { id:'10', nome:'A Roda Akáshica',          img: SUPABASE_CARTAS + '/10-roda.png',
+    normal:'A grande roda dos ciclos kármicos gira a seu favor. O que foi plantado está prestes a colher. Há uma inteligência maior operando. Confie.',
+    invertida:'Resistência ao ciclo natural. A roda está girando mas a alma tenta impedi-la. Solte o controle.' },
+  { id:'11', nome:'A Força Akáshica',         img: SUPABASE_CARTAS + '/11-forca.png',
+    normal:'Coragem suave e poder interior. A verdadeira força vem da compaixão. Momento de domar seus próprios medos com amor.',
+    invertida:'Dúvida sobre a própria força. O poder mais profundo é silencioso e não precisa se provar.' },
+  { id:'12', nome:'O Pendurado Akáshico',     img: SUPABASE_CARTAS + '/12-enforcado.png',
+    normal:'Suspensão sagrada e rendição voluntária. Ao parar de lutar, a resposta emerge naturalmente. Ver o mundo de outro ângulo traz iluminação.',
+    invertida:'Martírio desnecessário. Resistência a mudar a perspectiva. Deixe-se ser transformado.' },
+  { id:'13', nome:'A Transformação',          img: SUPABASE_CARTAS + '/13-morte.png',
+    normal:'A morte dos Registros não é fim — é a mais profunda transformação. O que precisa morrer para que o verdadeiro nasça? Os Guardiões celebram esta passagem.',
+    invertida:'Medo da mudança. Apego ao que já acabou. A estagnação é mais dolorosa que a transformação.' },
+  { id:'14', nome:'A Temperança Akáshica',    img: SUPABASE_CARTAS + '/14-temperanca.png',
+    normal:'O alquimista interior combina opostos em harmonia perfeita. Momento de integração, cura e equilíbrio refinado. Paciência divina guia cada passo.',
+    invertida:'Desequilíbrio ou excesso. Busque o meio dourado.' },
+  { id:'15', nome:'As Ilusões Akáshicas',     img: SUPABASE_CARTAS + '/15-diabo.png',
+    normal:'Os Registros revelam as ilusões que aprisionam a alma. O que você acredita ser externo é na verdade interno. O reconhecimento do padrão é o primeiro passo da libertação.',
+    invertida:'Início de libertação de padrões limitantes. Os Guardiões celebram que a alma começa a ver através das ilusões.' },
+  { id:'16', nome:'A Torre Akáshica',         img: SUPABASE_CARTAS + '/16-torre.png',
+    normal:'Uma estrutura construída sobre fundações falsas cai para que o verdadeiro possa ser erguido. Este caos é sagrado. O relâmpago que destrói também ilumina.',
+    invertida:'Resistência a uma mudança necessária. A destruição está acontecendo mais lentamente, mas está acontecendo.' },
+  { id:'17', nome:'A Estrela Akáshica',       img: SUPABASE_CARTAS + '/17-estrela.png',
+    normal:'Depois da tempestade, a esperança que renova tudo. Os Registros derramam bênçãos. Momento de cura profunda e conexão com o propósito maior da sua existência.',
+    invertida:'Desesperança temporária. A estrela sempre brilha, mesmo quando nuvens a escondem.' },
+  { id:'18', nome:'A Lua Akáshica',           img: SUPABASE_CARTAS + '/18-lua.png',
+    normal:'As profundezas do inconsciente falam. Nem tudo é como parece — ilusões e medos ancestrais precisam ser trazidos à luz. Confie na intuição mais do que nos fatos aparentes.',
+    invertida:'Confusão sendo dissipada. A alma está começando a ver com mais clareza através das névoas.' },
+  { id:'19', nome:'O Sol Akáshico',           img: SUPABASE_CARTAS + '/19-sol.png',
+    normal:'Alegria, vitalidade e clareza radiante. Sucesso, saúde, felicidade genuína e alinhamento com a criança interior. Celebre — você merece este momento de luz.',
+    invertida:'Alegria temporariamente bloqueada. A alma anseia pela luz mas ainda carrega sombras a integrar.' },
+  { id:'20', nome:'O Julgamento Akáshico',    img: SUPABASE_CARTAS + '/20-julgamento.png',
+    normal:'O chamado da alma para uma vida maior. Um despertar espiritual profundo — revisão de tudo que foi vivido e compreensão do propósito maior da sua encarnação.',
+    invertida:'Resistência ao chamado. Os Guardiões pedem compaixão: você está sendo chamado, não condenado.' },
+  { id:'21', nome:'O Mundo Akáshico',         img: SUPABASE_CARTAS + '/21-mundo.png',
+    normal:'Completude, realização e dança com o universo. Os Registros celebram um ciclo completado com maestria. O mundo inteiro está disponível para você agora.',
+    invertida:'Ciclo quase completo com detalhes finais a resolver. A conclusão está próxima.' },
+  { id:'22', nome:'O Mestre Akáshico',        img: SUPABASE_CARTAS + '/22-mestre.png',
+    normal:'Transcendência de todos os ciclos. Os Registros revelam uma alma que dominou todos os elementos e agora ensina a outros o caminho de volta à fonte. Maestria absoluta.',
+    invertida:'Sabedoria acumulada ainda não compartilhada. O Mestre que não ensina perde sua própria mestria.' },
+];
+
+// Arcanos Menores — naipes renomeados
+var NAIPES = [
+  { naipe:'Chamas',   cor:'#f87171', simbolo:'🔥' },
+  { naipe:'Cálices',  cor:'#60a5fa', simbolo:'💧' },
+  { naipe:'Cristais', cor:'#c4b5fd', simbolo:'⚡' },
+  { naipe:'Estrelas', cor:'#4ade80', simbolo:'✦' },
+];
+var VALS = ['Ás','2','3','4','5','6','7','8','9','10','Pajem','Cavaleiro','Rainha','Rei'];
+
+function montarBaralho() {
+  var b = ARCANOS_MAIORES.map(function(c){ return Object.assign({arcano:'maior'}, c); });
+  NAIPES.forEach(function(n) {
+    VALS.forEach(function(v) {
+      b.push({
+        arcano:'menor', naipe:n.naipe, cor:n.cor, simbolo:n.simbolo,
+        id: v.toLowerCase()+'-'+n.naipe.toLowerCase(),
+        nome: v + ' de ' + n.naipe,
+        img: null, // sem imagem específica por enquanto
+        normal: 'Os Registros revelam através do ' + v + ' de ' + n.naipe + ' uma mensagem de ' + n.naipe.toLowerCase() + ' para a sua jornada. Os Guardiões pedem atenção ao elemento ' + n.naipe.toLowerCase() + ' neste momento.',
+        invertida: 'A energia de ' + n.naipe + ' está bloqueada ou invertida. Os Guardiões pedem revisão dos padrões relacionados a este elemento na sua vida.'
+      });
+    });
+  });
+  return b;
+}
+
+var TIRAGENS = {
+  unica: { nome:'Carta do Dia', qtd:1, posicoes:['Mensagem dos Registros'] },
+  tres:  { nome:'Passado · Presente · Futuro', qtd:3, posicoes:['Passado','Presente','Futuro'] },
+  cruz:  { nome:'Cruz Akáshica', qtd:5, posicoes:['Centro da questão','O desafio','Base kármica','Caminho indicado','Resultado provável'] },
+  amor:  { nome:'Leitura de Amor', qtd:6, posicoes:['Você','A outra alma','A conexão','Os obstáculos','O potencial','O resultado'] },
+};
+
+// Estado
+var baralho = [], tiragem = null, cartasSelecionadas = [], pergunta = '';
+
+function embaralhar(arr) {
+  var a = arr.slice();
+  for (var i = a.length-1; i > 0; i--) {
+    var j = Math.floor(Math.random()*(i+1));
+    var t = a[i]; a[i]=a[j]; a[j]=t;
+  }
+  return a;
+}
+
+function mostrarTela(id) {
+  document.querySelectorAll('.tela').forEach(function(t){ t.classList.remove('ativa'); });
+  document.getElementById(id).classList.add('ativa');
+}
+
+function escolherTiragem(tipo) {
+  tiragem = TIRAGENS[tipo];
+  var labels = {
+    unica:'Qual mensagem os Registros têm para você agora?',
+    tres:'Qual situação deseja iluminar?',
+    cruz:'Qual é a questão central que traz para os Registros?',
+    amor:'Qual relação ou conexão deseja explorar?'
+  };
+  document.getElementById('label-pergunta').textContent = labels[tipo];
+  mostrarTela('tela-pergunta');
+}
+
+function irParaBaralho() {
+  pergunta = document.getElementById('perguntaInput').value.trim();
+  baralho = embaralhar(montarBaralho());
+  cartasSelecionadas = [];
+  document.getElementById('btn-interpretar').style.display = 'none';
+  document.getElementById('info-clique').style.display = 'none';
+
+  var qtdTexto = tiragem.qtd === 1 ? 'sua carta' : 'suas ' + tiragem.qtd + ' cartas';
+  document.getElementById('instrucao-qtd').textContent = qtdTexto + '.';
+
+  renderizarSlots();
+  document.getElementById('cartasRestantes').textContent = '';
+  document.getElementById('baralho').style.opacity = '1';
+  document.getElementById('baralho').style.pointerEvents = 'auto';
+  mostrarTela('tela-baralho');
+}
+
+function renderizarSlots() {
+  var c = document.getElementById('posicoes-container');
+  c.innerHTML = tiragem.posicoes.map(function(p, i) {
+    return '<div class="posicao-item">'
+      + '<div class="posicao-label">' + p + '</div>'
+      + '<div class="slot-vazio" id="slot-' + i + '"><span>⟡</span></div>'
+      + '</div>';
+  }).join('');
+}
+
+function puxarCarta() {
+  var idx = cartasSelecionadas.length;
+  if (idx >= tiragem.qtd || !baralho.length) return;
+
+  var carta = baralho.pop();
+  var invertida = Math.random() < 0.3;
+  cartasSelecionadas.push({ carta:carta, invertida:invertida, posicao:tiragem.posicoes[idx] });
+
+  // Renderizar carta no slot
+  var slot = document.getElementById('slot-' + idx);
+  if (carta.img) {
+    slot.outerHTML = '<div class="posicao-item">'
+      + '<div class="posicao-label">' + tiragem.posicoes[idx] + '</div>'
+      + '<div class="carta-virada' + (invertida?' invertida':'') + '" id="slot-' + idx + '" onclick="verCarta(' + idx + ')">'
+      + '<img src="' + carta.img + '" alt="' + carta.nome + '" onerror="this.parentNode.innerHTML=\'<div style=&quot;width:90px;height:148px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;background:rgba(14,12,28,.8);color:#f0c96b;&quot;>' + (carta.simbolo||'✦') + '</div>\'">'
+      + '</div>'
+      + (invertida ? '<div class="invertida-tag">INVERTIDA</div>' : '')
+      + '</div>';
+  } else {
+    // Sem imagem: exibe símbolo colorido
+    var corCarta = carta.cor || '#f0c96b';
+    slot.outerHTML = '<div class="posicao-item">'
+      + '<div class="posicao-label">' + tiragem.posicoes[idx] + '</div>'
+      + '<div class="carta-virada' + (invertida?' invertida':'') + '" id="slot-' + idx + '" onclick="verCarta(' + idx + ')" style="background:linear-gradient(135deg,#0a0520,#1a0840);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;">'
+      + '<span style="font-size:1.6rem;">' + (carta.simbolo||'✦') + '</span>'
+      + '<span style="font-family:var(--fd);font-size:.38rem;color:' + corCarta + ';text-align:center;letter-spacing:.04em;padding:0 4px;">' + carta.nome + '</span>'
+      + '</div>'
+      + (invertida ? '<div class="invertida-tag">INVERTIDA</div>' : '')
+      + '</div>';
+  }
+
+  var restam = tiragem.qtd - cartasSelecionadas.length;
+  if (restam > 0) {
+    document.getElementById('cartasRestantes').textContent = 'Clique mais ' + restam + ' vez' + (restam>1?'es':'') + ' no baralho';
+  } else {
+    document.getElementById('cartasRestantes').textContent = '';
+    document.getElementById('baralho').style.opacity = '0.3';
+    document.getElementById('baralho').style.pointerEvents = 'none';
+    document.getElementById('btn-interpretar').style.display = 'block';
+    document.getElementById('info-clique').style.display = 'block';
+  }
+}
+
+function verCarta(idx) {
+  // Destaque visual ao clicar
+  var slot = document.getElementById('slot-' + idx);
+  if (slot) {
+    slot.style.boxShadow = '0 0 28px rgba(240,201,107,.6)';
+    setTimeout(function(){ slot.style.boxShadow = ''; }, 800);
+  }
+}
+
+async function interpretarTodas() {
+  mostrarTela('tela-spinner');
+  var spinnerTexts = ['Os Registros se abrem...','Aureon consulta os Guardiões...','Nyrael lê as cartas...','A mensagem da sua alma emerge...'];
+  var si = 0;
+  var spinnerTimer = setInterval(function(){
+    si = (si+1) % spinnerTexts.length;
+    document.getElementById('spinnerText').textContent = spinnerTexts[si];
+  }, 2000);
+
+  var cartasPayload = cartasSelecionadas.map(function(c){
+    return {
+      posicao: c.posicao,
+      nome: c.carta.nome,
+      invertida: c.invertida,
+      significadoNormal: c.carta.normal,
+      significadoInvertido: c.carta.invertida
+    };
+  });
+
+  try {
+    var resp = await fetch('/api/espiritualidade', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        tipo: 'taro',
+        nome: user.nome || 'Alma',
+        sexo: user.sexo || '',
+        cartas: cartasPayload,
+        tiragem: tiragem.nome,
+        pergunta: pergunta
+      })
+    });
+
+    if (!resp.ok) throw new Error('Erro na API');
+
+    var reader = resp.body.getReader();
+    var decoder = new TextDecoder();
+    var buffer = '', fullText = '';
+
+    while (true) {
+      var res = await reader.read();
+      if (res.done) break;
+      buffer += decoder.decode(res.value, { stream: true });
+      var lines = buffer.split('\n');
+      buffer = lines.pop();
+      for (var line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        var raw = line.slice(6).trim();
+        try {
+          var ev = JSON.parse(raw);
+          if (ev.delta) fullText += ev.delta;
+          if (ev.done) {
+            clearInterval(spinnerTimer);
+            var match = fullText.match(/\{[\s\S]*\}/);
+            if (match) {
+              renderInterpretacao(JSON.parse(match[0]));
+            } else {
+              renderInterpretacaoLocal();
+            }
+          }
+        } catch(e) {}
+      }
+    }
+
+    // Fallback se done não chegou
+    if (document.getElementById('tela-interpretacao').style.display === 'none' ||
+        !document.getElementById('tela-interpretacao').classList.contains('ativa')) {
+      clearInterval(spinnerTimer);
+      var match2 = fullText.match(/\{[\s\S]*\}/);
+      if (match2) renderInterpretacao(JSON.parse(match2[0]));
+      else renderInterpretacaoLocal();
+    }
+
+  } catch(e) {
+    clearInterval(spinnerTimer);
+    renderInterpretacaoLocal();
+  }
+}
+
+function renderInterpretacao(data) {
+  var html = '<div class="interp-wrap">';
+  html += '<div class="interp-titulo">' + (data.titulo || '✦ Leitura Akáshica') + '</div>';
+  if (pergunta) html += '<div class="interp-pergunta">"' + pergunta + '"</div>';
+
+  if (data.cartas && data.cartas.length) {
+    data.cartas.forEach(function(c, i) {
+      var cs = cartasSelecionadas[i];
+      html += '<div class="interp-carta">';
+      html += '<div class="interp-carta-header">';
+      if (cs && cs.carta.img) {
+        html += '<img src="' + cs.carta.img + '" style="width:40px;height:66px;border-radius:5px;object-fit:cover;" alt="">';
+      } else if (cs) {
+        html += '<span style="font-size:1.4rem;">' + (cs.carta.simbolo||'✦') + '</span>';
+      }
+      html += '<span class="interp-carta-nome">' + (c.carta||c.nome||'') + (c.invertida||cs?.invertida?' <span style="font-size:.6rem;color:#f87171;">INVERTIDA</span>':'') + '</span>';
+      html += '<span class="interp-carta-pos">' + (c.posicao||'') + '</span>';
+      html += '</div>';
+      html += '<div class="interp-texto">' + (c.interpretacao||'') + '</div>';
+      html += '</div>';
+    });
+  }
+
+  if (data.sintese) {
+    html += '<div class="interp-sintese">';
+    html += '<div class="interp-sintese-label">✦ SÍNTESE AKÁSHICA</div>';
+    html += '<div class="interp-texto">' + data.sintese + '</div>';
+    html += '</div>';
+  }
+
+  if (data.acao_sagrada) {
+    html += '<div class="interp-acao">';
+    html += '<div class="interp-acao-label">⟡ AÇÃO SAGRADA</div>';
+    html += '<div class="interp-texto">' + data.acao_sagrada + '</div>';
+    html += '</div>';
+  }
+
+  html += '</div>';
+  document.getElementById('interp-conteudo').innerHTML = html;
+  mostrarTela('tela-interpretacao');
+}
+
+function renderInterpretacaoLocal() {
+  var html = '<div class="interp-wrap">';
+  html += '<div class="interp-titulo">✦ Leitura Akáshica — ' + tiragem.nome + '</div>';
+  if (pergunta) html += '<div class="interp-pergunta">"' + pergunta + '"</div>';
+
+  cartasSelecionadas.forEach(function(cs) {
+    var texto = cs.invertida ? cs.carta.invertida : cs.carta.normal;
+    html += '<div class="interp-carta">';
+    html += '<div class="interp-carta-header">';
+    if (cs.carta.img) {
+      html += '<img src="' + cs.carta.img + '" style="width:40px;height:66px;border-radius:5px;object-fit:cover;" alt="">';
+    } else {
+      html += '<span style="font-size:1.4rem;">' + (cs.carta.simbolo||'✦') + '</span>';
+    }
+    html += '<span class="interp-carta-nome">' + cs.carta.nome + (cs.invertida?' <span style="font-size:.6rem;color:#f87171;">INVERTIDA</span>':'') + '</span>';
+    html += '<span class="interp-carta-pos">' + cs.posicao + '</span>';
+    html += '</div>';
+    html += '<div class="interp-texto">' + texto + '</div>';
+    html += '</div>';
+  });
+
+  html += '<div class="interp-sintese"><div class="interp-sintese-label">✦ SÍNTESE AKÁSHICA</div>';
+  html += '<div class="interp-texto">Os Registros falam através destas ' + cartasSelecionadas.length + ' cartas uma mensagem unificada para sua alma. Confie no que emergiu desta leitura — cada carta é um espelho do momento presente da sua jornada.</div></div>';
+  html += '</div>';
+
+  document.getElementById('interp-conteudo').innerHTML = html;
+  mostrarTela('tela-interpretacao');
+}
+
+function novaLeitura() {
+  baralho = []; cartasSelecionadas = []; tiragem = null; pergunta = '';
+  document.getElementById('perguntaInput').value = '';
+  mostrarTela('tela-tiragem');
+}
+</script>
+
+<!-- Spinner esfera -->
+<script>
+(function(){
+  var cv=document.getElementById('atomoTaroCanvas');
+  if(!cv)return;
+  var ctx=cv.getContext('2d'),CX=60,CY=60,R=32,t=0;
+  function drawSphere(){var grd=ctx.createRadialGradient(CX-10,CY-12,2,CX,CY,R);grd.addColorStop(0,'#f0e8ff');grd.addColorStop(0.18,'#b080ff');grd.addColorStop(0.5,'#5010b0');grd.addColorStop(0.8,'#2d0a6e');grd.addColorStop(1,'#080318');ctx.beginPath();ctx.arc(CX,CY,R,0,Math.PI*2);ctx.fillStyle=grd;ctx.fill();}
+  function drawGrid(){ctx.save();ctx.beginPath();ctx.arc(CX,CY,R,0,Math.PI*2);ctx.clip();ctx.strokeStyle='rgba(255,255,255,0.1)';ctx.lineWidth=0.6;ctx.beginPath();ctx.ellipse(CX,CY,R*0.85,R*0.2,0,0,Math.PI*2);ctx.stroke();ctx.beginPath();ctx.ellipse(CX,CY,R*0.19,R,0,0,Math.PI*2);ctx.stroke();ctx.restore();}
+  function drawOrbit(a,rx,ry,col,lw,dash){ctx.save();ctx.translate(CX,CY);ctx.rotate(a);ctx.beginPath();ctx.ellipse(0,0,rx,ry,0,0,Math.PI*2);ctx.strokeStyle=col;ctx.lineWidth=lw;ctx.setLineDash(dash||[]);ctx.stroke();ctx.setLineDash([]);ctx.restore();}
+  function dot(a,rx,ry,da,r,col,glow){ctx.save();ctx.translate(CX,CY);ctx.rotate(a);var ox=Math.cos(da)*rx,oy=Math.sin(da)*ry;if(glow){var g=ctx.createRadialGradient(ox,oy,0,ox,oy,r*3);g.addColorStop(0,col);g.addColorStop(1,'rgba(0,0,0,0)');ctx.beginPath();ctx.arc(ox,oy,r*3,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();}ctx.beginPath();ctx.arc(ox,oy,r,0,Math.PI*2);ctx.fillStyle=col;ctx.fill();ctx.restore();}
+  function drawCruz(side){var sy=side==='top'?-1:1,py=CY+sy*R,col=side==='top'?'rgba(240,201,107,0.95)':'rgba(196,181,253,0.8)';ctx.strokeStyle=col;ctx.lineWidth=side==='top'?1.6:1.2;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(CX-6,py);ctx.lineTo(CX+6,py);ctx.stroke();ctx.beginPath();ctx.moveTo(CX,py-4);ctx.lineTo(CX,py+4);ctx.stroke();}
+  function drawCenter(){var pulse=0.7+0.3*Math.sin(t*2.5),r1=6*pulse;var g1=ctx.createRadialGradient(CX,CY,0,CX,CY,r1);g1.addColorStop(0,'rgba(255,252,200,0.5)');g1.addColorStop(1,'rgba(240,201,107,0)');ctx.beginPath();ctx.arc(CX,CY,r1,0,Math.PI*2);ctx.fillStyle=g1;ctx.fill();ctx.beginPath();ctx.arc(CX,CY,4.5,0,Math.PI*2);ctx.strokeStyle='rgba(240,201,107,0.9)';ctx.lineWidth=1.2;ctx.stroke();var gc=ctx.createRadialGradient(CX-1,CY-1,0,CX,CY,3.2);gc.addColorStop(0,'rgba(255,252,200,0.95)');gc.addColorStop(1,'rgba(240,180,40,0.85)');ctx.beginPath();ctx.arc(CX,CY,3.2,0,Math.PI*2);ctx.fillStyle=gc;ctx.fill();ctx.beginPath();ctx.arc(CX,CY,1.2,0,Math.PI*2);ctx.fillStyle='white';ctx.fill();}
+  function frame(){ctx.clearRect(0,0,120,120);var haloR=R+14+2*Math.sin(t*1.2);var hg=ctx.createRadialGradient(CX,CY,R+4,CX,CY,haloR);hg.addColorStop(0,'rgba(139,92,246,0.25)');hg.addColorStop(1,'rgba(139,92,246,0)');ctx.beginPath();ctx.arc(CX,CY,haloR,0,Math.PI*2);ctx.fillStyle=hg;ctx.fill();drawSphere();drawGrid();var rx=R+4,ry=9;drawOrbit(0,rx,ry,'rgba(240,201,107,0.9)',1.8);drawOrbit(Math.PI/3,rx,ry,'rgba(196,181,253,0.8)',1.4);drawOrbit(-Math.PI*0.3,rx,ry,'rgba(196,181,253,0.5)',0.9);drawOrbit(Math.PI/6,rx,ry,'rgba(196,181,253,0.28)',0.6,[2,3]);dot(0,rx,ry,0.8+t*6.0,3.8,'#f0c96b',true);dot(0,rx,ry,0.8+t*6.0+Math.PI,2.5,'rgba(240,201,107,0.55)',false);dot(Math.PI/3,rx,ry,2.2+t*4.0,3,'#c4b5fd',true);dot(Math.PI/3,rx,ry,2.2+t*4.0+Math.PI,2,'rgba(196,181,253,0.5)',false);dot(-Math.PI*0.3,rx,ry,1.5+t*8.0,2.2,'#f0c96b',false);drawCruz('top');drawCruz('bottom');drawCenter();t+=0.018;requestAnimationFrame(frame);}
+  frame();
+})();
+</script>
+</body>
+</html>
