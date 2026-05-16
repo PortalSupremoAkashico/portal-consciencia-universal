@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tarô Akáshico</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Cormorant+Garamond:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#05040f;--gold:#f0c96b;--gd:rgba(240,201,107,.6);--acc:#a78bfa;--txt:#ede9ff;--mut:rgba(196,181,253,.6);--fd:'Cinzel',serif;--fg:'Cormorant Garamond',serif;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--fg);color:var(--txt);background:var(--bg);min-height:100vh;overflow-x:hidden;}
+canvas#universeCanvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;}
+main{position:relative;z-index:2;max-width:980px;margin:0 auto;padding:20px 20px 80px;}
+
+/* keyframes */
+@keyframes pulseGold{0%,100%{box-shadow:0 0 6px rgba(240,201,107,.3);border-color:rgba(240,201,107,.5);}50%{box-shadow:0 0 18px rgba(240,201,107,.65);border-color:#f0c96b;}}
+@keyframes pulseHover{0%,100%{box-shadow:0 0 14px rgba(240,201,107,.6),0 0 0 2px rgba(240,201,107,.4);}50%{box-shadow:0 0 32px rgba(240,201,107,.9),0 0 0 2px #f0c96b;}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes overlayIn{from{opacity:0}to{opacity:1}}
+@keyframes flipReveal{0%{transform:rotateY(90deg) scale(.75);opacity:0}65%{transform:rotateY(-5deg) scale(1.03)}100%{transform:rotateY(0) scale(1);opacity:1}}
+@keyframes pageFlipIn{0%{transform:perspective(1200px) rotateY(-90deg);opacity:0}100%{transform:perspective(1200px) rotateY(0deg);opacity:1}}
+@keyframes dorsoPulse{0%,100%{box-shadow:0 0 30px rgba(240,201,107,.3)}50%{box-shadow:0 0 60px rgba(240,201,107,.6)}}
+@keyframes cartaSubindo{0%{transform:scale(1) translateY(0);opacity:1}100%{transform:scale(2.2) translateY(-80px);opacity:1}}
+@keyframes cartaDescendo{0%{transform:scale(2.2) translateY(-80px);opacity:1}100%{transform:scale(1) translateY(0);opacity:1}}
+@keyframes slotFlip{0%{transform:rotateY(90deg);opacity:0}100%{transform:rotateY(0);opacity:1}}
+
+/* back-link */
+.back-link{display:inline-flex;align-items:center;gap:6px;color:var(--mut);font-size:.78rem;text-decoration:none;font-family:var(--fd);letter-spacing:.06em;padding:6px 14px;border:1px solid rgba(240,201,107,.3);border-radius:20px;margin-bottom:22px;animation:pulseGold 2s ease-in-out infinite;}
+.back-link:hover{color:var(--gold);}
+
+/* hero */
+.hero{text-align:center;padding:10px 0 24px;}
+.hero h1{font-family:var(--fd);font-size:clamp(2rem,5vw,3rem);font-weight:400;color:var(--gold);margin-bottom:10px;}
+.hero p{font-size:1.05rem;color:var(--mut);max-width:520px;margin:0 auto;line-height:1.8;}
+
+/* telas */
+.tela{display:none;}.tela.ativa{display:block;animation:fadeIn .5s ease;}
+
+/* tiragens */
+.tiragens{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-top:22px;}
+.tcard{background:rgba(14,12,28,.9);border:1px solid rgba(240,201,107,.3);border-radius:16px;padding:20px 16px;cursor:pointer;text-align:center;transition:transform .2s;animation:pulseGold 2.5s ease-in-out infinite;}
+.tcard:nth-child(2){animation-delay:.4s;}.tcard:nth-child(3){animation-delay:.8s;}.tcard:nth-child(4){animation-delay:1.2s;}
+.tcard:hover{transform:translateY(-3px);}
+.tcard-icon{font-size:1.6rem;margin-bottom:8px;}
+.tcard-nome{font-family:var(--fd);font-size:.92rem;letter-spacing:.1em;color:var(--gold);margin-bottom:6px;}
+.tcard-qtd{font-size:.78rem;color:var(--gd);margin-bottom:8px;font-family:var(--fd);}
+.tcard-desc{font-size:.92rem;color:var(--mut);line-height:1.7;}
+
+/* pergunta */
+.form-box{background:rgba(14,12,28,.92);border:1px solid rgba(196,181,253,.12);border-radius:18px;padding:24px 28px;margin-top:18px;}
+.flabel{font-family:var(--fd);font-size:.82rem;letter-spacing:.15em;color:var(--gd);text-transform:uppercase;margin-bottom:12px;display:block;}
+textarea.pinput{width:100%;padding:18px 22px;background:rgba(255,255,255,.04);border:1px solid rgba(240,201,107,.25);border-radius:12px;color:var(--txt);font-family:var(--fg);font-size:1.3rem;outline:none;resize:none;min-height:140px;line-height:1.9;}
+textarea.pinput:focus{border-color:var(--gold);}
+.btn-ok{width:100%;margin-top:14px;padding:14px;background:linear-gradient(135deg,rgba(109,40,217,.4),rgba(167,139,250,.2));border:2px solid rgba(240,201,107,.5);border-radius:14px;color:var(--txt);font-family:var(--fd);font-size:.8rem;letter-spacing:.1em;cursor:pointer;animation:pulseGold 2s ease-in-out infinite;}
+.btn-ok:hover{animation:pulseHover .8s ease-in-out infinite;}
+
+/* mesa de tarô */
+.mesa-topo{text-align:center;margin-bottom:20px;}
+.instrucao{font-size:1.05rem;color:var(--mut);line-height:1.9;margin-bottom:18px;}
+.baralho-pilha{display:inline-block;position:relative;cursor:pointer;transition:transform .25s;user-select:none;}
+.baralho-pilha:hover{transform:scale(1.07);filter:drop-shadow(0 0 24px rgba(240,201,107,.5));}
+.dorso{width:110px;height:180px;border-radius:12px;border:2px solid rgba(240,201,107,.55);box-shadow:0 0 28px rgba(109,40,217,.4),4px 4px 0 rgba(0,0,0,.4);animation:pulseGold 2s ease-in-out infinite;position:relative;overflow:hidden;background:#05040f;}
+
+.dorso-inner{font-size:2rem;position:relative;z-index:1;}
+.sombra-dorso{position:absolute;width:110px;height:180px;background:linear-gradient(135deg,#080318,#150830);border:2px solid rgba(240,201,107,.18);border-radius:12px;}
+.restantes{font-family:var(--fd);font-size:.85rem;color:var(--gd);margin-top:14px;letter-spacing:.1em;}
+
+/* MESA — leque de cartas */
+.mesa-container{margin-top:28px;display:flex;justify-content:center;align-items:flex-end;flex-wrap:wrap;gap:10px;padding:16px 8px;}
+.mesa-slot{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;transition:transform .2s;}
+.mesa-slot:hover{transform:translateY(-8px) scale(1.05);z-index:10;}
+.slot-label{font-family:var(--fd);font-size:.72rem;letter-spacing:.08em;color:var(--gd);text-align:center;text-transform:uppercase;max-width:110px;}
+.slot-vazio{width:140px;height:228px;border-radius:12px;border:1px solid rgba(240,201,107,.25);display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;flex-shrink:0;background:#05040f;}
+.slot-carta{width:140px;height:228px;border-radius:12px;overflow:hidden;border:2.5px solid rgba(240,201,107,.9);box-shadow:0 0 24px rgba(240,201,107,.45),0 0 12px rgba(109,40,217,.5),inset 0 0 0 1px rgba(240,201,107,.2);animation:slotFlip .45s ease;cursor:pointer;transition:all .2s;flex-shrink:0;filter:brightness(1.15) contrast(1.05);}
+.slot-carta:hover{box-shadow:0 0 32px rgba(240,201,107,.7);border-color:#f0c96b;transform:translateY(-6px) scale(1.06);}
+.slot-carta img{width:100%;height:100%;object-fit:cover;display:block;}
+.slot-carta.invertida > img{transform:rotate(180deg);}
+.slot-carta.invertida{border-color:rgba(248,113,113,.5);box-shadow:0 0 12px rgba(248,113,113,.2);}
+.slot-carta-face{width:100%;height:100%;background:linear-gradient(135deg,#0a0520,#1a0840);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:6px;}
+.slot-carta-face span.sym{font-size:1.8rem;}
+.slot-carta-face span.nm{font-family:var(--fd);font-size:.36rem;color:var(--gold);text-align:center;letter-spacing:.04em;line-height:1.4;}
+.inv-tag{font-size:.48rem;color:#f87171;font-family:var(--fd);letter-spacing:.06em;margin-top:2px;}
+.info-click{font-size:.88rem;color:rgba(196,181,253,.45);text-align:center;margin-top:16px;font-style:italic;}
+
+/* OVERLAY — carta ampliada no centro */
+#overlay{display:none;position:fixed;inset:0;z-index:9999;background:rgba(5,4,15,.9);backdrop-filter:blur(12px);align-items:center;justify-content:center;flex-direction:column;gap:16px;cursor:pointer;}
+#overlay.aberto{display:flex;animation:overlayIn .2s ease;}
+#overlay .ov-img{width:min(340px,72vw);aspect-ratio:2/3;border-radius:18px;object-fit:cover;border:3px solid rgba(240,201,107,.9);box-shadow:0 0 80px rgba(240,201,107,.55),0 0 160px rgba(109,40,217,.4);animation:flipReveal .5s cubic-bezier(.175,.885,.32,1.275);}
+#overlay .ov-face{width:min(340px,72vw);aspect-ratio:2/3;border-radius:18px;background:linear-gradient(135deg,#0a0520,#1a0840);border:3px solid rgba(240,201,107,.9);box-shadow:0 0 80px rgba(240,201,107,.55);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;animation:flipReveal .5s cubic-bezier(.175,.885,.32,1.275);}
+#overlay .ov-face span.big{font-size:4rem;}
+#overlay .ov-face span.nm{font-family:var(--fd);font-size:.85rem;color:var(--gold);text-align:center;padding:0 20px;letter-spacing:.08em;}
+#overlay .ov-nome{font-family:var(--fd);font-size:1.1rem;letter-spacing:.12em;color:var(--gold);text-shadow:0 0 14px rgba(240,201,107,.4);}
+#overlay .ov-pos{font-size:.88rem;color:var(--mut);letter-spacing:.08em;}
+#overlay .ov-hint{font-size:.65rem;color:rgba(196,181,253,.35);letter-spacing:.08em;margin-top:4px;}
+
+/* botão interpretar */
+.btn-interp{display:none;margin:20px auto 0;padding:14px 28px;background:linear-gradient(135deg,rgba(109,40,217,.4),rgba(167,139,250,.2));border:2px solid rgba(240,201,107,.5);border-radius:14px;color:var(--txt);font-family:var(--fd);font-size:.8rem;letter-spacing:.1em;cursor:pointer;animation:pulseGold 2s ease-in-out infinite;text-align:center;}
+.btn-interp:hover{animation:pulseHover .8s ease-in-out infinite;}
+
+/* spinner */
+.spinner-tela{display:none;text-align:center;padding:60px 20px;flex-direction:column;align-items:center;gap:16px;}
+.spinner-tela.ativa{display:flex;}
+.spin-txt{font-family:var(--fd);font-size:1.1rem;letter-spacing:.12em;color:var(--txt);}
+
+/* interpretação */
+.interp-box{background:rgba(14,12,28,.92);border:1px solid rgba(196,181,253,.12);border-radius:18px;padding:24px 28px;margin-top:20px;animation:fadeIn .6s ease;}
+.interp-titulo{font-family:var(--fd);font-size:1.8rem;color:var(--gold);margin-bottom:14px;text-align:center;}
+.interp-perg{font-size:.82rem;color:var(--mut);font-style:italic;text-align:center;margin-bottom:22px;}
+.interp-carta{margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid rgba(196,181,253,.08);}
+.interp-carta:last-of-type{border-bottom:none;}
+.ic-header{display:flex;align-items:flex-start;gap:16px;margin-bottom:16px;}
+.ic-thumb{width:90px;height:148px;border-radius:10px;object-fit:cover;border:2px solid rgba(240,201,107,.6);box-shadow:0 0 18px rgba(240,201,107,.3);flex-shrink:0;}
+.ic-nome{font-family:var(--fd);font-size:1.05rem;color:var(--gold);letter-spacing:.08em;}
+.ic-pos{font-size:.82rem;color:var(--mut);}
+.ic-inv{font-size:.58rem;color:#f87171;font-family:var(--fd);}
+.ic-txt{font-family:var(--fg);font-size:1.25rem;line-height:2.1;color:rgba(237,233,255,.95);}
+.interp-sintese{margin-top:22px;padding:18px;background:rgba(240,201,107,.05);border:1px solid rgba(240,201,107,.2);border-radius:14px;}
+.interp-acao{margin-top:14px;padding:16px;background:rgba(109,40,217,.1);border:1px solid rgba(167,139,250,.2);border-radius:14px;}
+.label-sec{font-family:var(--fd);font-size:.78rem;letter-spacing:.15em;color:var(--gd);margin-bottom:10px;display:block;}
+.label-acc{font-family:var(--fd);font-size:.78rem;letter-spacing:.15em;color:var(--acc);margin-bottom:10px;display:block;}
+.btn-nova{display:block;margin:22px auto 0;padding:12px 28px;background:transparent;border:1px solid rgba(240,201,107,.3);border-radius:20px;color:var(--gd);font-family:var(--fd);font-size:.72rem;letter-spacing:.1em;cursor:pointer;animation:pulseGold 2s ease-in-out infinite;}
+.btn-nova:hover{animation:pulseHover .8s ease-in-out infinite;color:var(--gold);}
+</style>
+</head>
+<body>
+
+<!-- OVERLAY — carta ampliada -->
+<div id="overlay" onclick="fecharOverlay()">
+  <div id="ovWrap"></div>
+  <div class="ov-nome" id="ovNome"></div>
+  <div class="ov-pos" id="ovPos"></div>
+  <div class="ov-hint">Clique para fechar · ESC</div>
+</div>
+
+<canvas id="universeCanvas"></canvas>
+
+<main>
+  <div class="hero">
+    <div style="font-family:var(--fd);font-size:.6rem;letter-spacing:.25em;color:var(--gd);margin-bottom:14px;">PORTAL DOS REGISTROS AKÁSHICOS</div>
+    <div style="position:relative;display:flex;align-items:center;justify-content:center;min-height:48px;margin-bottom:8px;">
+      <a href="/perfil" class="back-link" style="position:absolute;left:0;margin-bottom:0;">← Voltar</a>
+      <h1 style="margin:0;">🎴 Tarô Akáshico</h1>
+    </div>
+    <p>Aureon e Nyrael revelam através das cartas o que sua alma precisa ver neste momento.</p>
+  </div>
+
+  <!-- TELA 1: Tiragem -->
+  <div class="tela ativa" id="tela-tiragem">
+    <div style="text-align:center;font-family:var(--fd);font-size:.6rem;letter-spacing:.2em;color:var(--gd);margin-bottom:8px;">ESCOLHA SUA TIRAGEM</div>
+    <div class="tiragens">
+
+      <div class="tcard" onclick="escolher('unica')">
+        <div class="tcard-icon">✦</div>
+        <div class="tcard-nome">Carta do Dia</div>
+        <div class="tcard-qtd">1 carta</div>
+        <div class="tcard-desc">Uma única carta revela a mensagem dos Registros para este momento.</div>
+      </div>
+
+      <div class="tcard" onclick="escolher('tres')">
+        <div class="tcard-icon">⟡ ✦ ⟡</div>
+        <div class="tcard-nome">Passado · Presente · Futuro</div>
+        <div class="tcard-qtd">3 cartas</div>
+        <div class="tcard-desc">O fio kármico que conecta onde você esteve, onde está e para onde caminha.</div>
+      </div>
+
+      <div class="tcard" onclick="escolher('cruz')">
+        <div class="tcard-icon">✛</div>
+        <div class="tcard-nome">Cruz Akáshica</div>
+        <div class="tcard-qtd">5 cartas</div>
+        <div class="tcard-desc">Centro, desafio, base kármica, caminho e resultado da sua jornada.</div>
+      </div>
+
+      <div class="tcard" onclick="escolher('amor')">
+        <div class="tcard-icon">♡</div>
+        <div class="tcard-nome">Leitura de Amor</div>
+        <div class="tcard-qtd">6 cartas</div>
+        <div class="tcard-desc">Dois lados, conexão, obstáculos, potencial e resultado do encontro das almas.</div>
+      </div>
+
+      <div class="tcard" onclick="escolher('celta')">
+        <div class="tcard-icon">☩</div>
+        <div class="tcard-nome">Cruz Celta</div>
+        <div class="tcard-qtd">10 cartas</div>
+        <div class="tcard-desc">A tiragem mais completa: presente, passado, futuro, influências internas, externas e resultado final.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- TELA 2: Pergunta -->
+  <div class="tela" id="tela-pergunta">
+    <div class="form-box">
+      <label class="flabel" id="flabel">Formule sua intenção ou pergunta</label>
+      <textarea class="pinput" id="perguntaInput" placeholder="O que deseja revelar? Pode deixar em branco para leitura livre..." rows="3"></textarea>
+      <button class="btn-ok" onclick="irBaralho()">✦ Consultar os Registros</button>
+    </div>
+  </div>
+
+
+  <!-- TELA 3: Mesa -->
+  <div class="tela" id="tela-mesa">
+    <div class="mesa-topo">
+      <p class="instrucao" id="instrucao">Concentre-se na sua intenção e clique no baralho.</p>
+      <div style="position:relative;display:inline-block;">
+        <!-- Botão embaralhar redondo flutuando à esquerda do baralho -->
+        <div style="position:absolute;left:-96px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;align-items:center;gap:6px;">
+          <button id="btnEmbaralhar" onclick="iniciarEmbaralhamento()" title="Embaralhar" style="width:76px;height:76px;border-radius:50%;background:linear-gradient(135deg,rgba(109,40,217,.5),rgba(167,139,250,.25));border:2.5px solid #f0c96b;color:#f0c96b;font-size:1.8rem;cursor:pointer;display:flex;align-items:center;justify-content:center;animation:pulseHover .9s ease-in-out infinite;box-shadow:0 0 24px rgba(240,201,107,.35);">🔀</button>
+          <span style="font-family:var(--fd);font-size:.48rem;letter-spacing:.08em;color:rgba(240,201,107,.5);text-align:center;">embaralhar</span>
+        </div>
+        <!-- Monte de cartas centralizado -->
+        <div class="baralho-pilha" id="baralho" onclick="puxar()">
+          <div class="sombra-dorso" style="top:6px;left:6px;"></div>
+          <div class="sombra-dorso" style="top:3px;left:3px;"></div>
+          <div class="dorso"><img src="https://opykejeaxehvzogrrwto.supabase.co/storage/v1/object/public/cartas-taro/dorso-carta.png" style="width:100%;height:100%;object-fit:cover;border-radius:10px;" ></div>
+        </div>
+      </div>
+      <div class="restantes" id="restantes"></div>
+    </div>
+    <div class="mesa-container" id="slots"></div>
+    <div class="info-click" id="infoClick" style="display:none;">Passe o cursor ou clique em qualquer carta para ampliá-la</div>
+    <div style="text-align:center;">
+      <button class="btn-interp" id="btnInterp" onclick="interpretar()">✦ Receber a Interpretação dos Registros</button>
+    </div>
+  </div>
+
+  <!-- TELA 4: Spinner -->
+  <div class="tela" id="tela-spin">
+    <div class="spinner-tela ativa">
+      <canvas id="spinCanvas" width="110" height="110"></canvas>
+      <div class="spin-txt" id="spinTxt">Os Registros se abrem...</div>
+      <div style="font-size:.8rem;color:var(--mut);font-style:italic;">Aureon e Nyrael consultam os Guardiões</div>
+    </div>
+  </div>
+
+  <!-- TELA 5: Interpretação -->
+  <div class="tela" id="tela-interp">
+    <div id="interpConteudo"></div>
+    <button class="btn-nova" onclick="novaLeitura()">↺ Nova Leitura</button>
+  </div>
+
+</main>
+
+<script>
+// ══════════════════════════════════════════
+// SUPABASE STORAGE
+// ══════════════════════════════════════════
+var SB = 'https://opykejeaxehvzogrrwto.supabase.co/storage/v1/object/public/cartas-taro';
+var DORSO = SB + '/dorso-carta.png';
+
+// ══════════════════════════════════════════
+// BARALHO — 80 cartas
+// ══════════════════════════════════════════
+var MAIORES = [
+  {id:'00-louco',      nome:'O Louco Akáshico',        n:'0',    naipe:'maior', cor:'#c4b5fd',
+   normal:'A alma inicia nova jornada com fé absoluta no universo. Momento de salto quântico onde a confiança na Inteligência Divina é o único guia. Novas possibilidades se abrem sem que a mente possa compreendê-las.',
+   inv:'Impulsividade sem discernimento. A alma age antes de consultar sua sabedoria interna. Pausa e conexão com os Guardiões são necessárias antes de qualquer passo.'},
+  {id:'01-mago',       nome:'O Mago dos Registros',     n:'I',    naipe:'maior', cor:'#f0c96b',
+   normal:'Todo o poder do universo está disponível. Os Registros mostram uma alma com todos os recursos para manifestar sua realidade. Ação consciente alinhada à Vontade Superior cria milagres.',
+   inv:'Poder mal utilizado ou talentos desperdiçados. Desconexão entre o que a alma deseja e o que está criando. Reconecte-se com sua intenção mais pura.'},
+  {id:'02-sacerdotisa',nome:'A Sacerdotisa Akáshica',   n:'II',   naipe:'maior', cor:'#c4b5fd',
+   normal:'O véu entre os mundos está fino. Confie na intuição acima da razão. Segredos revelados em sonhos e meditação. Não aja ainda — observe e permita que a sabedoria emerge.',
+   inv:'Desconexão do mundo interior. Sinais importantes dos Registros estão sendo ignorados. Cultive o silêncio.'},
+  {id:'03-imperatriz', nome:'A Imperatriz dos Jardins', n:'III',  naipe:'maior', cor:'#4ade80',
+   normal:'Abundância, fertilidade e criação fluem dos Registros. Florescimento em todas as áreas — amor, finanças, projetos criativos. Permita-se receber com graça.',
+   inv:'Bloqueio no fluxo de abundância. Crenças limitantes sobre merecer receber. Trabalhe a relação com o dar e receber.'},
+  {id:'04-imperador',  nome:'O Imperador Akáshico',     n:'IV',   naipe:'maior', cor:'#f87171',
+   normal:'Estrutura, autoridade e estabilidade são os presentes dos Registros. Momento de estabelecer fundações sólidas e exercer liderança com sabedoria.',
+   inv:'Rigidez excessiva ou abuso de autoridade. Aprenda a governar com o coração, não apenas com a mente.'},
+  {id:'05-hierofante', nome:'O Hierofante Akáshico',    n:'V',    naipe:'maior', cor:'#c4b5fd',
+   normal:'Sabedoria transmitida pelos Registros. Um professor ou ensinamento transformador entra em cena. Há conhecimento ancestral disponível para orientar seu caminho.',
+   inv:'Dogmatismo ou rebeldia espiritual. Questione, mas não descarte toda sabedoria acumulada.'},
+  {id:'06-enamorados', nome:'Os Amantes Akáshicos',     n:'VI',   naipe:'maior', cor:'#f0c96b',
+   normal:'Escolha fundamental do coração. Conexão de alma — com pessoa, propósito ou caminho. O amor exige escolha consciente e alinhamento com os valores mais profundos.',
+   inv:'Desequilíbrio em relacionamentos. A alma está dividida. Trabalhe a integração interna antes de buscar conexão externa.'},
+  {id:'07-carro',      nome:'O Carro Akáshico',         n:'VII',  naipe:'maior', cor:'#f0c96b',
+   normal:'Vitória após desafios. A alma aprendeu a guiar forças opostas em direção a um objetivo. A verdadeira vitória vem do domínio de si mesmo.',
+   inv:'Falta de direção ou conflito interno paralisante. Clarifique sua intenção antes de agir.'},
+  {id:'08-forca',      nome:'A Força Akáshica',         n:'VIII', naipe:'maior', cor:'#c4b5fd',
+   normal:'Coragem suave e poder interior. A verdadeira força vem da compaixão, não da dominação. Momento de domar seus próprios medos com amor.',
+   inv:'Dúvida sobre a própria força. O poder mais profundo é silencioso e não precisa se provar.'},
+  {id:'09-eremita',    nome:'O Eremita Akáshico',       n:'IX',   naipe:'maior', cor:'#c4b5fd',
+   normal:'Período sagrado de recolhimento e sabedoria interior. Os Registros pedem afastamento do ruído para encontrar sua luz interna. Verdades profundas emergem no silêncio.',
+   inv:'Isolamento excessivo. A alma se afastou tanto que perdeu o fio com o mundo. Hora de compartilhar sua luz.'},
+  {id:'10-roda',       nome:'A Roda Akáshica',          n:'X',    naipe:'maior', cor:'#f0c96b',
+   normal:'A grande roda dos ciclos kármicos gira a seu favor. O que foi plantado está prestes a colher. Há uma inteligência maior operando. Confie.',
+   inv:'Resistência ao ciclo natural. A roda está girando mas a alma tenta impedi-la. Solte o controle.'},
+  {id:'11-justica',    nome:'A Justiça Akáshica',       n:'XI',   naipe:'maior', cor:'#f0c96b',
+   normal:'A lei do karma opera com perfeição absoluta. Cada ação encontra seu reflexo exato. Momento de acertos e equilíbrio. A verdade sempre vence.',
+   inv:'Desequilíbrio kármico. Os Guardiões pedem honestidade radical sobre responsabilidades passadas.'},
+  {id:'12-enforcado',  nome:'O Pendurado Akáshico',     n:'XII',  naipe:'maior', cor:'#c4b5fd',
+   normal:'Suspensão sagrada e rendição voluntária. Ao parar de lutar, a resposta emerge. Ver o mundo de outro ângulo traz iluminação profunda.',
+   inv:'Martírio desnecessário. Resistência a mudar a perspectiva. Deixe-se ser transformado.'},
+  {id:'13-morte',      nome:'A Transformação',          n:'XIII', naipe:'maior', cor:'#c4b5fd',
+   normal:'A morte dos Registros não é fim — é a mais profunda transformação. O que precisa morrer para que o verdadeiro nasça? Os Guardiões celebram esta passagem sagrada.',
+   inv:'Medo da mudança. Apego ao que já acabou. A estagnação é mais dolorosa que a transformação.'},
+  {id:'14-temperanca', nome:'A Temperança Akáshica',    n:'XIV',  naipe:'maior', cor:'#c4b5fd',
+   normal:'O alquimista interior combina opostos em harmonia perfeita. Integração, cura e equilíbrio refinado. Paciência divina e timing perfeito guiam cada passo.',
+   inv:'Desequilíbrio ou excesso. Busque o meio dourado entre os extremos.'},
+  {id:'15-diabo',      nome:'As Ilusões Akáshicas',     n:'XV',   naipe:'maior', cor:'#c4b5fd',
+   normal:'Os Registros revelam as ilusões que aprisionam a alma. O que parece externo é interno. O reconhecimento do padrão é o primeiro passo da libertação.',
+   inv:'Início de libertação de padrões limitantes. Os Guardiões celebram que a alma começa a ver através das ilusões.'},
+  {id:'16-torre',      nome:'A Torre Akáshica',         n:'XVI',  naipe:'maior', cor:'#f87171',
+   normal:'Estrutura de fundações falsas cai para que o verdadeiro possa ser erguido. Este caos é sagrado. O relâmpago que destrói também ilumina.',
+   inv:'Resistência a mudança necessária. A transformação está acontecendo mais lentamente, mas acontecendo.'},
+  {id:'17-estrela',    nome:'A Estrela Akáshica',       n:'XVII', naipe:'maior', cor:'#f0c96b',
+   normal:'Depois da tempestade, a esperança que renova tudo. Os Registros derramam bênçãos e inspiração divina. Momento de cura profunda e conexão com o propósito maior.',
+   inv:'Desesperança temporária. A estrela sempre brilha, mesmo quando nuvens a escondem.'},
+  {id:'18-lua',        nome:'A Lua Akáshica',           n:'XVIII',naipe:'maior', cor:'#c4b5fd',
+   normal:'As profundezas do inconsciente falam. Nem tudo é como parece — ilusões e medos ancestrais precisam ser trazidos à luz. Confie na intuição mais que nos fatos aparentes.',
+   inv:'Confusão sendo dissipada. A alma começa a ver com mais clareza através das névoas da ilusão.'},
+  {id:'19-sol',        nome:'O Sol Akáshico',           n:'XIX',  naipe:'maior', cor:'#f0c96b',
+   normal:'Alegria, vitalidade e clareza radiante. Sucesso, saúde, felicidade genuína e alinhamento com a criança interior. Celebre — você merece este momento de pura luz.',
+   inv:'Alegria temporariamente bloqueada. A alma anseia pela luz mas ainda carrega sombras a integrar.'},
+  {id:'20-julgamento', nome:'O Julgamento Akáshico',    n:'XX',   naipe:'maior', cor:'#f0c96b',
+   normal:'O chamado da alma para uma vida maior. Despertar espiritual profundo — revisão de tudo que foi vivido e compreensão do propósito maior da sua encarnação.',
+   inv:'Resistência ao chamado. Os Guardiões pedem compaixão: você está sendo chamado, não condenado.'},
+  {id:'21-mundo',      nome:'O Mundo Akáshico',         n:'XXI',  naipe:'maior', cor:'#f0c96b',
+   normal:'Completude, realização e dança com o universo. Os Registros celebram um ciclo completado com maestria. O mundo inteiro está disponível para você agora.',
+   inv:'Ciclo quase completo com detalhes finais a resolver. Dê os últimos passos — a conclusão está próxima.'},
+  {id:'mestre',        nome:'O Mestre Akáshico',        n:'',     naipe:'maior', cor:'#fff8d0',
+   normal:'Transcendência de todos os ciclos. Os Registros revelam uma alma que dominou todos os elementos e agora ensina a outros o caminho de volta à fonte. Maestria absoluta.',
+   inv:'Sabedoria acumulada ainda não compartilhada. O Mestre que não ensina perde sua própria mestria.'},
+];
+
+var NAIPES_DEF = [
+  {naipe:'chamas',   nome:'Chamas',   cor:'#f87171', sim:'🔥', el:'Fogo'},
+  {naipe:'calices',  nome:'Cálices',  cor:'#60a5fa', sim:'💧', el:'Água'},
+  {naipe:'cristais', nome:'Cristais', cor:'#c4b5fd', sim:'⚡', el:'Ar'},
+  {naipe:'estrelas', nome:'Estrelas', cor:'#4ade80', sim:'✦',  el:'Terra'},
+];
+var VALS = [
+  {v:'as',        vn:'Ás'},
+  {v:'2',         vn:'2'},
+  {v:'3',         vn:'3'},
+  {v:'4',         vn:'4'},
+  {v:'5',         vn:'5'},
+  {v:'6',         vn:'6'},
+  {v:'7',         vn:'7'},
+  {v:'8',         vn:'8'},
+  {v:'9',         vn:'9'},
+  {v:'10',        vn:'10'},
+  {v:'pajem',     vn:'Pajem'},
+  {v:'cavaleiro', vn:'Cavaleiro'},
+  {v:'rainha',    vn:'Rainha'},
+  {v:'rei',       vn:'Rei'},
+];
+
+function montarBaralho() {
+  var b = MAIORES.map(function(c){ return Object.assign({},c,{img: SB+'/'+c.id+'.png'}); });
+  NAIPES_DEF.forEach(function(n){
+    VALS.forEach(function(vd){
+      b.push({
+        id: n.naipe+'-'+vd.v,
+        nome: vd.vn+' de '+n.nome,
+        n: vd.vn, naipe: n.naipe,
+        cor: n.cor, sim: n.sim,
+        img: SB+'/'+n.naipe+'-'+vd.v+'.png',
+        normal: 'Os Registros revelam através do '+vd.vn+' de '+n.nome+' ('+n.el+') uma mensagem de transformação. Os Guardiões pedem atenção ao elemento '+n.el.toLowerCase()+' neste momento da sua jornada.',
+        inv: 'A energia de '+n.nome+' está bloqueada. Os Guardiões pedem revisão dos padrões relacionados a '+ n.el.toLowerCase()+' na sua vida.'
+      });
+    });
+  });
+  return b;
+}
+
+var TIRAGENS = {
+  unica: {nome:'Carta do Dia',             qtd:1,  pos:['Mensagem dos Registros']},
+  tres:  {nome:'Passado · Presente · Futuro', qtd:3,  pos:['Passado','Presente','Futuro']},
+  cruz:  {nome:'Cruz Akáshica',            qtd:5,  pos:['Centro da questão','O desafio','Base kármica','Caminho indicado','Resultado provável']},
+  amor:  {nome:'Leitura de Amor',          qtd:6,  pos:['Você','A outra alma','A conexão','Os obstáculos','O potencial','O resultado']},
+  celta: {nome:'Cruz Celta',               qtd:10, pos:['A situação','O obstáculo','Raiz do problema','O passado','O que pode acontecer','O futuro próximo','Você diante da situação','Influências externas','Esperanças e medos','Resultado final']},
+};
+
+// Estado
+var baralho=[], tiragem=null, selecionadas=[], pergunta='';
+
+function embaralhar(a){
+  for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}
+  return a;
+}
+
+function ir(id){
+  document.querySelectorAll('.tela').forEach(function(t){t.classList.remove('ativa');});
+  document.getElementById(id).classList.add('ativa');
+}
+
+function escolher(tipo){
+  tiragem = TIRAGENS[tipo];
+  var labels={unica:'Qual mensagem os Registros têm para você agora?',tres:'Qual situação deseja iluminar?',cruz:'Qual é a questão central que traz para os Registros?',amor:'Qual relação deseja explorar?',celta:'Qual é a pergunta profunda que traz para os Registros?'};
+  document.getElementById('flabel').textContent = labels[tipo];
+  ir('tela-pergunta');
+}
+
+function irBaralho(){
+  pergunta = document.getElementById('perguntaInput').value.trim();
+  baralho = embaralhar(montarBaralho());
+  selecionadas = [];
+  renderSlots();
+  document.getElementById('baralho').style.opacity='1';
+  document.getElementById('baralho').style.pointerEvents='auto';
+  document.getElementById('btnInterp').style.display='none';
+  document.getElementById('infoClick').style.display='none';
+  atualizarInstrucao();
+  ir('tela-mesa');
+}
+
+function atualizarInstrucao(){
+  var faltam = tiragem.qtd - selecionadas.length;
+  if(faltam>0){
+    document.getElementById('instrucao').textContent = faltam===tiragem.qtd
+      ? 'Respire fundo. Concentre-se na sua intenção e clique no baralho.'
+      : 'Clique mais ' + faltam + ' vez'+(faltam>1?'es':'')+' no baralho.';
+    document.getElementById('restantes').textContent = '';
+  } else {
+    document.getElementById('instrucao').textContent = 'Todas as cartas foram reveladas.';
+    document.getElementById('restantes').textContent = '';
+  }
+}
+
+function renderSlots(){
+  var c = document.getElementById('slots');
+
+  // Cruz Celta: 4 em cima + 6 embaixo
+  if(tiragem.qtd === 10){
+    var linha1 = tiragem.pos.slice(0,4);
+    var linha2 = tiragem.pos.slice(4,10);
+    c.innerHTML =
+      '<div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;width:100%;margin-bottom:10px;">'
+      + linha1.map(function(p,i){ return slotHTML(p,i); }).join('')
+      + '</div>'
+      + '<div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;width:100%;">'
+      + linha2.map(function(p,i){ return slotHTML(p,i+4); }).join('')
+      + '</div>';
+    return;
+  }
+
+  // Demais tiragens: todos na mesma linha
+  c.innerHTML = tiragem.pos.map(function(p,i){ return slotHTML(p,i); }).join('');
+}
+
+function slotHTML(p, i){
+  return '<div class="mesa-slot" id="mslot-'+i+'">'
+    +'<div class="slot-vazio" id="slot-'+i+'">'
+    +'<img src="'+DORSO+'" style="width:100%;height:100%;object-fit:cover;border-radius:11px;opacity:.45;" >'
+    +'</div>'
+    +'<div class="slot-label">'+p+'</div>'
+    +'</div>';
+}
+
+var _puxando = false; // bloqueia cliques durante animação
+
+function puxar(){
+  if(_puxando) return;
+  var idx = selecionadas.length;
+  if(idx>=tiragem.qtd || !baralho.length) return;
+
+  _puxando = true;
+  var baralhoEl = document.getElementById('baralho');
+  baralhoEl.style.pointerEvents = 'none';
+  // Desabilitar embaralhar após primeira carta
+  if(selecionadas.length === 0){
+    var btnEmb = document.getElementById('btnEmbaralhar');
+    if(btnEmb){ btnEmb.disabled=true; btnEmb.style.opacity='.3'; btnEmb.style.animation='none'; }
+    var labelEmb2 = document.querySelector('#btnEmbaralhar + span');
+    if(labelEmb2) labelEmb2.style.opacity='.3';
+  }
+
+  var carta = baralho.pop();
+  var inv = Math.random()<0.15;
+  selecionadas.push({carta:carta, inv:inv, pos:tiragem.pos[idx]});
+  atualizarInstrucao();
+
+  // Criar carta voadora sobre o baralho
+  var rect = baralhoEl.getBoundingClientRect();
+  var voadora = document.createElement('img');
+  voadora.src = DORSO;
+  voadora.style.cssText = [
+    'position:fixed',
+    'left:'+rect.left+'px',
+    'top:'+rect.top+'px',
+    'width:'+rect.width+'px',
+    'height:'+rect.height+'px',
+    'border-radius:12px',
+    'border:2px solid rgba(240,201,107,.7)',
+    'box-shadow:0 0 30px rgba(240,201,107,.4)',
+    'z-index:8888',
+    'pointer-events:none',
+    'transition:none',
+    'object-fit:cover'
+  ].join(';');
+  document.body.appendChild(voadora);
+
+  // FASE 1: subir e aumentar no centro
+  var cx = window.innerWidth/2 - 160;
+  var cy = window.innerHeight/2 - 262;
+  voadora.style.transition = 'all .5s cubic-bezier(.4,0,.2,1)';
+  requestAnimationFrame(function(){
+    requestAnimationFrame(function(){
+      voadora.style.left = cx+'px';
+      voadora.style.top = cy+'px';
+      voadora.style.width = '320px';
+      voadora.style.height = '524px';
+      voadora.style.boxShadow = '0 0 100px rgba(240,201,107,.95), 0 0 200px rgba(240,201,107,.5), 0 0 300px rgba(109,40,217,.4)';
+      voadora.style.borderColor = '#f0c96b';
+      voadora.style.border = '3px solid #f0c96b';
+    });
+  });
+
+  // PRÉ-CARREGAR imagem da frente
+  var imgFrente = new Image();
+  if(carta.img) imgFrente.src = carta.img;
+
+  // FASE 2: virar como página SEM sumiço
+  setTimeout(function(){
+    function mostrarFrente(){
+      var frente = document.createElement('img');
+      frente.src = carta.img;
+      frente.style.cssText = voadora.style.cssText;
+      frente.style.transition = 'none';
+      if(inv) frente.style.transform = 'rotate(180deg)';
+      // Sem animação de flip que cause sumiço — apenas aparece direto
+      document.body.appendChild(frente);
+      if(document.body.contains(voadora)) document.body.removeChild(voadora);
+      voadora = frente;
+    }
+
+    if(carta.img){
+      if(imgFrente.complete && imgFrente.naturalWidth > 0){
+        mostrarFrente();
+      } else {
+        imgFrente.onload = mostrarFrente;
+        imgFrente.onerror = function(){
+          voadora.style.background = 'linear-gradient(135deg,#0a0520,#1a0840)';
+        };
+      }
+    }
+
+    // FASE 3: aguarda 2500ms após virar — depois desce para o slot
+    setTimeout(function(){
+      var slotEl = document.getElementById('slot-'+idx);
+      if(slotEl){
+        var sr = slotEl.getBoundingClientRect();
+        voadora.style.animation = 'none';
+        voadora.style.transition = 'all .5s cubic-bezier(.6,0,.4,1)';
+        requestAnimationFrame(function(){
+          requestAnimationFrame(function(){
+            voadora.style.left = sr.left+'px';
+            voadora.style.top = sr.top+'px';
+            voadora.style.width = sr.width+'px';
+            voadora.style.height = sr.height+'px';
+            voadora.style.boxShadow = '0 0 14px rgba(109,40,217,.3)';
+            voadora.style.borderColor = 'rgba(240,201,107,.4)';
+          });
+        });
+
+        // FASE 4: após pousar — renderizar no slot e limpar
+        setTimeout(function(){
+          renderSlotCarta(idx, carta, inv);
+          if(document.body.contains(voadora)) document.body.removeChild(voadora);
+
+          // Liberar baralho ou finalizar
+          if(selecionadas.length===tiragem.qtd){
+            baralhoEl.style.opacity='0.3';
+            baralhoEl.style.pointerEvents='none';
+            document.getElementById('btnInterp').style.display='inline-block';
+            document.getElementById('infoClick').style.display='block';
+          } else {
+            baralhoEl.style.pointerEvents='auto';
+          }
+          _puxando = false;
+        }, 550);
+      } else {
+        if(document.body.contains(voadora)) document.body.removeChild(voadora);
+        renderSlotCarta(idx, carta, inv);
+        baralhoEl.style.pointerEvents='auto';
+        _puxando = false;
+      }
+    }, 2500);
+  }, 500);
+}
+
+function renderSlotCarta(idx, carta, inv){
+  var slot = document.getElementById('slot-'+idx);
+  var novoSlot = document.createElement('div');
+  novoSlot.className = 'slot-carta' + (inv ? ' invertida' : '');
+  novoSlot.id = 'slot-' + idx;
+  novoSlot.style.animation = 'slotFlip .45s ease';
+
+  if(carta.img){
+    var imgEl = document.createElement('img');
+    imgEl.src = carta.img;
+    imgEl.alt = carta.nome;
+    imgEl.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;' + (inv ? 'transform:rotate(180deg);' : '');
+    imgEl.onerror = function(){
+      novoSlot.innerHTML = '<div class="slot-carta-face"><span class="sym">'+(carta.sim||'✦')+'</span><span class="nm">'+carta.nome+'</span></div>';
+    };
+    novoSlot.appendChild(imgEl);
+  } else {
+    novoSlot.innerHTML = '<div class="slot-carta-face"><span class="sym">'+(carta.sim||'✦')+'</span><span class="nm">'+carta.nome+'</span></div>';
+  }
+
+  // Sem clique automático — só manual pelo consulente
+  slot.parentNode.replaceChild(novoSlot, slot);
+}
+
+// ── OVERLAY ──
+function abrirOverlay(idx){
+  var s = selecionadas[idx];
+  if(!s) return;
+  var carta = s.carta, inv = s.inv, pos = s.pos;
+  var wrap = document.getElementById('ovWrap');
+  wrap.innerHTML = '';
+
+  // 1. Mostrar dorso pulsando
+  var dorsImg = document.createElement('img');
+  dorsImg.className = 'ov-img';
+  dorsImg.src = DORSO;
+  dorsImg.style.animation = 'dorsoPulse 1s ease-in-out';
+  wrap.appendChild(dorsImg);
+
+  document.getElementById('ovNome').textContent = '';
+  document.getElementById('ovPos').textContent = '✦ Revelando...';
+  document.getElementById('overlay').classList.add('aberto');
+  document.body.style.overflow = 'hidden';
+
+  // 2. Após 900ms vira como página mostrando a carta
+  setTimeout(function(){
+    wrap.innerHTML = '';
+    var el;
+    if(carta.img){
+      el = document.createElement('img');
+      el.className = 'ov-img';
+      el.src = carta.img;
+      el.alt = carta.nome;
+      if(inv) el.style.transform = 'rotate(180deg)';
+      el.onerror = function(){
+        wrap.innerHTML = '<div class="ov-face"><span class="big">'+(carta.sim||'✦')+'</span><span class="nm">'+carta.nome+'</span></div>';
+      };
+    } else {
+      el = document.createElement('div');
+      el.className = 'ov-face';
+      el.innerHTML = '<span class="big">'+(carta.sim||'✦')+'</span><span class="nm">'+carta.nome+'</span>';
+    }
+    el.style.animation = 'pageFlipIn .7s cubic-bezier(.4,0,.2,1)';
+    wrap.appendChild(el);
+    document.getElementById('ovNome').textContent = (carta.n?carta.n+' — ':'')+carta.nome+(inv?' — Invertida':'');
+    document.getElementById('ovPos').textContent = pos || '';
+  }, 900);
+}
+
+function fecharOverlay(){
+  document.getElementById('overlay').classList.remove('aberto');
+  document.body.style.overflow='';
+}
+
+document.addEventListener('keydown',function(e){ if(e.key==='Escape') fecharOverlay(); });
+
+// ── INTERPRETAÇÃO ──
+async function interpretar(){
+  ir('tela-spin');
+  var msgs=['Os Registros se abrem...','Aureon consulta os Guardiões...','Nyrael lê as cartas...','A mensagem emerge...'];
+  var mi=0, timer=setInterval(function(){document.getElementById('spinTxt').textContent=msgs[mi=(mi+1)%msgs.length];},2200);
+
+  var payload = selecionadas.map(function(s){
+    return {posicao:s.pos, nome:s.carta.nome, invertida:s.inv, significadoNormal:s.carta.normal, significadoInvertido:s.carta.inv};
+  });
+
+  try {
+    var resp = await fetch('/api/espiritualidade',{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        tipo:'taro',
+        nome: (JSON.parse(localStorage.getItem('akashic_user')||sessionStorage.getItem('akashic_user')||'{}')).nome||'Alma',
+        cartas: payload, tiragem: tiragem.nome, pergunta: pergunta
+      })
+    });
+    if(!resp.ok) throw new Error();
+
+    var reader=resp.body.getReader(), dec=new TextDecoder(), buf='', full='';
+    while(true){
+      var r=await reader.read(); if(r.done)break;
+      buf+=dec.decode(r.value,{stream:true});
+      var lines=buf.split('\n'); buf=lines.pop();
+      for(var ln of lines){
+        if(!ln.startsWith('data: ')) continue;
+        try{var ev=JSON.parse(ln.slice(6));if(ev.delta)full+=ev.delta;if(ev.done){clearInterval(timer);renderInterp(full);}}catch(e){}
+      }
+    }
+    // fallback se done não chegou
+    if(document.getElementById('tela-spin').classList.contains('ativa')){clearInterval(timer);renderInterp(full);}
+  } catch(e) {
+    clearInterval(timer); renderInterpLocal();
+  }
+}
+
+function renderInterp(txt){
+  try{
+    var m=txt.match(/\{[\s\S]*\}/);
+    if(m){renderInterpData(JSON.parse(m[0]));return;}
+  }catch(e){}
+  renderInterpLocal();
+}
+
+function renderInterpData(d){
+  var html='<div class="interp-box">';
+  html+='<div class="interp-titulo">'+(d.titulo||'✦ Leitura Akáshica')+'</div>';
+  if(pergunta) html+='<div class="interp-perg">"'+pergunta+'"</div>';
+  if(d.cartas) d.cartas.forEach(function(c,i){
+    var cs=selecionadas[i];
+    html+='<div class="interp-carta"><div class="ic-header">';
+    if(cs&&cs.carta.img) html+='<img class="ic-thumb" src="'+cs.carta.img+'" alt="" '+(cs.inv?'style="transform:rotate(180deg)"':'')+'>';
+    html+='<span class="ic-nome">'+(c.carta||c.nome||'')+(c.invertida||cs&&cs.inv?' <span class="ic-inv">INVERTIDA</span>':'')+'</span>';
+    html+='<span class="ic-pos">'+(c.posicao||'')+'</span></div>';
+    html+='<div class="ic-txt">'+(c.interpretacao||'')+'</div></div>';
+  });
+  if(d.sintese) html+='<div class="interp-sintese"><span class="label-sec">✦ SÍNTESE AKÁSHICA</span><div class="ic-txt">'+d.sintese+'</div></div>';
+  if(d.acao_sagrada) html+='<div class="interp-acao"><span class="label-acc">⟡ AÇÃO SAGRADA</span><div class="ic-txt">'+d.acao_sagrada+'</div></div>';
+  html+='</div>';
+  document.getElementById('interpConteudo').innerHTML=html;
+  ir('tela-interp');
+}
+
+function renderInterpLocal(){
+  var html='<div class="interp-box"><div class="interp-titulo">✦ Leitura Akáshica — '+tiragem.nome+'</div>';
+  if(pergunta) html+='<div class="interp-perg">"'+pergunta+'"</div>';
+  selecionadas.forEach(function(s){
+    html+='<div class="interp-carta"><div class="ic-header">';
+    if(s.carta.img) html+='<img class="ic-thumb" src="'+s.carta.img+'" alt="" '+(s.inv?'style="transform:rotate(180deg)"':'')+'>';
+    html+='<span class="ic-nome">'+s.carta.nome+(s.inv?' <span class="ic-inv">INVERTIDA</span>':'')+'</span>';
+    html+='<span class="ic-pos">'+s.pos+'</span></div>';
+    html+='<div class="ic-txt">'+(s.inv?s.carta.inv:s.carta.normal)+'</div></div>';
+  });
+  html+='<div class="interp-sintese"><span class="label-sec">✦ SÍNTESE AKÁSHICA</span><div class="ic-txt">Os Registros falam através destas cartas uma mensagem unificada para sua alma. Confie no que emergiu nesta leitura.</div></div></div>';
+  document.getElementById('interpConteudo').innerHTML=html;
+  ir('tela-interp');
+}
+
+
+// ── Embaralhamento visual ──
+var _embaralhando = false;
+function iniciarEmbaralhamento() {
+  if(_embaralhando) return;
+  _embaralhando = true;
+  var btn = document.getElementById('btnEmbaralhar');
+  if(btn) { btn.disabled = true; btn.textContent = '✦ Embaralhando...'; }
+  var pilha = document.getElementById('baralho');
+  var flashes = 0;
+  // Esconder o label enquanto embaralha
+  var labelEmb = document.querySelector('#btnEmbaralhar + span');
+  if(labelEmb) labelEmb.style.visibility = 'hidden';
+  if(btn) btn.textContent = '⟳';
+
+  var timer = setInterval(function(){
+    var even = flashes%2===0;
+    pilha.style.transform = even ? 'scale(1.12) rotate(-4deg)' : 'scale(1.06) rotate(4deg)';
+    pilha.style.filter = 'drop-shadow(0 0 '+(even?'30':'12')+'px rgba(240,201,107,.9))';
+    flashes++;
+    if(flashes >= 12) {
+      clearInterval(timer);
+      pilha.style.transform = '';
+      pilha.style.filter = '';
+      baralho = embaralhar(montarBaralho());
+      selecionadas = [];
+      renderSlots();
+      document.getElementById('baralho').style.opacity='1';
+      document.getElementById('baralho').style.pointerEvents='auto';
+      document.getElementById('btnInterp').style.display='none';
+      document.getElementById('infoClick').style.display='none';
+      atualizarInstrucao();
+      _embaralhando = false;
+      if(btn) { btn.disabled=false; btn.textContent='🔀'; }
+      if(labelEmb) labelEmb.style.visibility = 'visible';
+    }
+  }, 100);
+}
+
+function novaLeitura(){
+  baralho=[];selecionadas=[];tiragem=null;pergunta='';
+  document.getElementById('perguntaInput').value='';
+  ir('tela-tiragem');
+}
+
+// Verificar login
+var _u=JSON.parse(localStorage.getItem('akashic_user')||sessionStorage.getItem('akashic_user')||'{}');
+if(!_u.email) window.location.href='/login';
+</script>
+
+<!-- Spinner animado -->
+<script>
+(function(){
+  var cv=document.getElementById('spinCanvas');
+  if(!cv)return;
+  var ctx=cv.getContext('2d'),CX=55,CY=55,R=30,t=0;
+  function frame(){
+    ctx.clearRect(0,0,110,110);
+    var g=ctx.createRadialGradient(CX-8,CY-10,2,CX,CY,R);
+    g.addColorStop(0,'#e8d8ff');g.addColorStop(.2,'#9040e0');g.addColorStop(.6,'#400890');g.addColorStop(1,'#080318');
+    ctx.beginPath();ctx.arc(CX,CY,R,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();
+    var orbs=[{a:0,s:5},{a:Math.PI/2.5,s:3.5},{a:Math.PI*1.1,s:3}];
+    orbs.forEach(function(o,i){
+      var ang=o.a+t*(2+i*.6);
+      var rx=R+8,ry=7;
+      var ox=Math.cos(ang)*rx,oy=Math.sin(ang)*ry;
+      ctx.save();ctx.translate(CX,CY);
+      var gd=ctx.createRadialGradient(ox,oy,0,ox,oy,o.s*2.5);
+      gd.addColorStop(0,'rgba(240,201,107,0.9)');gd.addColorStop(1,'rgba(240,201,107,0)');
+      ctx.beginPath();ctx.arc(ox,oy,o.s*2.5,0,Math.PI*2);ctx.fillStyle=gd;ctx.fill();
+      ctx.beginPath();ctx.arc(ox,oy,o.s,0,Math.PI*2);ctx.fillStyle='#f0c96b';ctx.fill();
+      ctx.restore();
+    });
+    var cc=ctx.createRadialGradient(CX,CY,0,CX,CY,5);
+    cc.addColorStop(0,'white');cc.addColorStop(1,'rgba(240,201,107,.8)');
+    ctx.beginPath();ctx.arc(CX,CY,5,0,Math.PI*2);ctx.fillStyle=cc;ctx.fill();
+    t+=0.022;requestAnimationFrame(frame);
+  }
+  frame();
+})();
+</script>
+
+<!-- Universo do Portal -->
+  <script>
+  (function(){
+    const canvas = document.getElementById('universeCanvas');
+    const ctx = canvas.getContext('2d');
+    let W, H, stars=[], nebulae=[], galaxies=[], spaceships=[], starClusters=[], t=0;
+    const startTime = Date.now(); // Tempo de início do programa
+    function resize(){
+      W = canvas.width  = window.innerWidth;
+      H = canvas.height = window.innerHeight;
+      initScene();
+    }
+    function rand(a,b){ return a + Math.random()*(b-a); }
+    function initScene(){
+      stars = [];
+      const count = Math.floor((W*H)/600);
+      for(let i=0;i<count;i++){
+        const spd=rand(0.3,1.2); stars.push({ x:rand(0,W), y:rand(0,H), r:rand(0.5,2.2), alpha:rand(0.4,1), speed:rand(0.0003,0.0012), phase:rand(0,Math.PI*2), color:Math.random()<0.20?`hsl(${rand(200,280)},85%,92%)`:'#fff', dx:spd*0.7, dy:spd*0.2 });
+      }
+      
+      // Adiciona estrelas MUITO brilhantes (ULTRA RARAS)
+      const brightStarCount = Math.floor((W*H)/80000); // Ultra raras!
+      for(let i=0; i<brightStarCount; i++){
+        const spd=rand(0.2,0.8);
+        const size = rand(2.5, 7); // Tamanhos MUITO variados (pequenas a grandes)
+        stars.push({ 
+          x:rand(0,W), 
+          y:rand(0,H), 
+          r:size,
+          alpha:1,
+          speed:rand(0.0005,0.0015), 
+          phase:rand(0,Math.PI*2), 
+          color:'#ffffff', 
+          dx:spd*0.5, 
+          dy:spd*0.15,
+          isBright: true
+        });
+      }
+      
+      // Aglomerados de estrelas RAROS (movem-se lentamente)
+      starClusters = [];
+      // Apenas 0-1 aglomerado inicial (muito raros!)
+      if(Math.random() < 0.3){
+        const cluster = {
+          x: rand(0, W),
+          y: rand(H*0.2, H*0.8),
+          radius: rand(40, 100),
+          dx: rand(0.3, 0.8),
+          stars: []
+        };
+        
+        const numStars = Math.floor(rand(12, 25)); // Menos estrelas
+        for(let s=0; s<numStars; s++){
+          const angle = Math.random() * Math.PI * 2;
+          const distance = Math.random() * cluster.radius;
+          cluster.stars.push({
+            offsetX: Math.cos(angle) * distance,
+            offsetY: Math.sin(angle) * distance,
+            size: rand(0.3, 1.0),
+            alpha: rand(0.2, 0.5),
+            color: Math.random() < 0.3 ? `hsl(${rand(200,280)},70%,85%)` : 'rgba(255,255,255,0.6)'
+          });
+        }
+        starClusters.push(cluster);
+      }
+      
+      nebulae = [];
+      const cols = [[120,70,200],[60,100,255],[200,80,160],[30,120,220],[160,60,220],[80,160,255],[255,140,80],[100,200,255]];
+      for(let i=0;i<15;i++){
+        const [r,g,b] = cols[i%cols.length];
+        nebulae.push({ x:rand(0,W), y:rand(0,H), rx:rand(W*.15,W*.5), ry:rand(H*.12,H*.4), alpha:rand(0.08,0.18), angle:rand(0,Math.PI), r,g,b, driftX:rand(-0.03,0.03), driftY:rand(-0.02,0.02), rotSpeed:rand(-0.00005,0.00005), pulseSpeed:rand(0.0003,0.0008), pulsePhase:rand(0,Math.PI*2) });
+      }
+      
+      spaceships = [];
+    }
+    function createSpaceship() {
+      if(Math.random() < 0.004 && spaceships.length < 2) {
+        const direction = Math.random() < 0.5 ? 1 : -1; // Esquerda→Direita ou Direita→Esquerda
+        spaceships.push({
+          x: direction > 0 ? -50 : W + 50,
+          y: rand(H * 0.2, H * 0.8),
+          size: rand(8, 14),
+          speed: rand(15, 25) * direction,
+          lightPhase: rand(0, Math.PI * 2),
+          lightSpeed: rand(0.2, 0.3),
+          color: Math.random() < 0.5 ? [100, 200, 255] : [200, 100, 255],
+          trail: []
+        });
+      }
+    }
+    function drawSpaceships() {
+      spaceships.forEach((ship, idx) => {
+        // Adiciona posição atual ao rastro
+        ship.trail.push({ x: ship.x, y: ship.y, alpha: 1 });
+        if(ship.trail.length > 15) ship.trail.shift();
+        
+        // Desenha rastro de luz
+        ship.trail.forEach((point, i) => {
+          const alpha = (i / ship.trail.length) * point.alpha;
+          const size = ship.size * 0.3 * (i / ship.trail.length);
+          
+          ctx.save();
+          ctx.globalAlpha = alpha * 0.6;
+          ctx.shadowBlur = 15;
+          ctx.shadowColor = `rgba(${ship.color[0]}, ${ship.color[1]}, ${ship.color[2]}, ${alpha})`;
+          
+          // Partícula de luz do rastro
+          const gradient = ctx.createRadialGradient(point.x, point.y, 0, point.x, point.y, size * 3);
+          gradient.addColorStop(0, `rgba(255, 255, 255, ${alpha * 0.8})`);
+          gradient.addColorStop(0.5, `rgba(${ship.color[0]}, ${ship.color[1]}, ${ship.color[2]}, ${alpha * 0.6})`);
+          gradient.addColorStop(1, `rgba(${ship.color[0]}, ${ship.color[1]}, ${ship.color[2]}, 0)`);
+          
+          ctx.fillStyle = gradient;
+          ctx.beginPath();
+          ctx.arc(point.x, point.y, size * 3, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+          
+          point.alpha *= 0.95;
+        });
+        
+        // Desenha a nave
+        ctx.save();
+        ctx.translate(ship.x, ship.y);
+        
+        // Corpo da nave
+        ctx.fillStyle = `rgba(${ship.color[0]}, ${ship.color[1]}, ${ship.color[2]}, 0.9)`;
+        ctx.shadowBlur = 12;
+        ctx.shadowColor = `rgba(${ship.color[0]}, ${ship.color[1]}, ${ship.color[2]}, 0.8)`;
+        
+        // Cúpula superior
+        ctx.beginPath();
+        ctx.ellipse(0, -ship.size*0.15, ship.size*0.5, ship.size*0.25, 0, 0, Math.PI*2);
+        ctx.fill();
+        
+        // Disco principal
+        ctx.fillStyle = `rgba(${ship.color[0] - 30}, ${ship.color[1] - 30}, ${ship.color[2] - 30}, 0.8)`;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, ship.size*0.8, ship.size*0.3, 0, 0, Math.PI*2);
+        ctx.fill();
+        
+        // Luz piscante central
+        const lightBlink = Math.sin(ship.lightPhase) * 0.5 + 0.5;
+        ctx.fillStyle = `rgba(255, 255, 200, ${lightBlink})`;
+        ctx.shadowBlur = 8;
+        ctx.shadowColor = `rgba(255, 255, 200, ${lightBlink})`;
+        ctx.beginPath();
+        ctx.arc(0, 0, ship.size*0.15, 0, Math.PI*2);
+        ctx.fill();
+        
+        ctx.restore();
+        
+        // Movimento horizontal
+        ship.x += ship.speed;
+        ship.lightPhase += ship.lightSpeed;
+        
+        // Remove naves que saíram da tela
+        if(ship.x < -100 || ship.x > W + 100) {
+          spaceships.splice(idx, 1);
+        }
+      });
+    }
+    function drawBg(){
+      const bg = ctx.createRadialGradient(W*.5,H*.4,0,W*.5,H*.5,Math.max(W,H)*.8);
+      bg.addColorStop(0,'#0d0820'); bg.addColorStop(0.4,'#060314'); bg.addColorStop(1,'#020108');
+      ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
+    }
+    function drawStarClusters(){
+      // Move e desenha aglomerados
+      starClusters.forEach((cluster, idx) => {
+        cluster.x += cluster.dx;
+        
+        // Remove aglomerados que saíram da tela
+        if(cluster.x > W + cluster.radius*2){
+          starClusters.splice(idx, 1);
+        }
+        
+        cluster.stars.forEach(star => {
+          const starX = cluster.x + star.offsetX;
+          const starY = cluster.y + star.offsetY;
+          
+          ctx.globalAlpha = star.alpha;
+          ctx.fillStyle = star.color;
+          ctx.beginPath();
+          ctx.arc(starX, starY, star.size, 0, Math.PI*2);
+          ctx.fill();
+          
+          // Pequeno brilho para estrelas maiores
+          if(star.size > 0.7){
+            const glow = ctx.createRadialGradient(starX, starY, 0, starX, starY, star.size*2);
+            glow.addColorStop(0, `rgba(255,255,255,${star.alpha*0.3})`);
+            glow.addColorStop(1, 'transparent');
+            ctx.fillStyle = glow;
+            ctx.beginPath();
+            ctx.arc(starX, starY, star.size*2, 0, Math.PI*2);
+            ctx.fill();
+          }
+        });
+      });
+      ctx.globalAlpha = 1;
+    }
+    
+    function createStarCluster(){
+      // RARO: 0.15% de chance por frame, máximo 2 aglomerados
+      if(Math.random() < 0.0015 && starClusters.length < 2){
+        const cluster = {
+          x: -100,
+          y: rand(H*0.2, H*0.8),
+          radius: rand(40, 100),
+          dx: rand(0.3, 0.8),
+          stars: []
+        };
+        
+        const numStars = Math.floor(rand(12, 25)); // Menos estrelas
+        for(let s=0; s<numStars; s++){
+          const angle = Math.random() * Math.PI * 2;
+          const distance = Math.random() * cluster.radius;
+          cluster.stars.push({
+            offsetX: Math.cos(angle) * distance,
+            offsetY: Math.sin(angle) * distance,
+            size: rand(0.3, 1.0),
+            alpha: rand(0.2, 0.5),
+            color: Math.random() < 0.3 ? `hsl(${rand(200,280)},70%,85%)` : 'rgba(255,255,255,0.6)'
+          });
+        }
+        starClusters.push(cluster);
+      }
+    }
+    
+    function drawGalaxies(){
+      galaxies.forEach(g=>{
+        ctx.save();
+        ctx.translate(g.x, g.y);
+        ctx.rotate(g.angle);
+        g.angle += g.rotationSpeed;
+        
+        // Escala para perspectiva 3D
+        ctx.scale(1, g.ry/g.rx);
+        
+        // GALÁXIA ESPIRAL REALISTA
+        
+        // Halo externo brilhante
+        const haloGrad = ctx.createRadialGradient(0,0,0,0,0,g.rx*1.2);
+        haloGrad.addColorStop(0,`rgba(${g.color[0]+40},${g.color[1]+40},${g.color[2]+40},${g.alpha*0.5})`);
+        haloGrad.addColorStop(0.5,`rgba(${g.color[0]+20},${g.color[1]+20},${g.color[2]+20},${g.alpha*0.3})`);
+        haloGrad.addColorStop(1,`rgba(${g.color[0]},${g.color[1]},${g.color[2]},0)`);
+        ctx.fillStyle = haloGrad;
+        ctx.beginPath();
+        ctx.arc(0,0,g.rx*1.2,0,Math.PI*2);
+        ctx.fill();
+        
+        // Núcleo galáctico super brilhante
+        const coreGrad = ctx.createRadialGradient(0,0,0,0,0,g.rx*0.2);
+        coreGrad.addColorStop(0,'rgba(255,255,255,0.9)');
+        coreGrad.addColorStop(0.4,`rgba(${g.color[0]+80},${g.color[1]+80},${g.color[2]+80},0.7)`);
+        coreGrad.addColorStop(1,`rgba(${g.color[0]},${g.color[1]},${g.color[2]},0.3)`);
+        ctx.shadowBlur = 25;
+        ctx.shadowColor = `rgba(${g.color[0]},${g.color[1]},${g.color[2]},0.8)`;
+        ctx.fillStyle = coreGrad;
+        ctx.beginPath();
+        ctx.arc(0,0,g.rx*0.2,0,Math.PI*2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+        
+        // Braços espirais (3-4 braços)
+        const numArms = 3 + Math.floor(Math.random()*2);
+        ctx.globalAlpha = 0.9;
+        
+        for(let armIdx=0; armIdx<numArms; armIdx++){
+          ctx.save();
+          ctx.rotate((Math.PI*2/numArms)*armIdx);
+          
+          // Desenha braço espiral
+          ctx.beginPath();
+          for(let i=0; i<=100; i++){
+            const t = i/100;
+            const angle = t * Math.PI * 2.2;
+            const radius = t * g.rx * 0.9;
+            const x = Math.cos(angle) * radius;
+            const y = Math.sin(angle) * radius;
+            if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+          }
+          
+          const armGrad = ctx.createLinearGradient(0,0,g.rx*0.9,0);
+          armGrad.addColorStop(0,`rgba(${g.color[0]+100},${g.color[1]+100},${g.color[2]+100},0.8)`);
+          armGrad.addColorStop(0.5,`rgba(${g.color[0]+50},${g.color[1]+30},${g.color[2]+70},0.6)`);
+          armGrad.addColorStop(1,`rgba(${g.color[0]},${g.color[1]},${g.color[2]},0.2)`);
+          
+          ctx.strokeStyle = armGrad;
+          ctx.lineWidth = 5;
+          ctx.shadowBlur = 10;
+          ctx.shadowColor = `rgba(${g.color[0]},${g.color[1]},${g.color[2]},0.5)`;
+          ctx.stroke();
+          
+          // Estrelas no braço
+          for(let s=0; s<30; s++){
+            const t = Math.random();
+            const angle = t * Math.PI * 2.2;
+            const radius = t * g.rx * 0.85;
+            const x = Math.cos(angle) * radius + (Math.random()-0.5)*8;
+            const y = Math.sin(angle) * radius + (Math.random()-0.5)*8;
+            
+            ctx.fillStyle = 'rgba(255,255,255,0.8)';
+            ctx.shadowBlur = 3;
+            ctx.shadowColor = 'rgba(255,255,255,0.8)';
+            ctx.beginPath();
+            ctx.arc(x,y,Math.random()*1.5+0.5,0,Math.PI*2);
+            ctx.fill();
+          }
+          
+          ctx.restore();
+        }
+        
+        ctx.shadowBlur = 0;
+        ctx.globalAlpha = 1;
+        ctx.restore();
+      });
+    }
+    function drawNebulae(){
+      nebulae.forEach(n=>{
+        const pulse=Math.sin(t*n.pulseSpeed+n.pulsePhase)*0.4+0.8;
+        ctx.save(); 
+        ctx.translate(n.x,n.y); 
+        ctx.rotate(n.angle);
+        
+        // Adiciona blur para efeito de nebulosa
+        ctx.shadowBlur = 50;
+        ctx.shadowColor = `rgba(${n.r},${n.g},${n.b},${n.alpha*0.5})`;
+        
+        const g=ctx.createRadialGradient(0,0,0,0,0,n.rx);
+        const a=n.alpha*pulse;
+        g.addColorStop(0,`rgba(${n.r},${n.g},${n.b},${a})`);
+        g.addColorStop(0.3,`rgba(${n.r},${n.g},${n.b},${a*0.7})`);
+        g.addColorStop(0.6,`rgba(${n.r},${n.g},${n.b},${a*0.4})`);
+        g.addColorStop(1,`rgba(${n.r},${n.g},${n.b},0)`);
+        
+        ctx.scale(1,n.ry/n.rx); 
+        ctx.beginPath(); 
+        ctx.arc(0,0,n.rx,0,Math.PI*2); 
+        ctx.fillStyle=g; 
+        ctx.fill(); 
+        ctx.restore();
+        
+        n.x+=n.driftX; n.y+=n.driftY; n.angle+=n.rotSpeed;
+        if(n.x<-n.rx)n.x=W+n.rx; if(n.x>W+n.rx)n.x=-n.rx;
+        if(n.y<-n.ry)n.y=H+n.ry; if(n.y>H+n.ry)n.y=-n.ry;
+      });
+    }
+    function drawStars(){
+      stars.forEach(s=>{
+        s.x += s.dx; s.y += s.dy;
+        if(s.x < -2) s.x = W+2; if(s.x > W+2) s.x = -2;
+        if(s.y < -2) s.y = H+2; if(s.y > H+2) s.y = -2;
+        
+        // Estrelas brilhantes SEM cintilar (constante)
+        if(s.isBright){
+          const flicker = 1; // SEM cintilar - sempre no máximo!
+          
+          // Halo grande
+          const bigGlow = ctx.createRadialGradient(s.x,s.y,0,s.x,s.y,s.r*8);
+          bigGlow.addColorStop(0,`rgba(255,255,255,${0.4*flicker})`);
+          bigGlow.addColorStop(0.3,`rgba(200,220,255,${0.2*flicker})`);
+          bigGlow.addColorStop(1,'transparent');
+          ctx.fillStyle=bigGlow;
+          ctx.beginPath(); 
+          ctx.arc(s.x,s.y,s.r*8,0,Math.PI*2); 
+          ctx.fill();
+          
+          // Núcleo brilhante constante
+          ctx.shadowBlur = 20;
+          ctx.shadowColor = `rgba(255,255,255,${flicker})`;
+          ctx.beginPath(); 
+          ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+          ctx.fillStyle='#ffffff'; 
+          ctx.globalAlpha=flicker; 
+          ctx.fill();
+          ctx.shadowBlur = 0;
+          ctx.globalAlpha=1;
+        } else {
+          // Estrelas normais com cintilar
+          const flicker=Math.sin(t*s.speed*1000+s.phase)*0.35+0.65;
+          ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+          ctx.fillStyle=s.color; ctx.globalAlpha=s.alpha*flicker; ctx.fill();
+          if(s.r>1.2){
+            const glow=ctx.createRadialGradient(s.x,s.y,0,s.x,s.y,s.r*4);
+            glow.addColorStop(0,`rgba(255,255,255,${0.15*flicker})`); glow.addColorStop(1,'transparent');
+            ctx.beginPath(); ctx.arc(s.x,s.y,s.r*4,0,Math.PI*2); ctx.fillStyle=glow; ctx.fill();
+          }
+          ctx.globalAlpha=1;
+        }
+      });
+    }
+    function drawVignette(){
+      const v=ctx.createRadialGradient(W*.5,H*.5,H*.2,W*.5,H*.5,Math.max(W,H)*.75);
+      v.addColorStop(0,'transparent'); v.addColorStop(1,'rgba(2,1,8,0.72)');
+      ctx.fillStyle=v; ctx.fillRect(0,0,W,H);
+    }
+    function loop(ts){ 
+      t=ts; 
+      ctx.clearRect(0,0,W,H); 
+      drawBg();
+      createStarCluster();
+      drawStarClusters();
+      drawNebulae();
+      drawStars();
+      createSpaceship();
+      drawSpaceships();
+      drawVignette(); 
+      requestAnimationFrame(loop); 
+    }
+    window.addEventListener('resize',resize); resize(); requestAnimationFrame(loop);
+  })();
+  </script>
+
+
+</body>
+</html>
