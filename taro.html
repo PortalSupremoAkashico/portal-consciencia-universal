@@ -1085,7 +1085,7 @@ if(!_u.email) window.location.href='/login';
   // Boas-vindas TTS ao carregar a página
   var u = JSON.parse(localStorage.getItem('akashic_user')||sessionStorage.getItem('akashic_user')||'{}');
   var firstName = u.nome ? u.nome.trim().split(/\s+/)[0] : '';
-  var frase = (firstName ? firstName + ', ' : '') + 'Bem vindo ao Tarô Akáshico.';
+  var frase = (firstName ? firstName + ', ' : '') + 'Bem vindo ao Tarô Akáshico, escolha qual consulta você deseja.';
 
   fetch('/api/tts', {
     method:'POST', headers:{'Content-Type':'application/json'},
