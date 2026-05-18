@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login — Portal dos Registros Akáshicos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #07050f; --bg-card: rgba(18,13,38,.92);
+      --accent: #a78bfa; --accent-bright: #c4b5fd;
+      --gold: #f0c96b; --border: rgba(196,181,253,.14);
+      --radius: 20px; --radius-sm: 14px;
+      --font-display: 'Cinzel', serif;
+      --font-body: 'Inter', sans-serif;
+      --muted: rgba(196,181,253,.75);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      background: var(--bg); color: #e2e0f0;
+      font-family: var(--font-body); font-size: 15px;
+      display: flex; align-items: center; justify-content: center;
+      min-height: 100vh; padding: 20px;
+    }
+
+    /* Fundo cósmico */
+    
+
+    .card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius); backdrop-filter: blur(24px);
+      padding: 100px 44px; width: min(560px, 100%);
+      position: relative; z-index: 1;
+      box-shadow: 0 8px 48px rgba(0,0,0,.6), 0 0 80px rgba(109,40,217,.1);
+    }
+
+    .logo {
+      text-align: center; margin-bottom: 36px;
+    }
+    .logo-title {
+      font-family: var(--font-display); font-size: .65rem;
+      letter-spacing: .18em; color: rgba(240,201,107,.7);
+      margin-bottom: 6px; text-transform: uppercase;
+    }
+    .logo-name {
+      font-family: var(--font-display); font-size: 1.15rem;
+      letter-spacing: .08em; color: var(--accent-bright);
+      font-weight: 600;
+    }
+    .logo-sep {
+      width: 48px; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(196,181,253,.3), transparent);
+      margin: 12px auto;
+    }
+
+    .stack { display: flex; flex-direction: column; gap: 12px; }
+
+    input, select {
+      width: 100%; padding: 13px 16px;
+      background: rgba(7,5,15,.85) !important; border: 1px solid rgba(147,109,255,.22);
+      border-radius: var(--radius-sm); color: #e2e0f0 !important;
+      font-family: var(--font-body); font-size: .9rem;
+      outline: none; transition: border-color .2s, box-shadow .2s;
+      -webkit-text-fill-color: #e2e0f0 !important;
+    }
+    input::placeholder { color: rgba(196,181,253,.6); }
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover,
+    input:-webkit-autofill:focus {
+      -webkit-box-shadow: 0 0 0 1000px rgba(7,5,15,.95) inset !important;
+      -webkit-text-fill-color: #e2e0f0 !important;
+      box-shadow: 0 0 0 1000px rgba(7,5,15,.95) inset !important;
+      caret-color: #e2e0f0;
+    }
+    input:focus, select:focus {
+      border-color: rgba(196,181,253,.6);
+      box-shadow: 0 0 0 3px rgba(139,92,246,.15);
+      background: rgba(12,7,28,.9) !important;
+    }
+
+    button {
+      display: block; width: auto; padding: 12px 28px; margin: 0 auto;
+      font-family: var(--font-display); font-size: .78rem;
+      font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+      cursor: pointer; border-radius: var(--radius-sm);
+      border: 1px solid rgba(240,201,107,.5);
+      background: linear-gradient(135deg, rgba(240,201,107,.15), rgba(240,201,107,.07));
+      color: var(--gold); transition: all .25s;
+    animation:btnPulseGold 2s ease-in-out infinite;}
+    button:hover {
+      background: linear-gradient(135deg, rgba(240,201,107,.28), rgba(240,201,107,.14));
+      border-color: rgba(240,201,107,.85);
+      box-shadow: 0 0 24px rgba(240,201,107,.35);
+      transform: translateY(-1px);
+    animation:btnPulseGoldHover .8s ease-in-out infinite;color:#f0c96b;}
+    button.btn-sec {
+      background: rgba(196,181,253,.06);
+      border-color: rgba(196,181,253,.25);
+      color: var(--accent-bright);
+    }
+    button.btn-sec:hover {
+      background: rgba(196,181,253,.14);
+      border-color: rgba(196,181,253,.7);
+      box-shadow: 0 0 20px rgba(139,92,246,.3);
+      color: #fff;
+    animation:btnPulseGoldHover .8s ease-in-out infinite;color:#f0c96b;}
+
+    .status {
+      font-size: .8rem; min-height: 18px; text-align: center;
+      color: rgba(196,181,253,.6);
+    }
+    .status.error { color: #fca5a5; }
+    .status.ok    { color: #6ee7b7; }
+    .status.warn  { color: #fcd34d; }
+
+    .row-links {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: 4px;
+    }
+    .row-links span {
+      font-size: .8rem; color: rgba(196,181,253,.6);
+      cursor: pointer; text-decoration: underline;
+      text-underline-offset: 3px; transition: color .2s;
+    }
+    .row-links span:hover { color: var(--accent-bright); }
+
+    /* Cadastro oculto */
+    #painelCadastro { display: none; }
+    .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    /* Painel reset */
+    #painelReset { display: none; margin-top: 12px; }
+  
+    @keyframes btnPulseGold { 0%,100%{box-shadow:0 0 4px rgba(240,201,107,.15);border-color:rgba(240,201,107,.35);}50%{box-shadow:0 0 14px rgba(240,201,107,.45);border-color:rgba(240,201,107,.75);} }
+    @keyframes btnPulseGoldHover { 0%,100%{box-shadow:0 0 8px rgba(240,201,107,.4),0 0 0 1px rgba(240,201,107,.5);border-color:rgba(240,201,107,.6);}50%{box-shadow:0 0 22px rgba(240,201,107,.8),0 0 0 2px rgba(240,201,107,.9);border-color:#f0c96b;} }
+    </style>
+</head>
+<body>
+<canvas id="universeCanvas" style="position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;"></canvas>
+  <script>
+  (function(){
+  const canvas=document.getElementById('universeCanvas');
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  let W,H,stars=[],nebulae=[],t=0,paused=false;
+  function rand(a,b){return a+Math.random()*(b-a);}
+  function init(){
+    W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;
+    stars=[];
+    const n=Math.min(Math.floor((W*H)/2000),220);
+    for(let i=0;i<n;i++){
+      const spd=rand(0.1,0.4);
+      const bright=i<Math.floor(n*0.08);
+      stars.push({x:rand(0,W),y:rand(0,H),r:bright?rand(2.5,5):rand(0.4,1.8),alpha:rand(0.4,1),speed:rand(0.0004,0.001),phase:rand(0,Math.PI*2),color:Math.random()<0.2?`hsl(${rand(200,280)},80%,90%)`:'#fff',dx:spd*0.6,dy:spd*0.15,isBright:bright});
+    }
+    nebulae=[];
+    const cols=[[120,70,200],[60,100,255],[200,80,160],[30,120,220]];
+    for(let i=0;i<4;i++){const[r,g,b]=cols[i];nebulae.push({x:rand(0,W),y:rand(0,H),rx:rand(W*.2,W*.4),ry:rand(H*.15,H*.3),alpha:rand(0.05,0.1),angle:rand(0,Math.PI),r,g,b,driftX:rand(-0.02,0.02),driftY:rand(-0.015,0.015),rotSpeed:rand(-0.00004,0.00004),pulseSpeed:rand(0.0003,0.0007),pulsePhase:rand(0,Math.PI*2)});}
+  }
+  function loop(ts){
+    if(paused){requestAnimationFrame(loop);return;}
+    t=ts;ctx.clearRect(0,0,W,H);
+    const bg=ctx.createRadialGradient(W*.5,H*.4,0,W*.5,H*.5,Math.max(W,H)*.8);bg.addColorStop(0,'#0d0820');bg.addColorStop(0.4,'#060314');bg.addColorStop(1,'#020108');ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+    nebulae.forEach(n=>{const pulse=Math.sin(t*n.pulseSpeed+n.pulsePhase)*0.4+0.8;ctx.save();ctx.translate(n.x,n.y);ctx.rotate(n.angle);const g=ctx.createRadialGradient(0,0,0,0,0,n.rx),a=n.alpha*pulse;g.addColorStop(0,`rgba(${n.r},${n.g},${n.b},${a})`);g.addColorStop(1,`rgba(${n.r},${n.g},${n.b},0)`);ctx.scale(1,n.ry/n.rx);ctx.beginPath();ctx.arc(0,0,n.rx,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();ctx.restore();n.x+=n.driftX;n.y+=n.driftY;n.angle+=n.rotSpeed;});
+    stars.forEach(s=>{
+      s.x+=s.dx;s.y+=s.dy;
+      if(s.x>W+4)s.x=-4;if(s.x<-4)s.x=W+4;
+      if(s.y>H+4)s.y=-4;if(s.y<-4)s.y=H+4;
+      const fl=Math.sin(t*s.speed*800+s.phase)*0.35+0.65;
+      if(s.isBright){
+        const g2=ctx.createRadialGradient(s.x,s.y,0,s.x,s.y,s.r*3);g2.addColorStop(0,'rgba(255,255,255,0.4)');g2.addColorStop(1,'rgba(255,255,255,0)');
+        ctx.beginPath();ctx.arc(s.x,s.y,s.r*3,0,Math.PI*2);ctx.fillStyle=g2;ctx.fill();
+        ctx.shadowBlur=18;ctx.shadowColor='rgba(255,255,255,.9)';ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle='#fff';ctx.globalAlpha=1;ctx.fill();ctx.shadowBlur=0;
+      }else{ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle=s.color;ctx.globalAlpha=s.alpha*fl;ctx.fill();ctx.globalAlpha=1;}
+    });
+    const v=ctx.createRadialGradient(W*.5,H*.5,H*.2,W*.5,H*.5,Math.max(W,H)*.75);v.addColorStop(0,'transparent');v.addColorStop(1,'rgba(2,1,8,0.65)');ctx.fillStyle=v;ctx.fillRect(0,0,W,H);
+    requestAnimationFrame(loop);
+  }
+  document.addEventListener('visibilitychange',()=>{paused=document.hidden;});
+  window.addEventListener('resize',init);
+  init();requestAnimationFrame(loop);
+})();
+  </script>
+
+<div class="card">
+  <div class="logo">
+    <div class="logo-title">Inteligência Universal</div>
+    <div class="logo-name">Portal dos Registros Akáshicos</div>
+    <div class="logo-sep"></div>
+  </div>
+
+  <!-- LOGIN -->
+  <div id="authMain" class="stack">
+    <input id="loginEmail" type="email" placeholder="seu@email.com" autocomplete="email"
+      onkeydown="if(event.key==='Enter') handleEntrar()" />
+    <div style="position:relative;">
+      <input id="loginSenha" type="password" placeholder="Sua senha"
+        autocomplete="current-password" maxlength="72"
+        onkeydown="if(event.key==='Enter') handleEntrar()"
+        style="padding-right:44px;" />
+      <span onclick="toggleSenha('loginSenha',this)"
+        style="position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;color:rgba(196,181,253,.65);">👁</span>
+    </div>
+    <div class="status" id="authStatus"></div>
+    <button onclick="handleEntrar()">✦ Entrar no Portal</button>
+    <div class="row-links">
+      <span onclick="iniciarResetSenha()">Esqueceu sua senha?</span>
+      <span onclick="abrirCadastro()">Cadastre-se</span>
+    </div>
+  </div>
+
+  <!-- CADASTRO -->
+  <div id="painelCadastro" class="stack">
+    <div style="font-family:var(--font-display);font-size:.7rem;letter-spacing:.12em;color:var(--gold);margin-bottom:4px;">CRIAR CONTA</div>
+    <input id="cadNome" type="text" placeholder="Nome completo" autocomplete="name" />
+    <div class="row-2">
+      <input id="cadData" type="text" placeholder="dd/mm/aaaa" maxlength="10" autocomplete="bday" />
+      <select id="cadSexo">
+        <option value="">Sexo</option>
+        <option>Masculino</option>
+        <option>Feminino</option>
+        <option>Prefiro Não Informar</option>
+      </select>
+    </div>
+    <input id="cadEmail" type="email" placeholder="seu@email.com" autocomplete="email"
+      onblur="validarEmailCadastro(this)" />
+    <div class="row-2">
+      <div style="position:relative;">
+        <input id="cadSenha" type="password" placeholder="Senha" maxlength="72" style="width:100%;padding-right:36px;" />
+        <span onclick="toggleSenha('cadSenha')" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer;color:rgba(196,181,253,.65);font-size:1rem;user-select:none;">👁</span>
+      </div>
+      <div style="position:relative;">
+        <input id="cadSenhaConf" type="password" placeholder="Confirmar" maxlength="72" style="width:100%;padding-right:36px;" />
+        <span onclick="toggleSenha('cadSenhaConf')" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer;color:rgba(196,181,253,.65);font-size:1rem;user-select:none;">👁</span>
+      </div>
+    </div>
+    <div class="status" id="cadastroStatus"></div>
+    <button onclick="handleCadastro()">✦ Criar Perfil Akáshico</button>
+    <button class="btn-sec" onclick="fecharCadastro()">← Voltar</button>
+  </div>
+
+  <!-- RESET SENHA -->
+  <div id="painelReset" class="stack"></div>
+</div>
+
+<script>
+// ── Fundo cósmico ──
+
+
+// ── Utilitários ──
+function setStatus(el, type, msg) {
+  if (!el) return;
+  el.className = 'status' + (type ? ' ' + type : '');
+  el.textContent = msg;
+}
+
+function toggleSenha(id, btn) {
+  const inp = document.getElementById(id);
+  if (!inp) return;
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+function filtrarSenha(inp) {
+  inp.value = inp.value.replace(/\s/g, '');
+}
+
+// ── Storage ──
+const STORAGE_KEY = 'akashic_user';
+function getStoredUser() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch { return {}; }
+}
+function saveStoredUser(obj) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(obj)); } catch {}
+}
+
+// ── Hash SHA-256 ──
+async function hashPassword(senha) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(senha));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+// ── Após login bem-sucedido → vai para o portal ──
+function entrarPortal(user) {
+  saveStoredUser(user);
+  sessionStorage.setItem('akashic_auth_token', user.email);
+  window.location.href = '/planos';
+}
+
+// ── LOGIN ──
+const loginAttempts = {};
+
+async function handleEntrar() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const senha  = document.getElementById('loginSenha').value;
+  const status = document.getElementById('authStatus');
+
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    setStatus(status, 'error', 'Digite um e-mail válido.'); return;
+  }
+  if (!senha) {
+    setStatus(status, 'error', 'Digite sua senha.');
+    document.getElementById('loginSenha').focus(); return;
+  }
+
+  setStatus(status, '', 'Verificando...');
+
+  try {
+    const hash = await hashPassword(senha);
+    const resp = await fetch('/api/auth', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ action: 'login', email, senha_hash: hash })
+    });
+    const data = await resp.json();
+
+    if (!resp.ok) {
+      loginAttempts[email] = (loginAttempts[email] || 0) + 1;
+      const rest = 5 - loginAttempts[email];
+      if (loginAttempts[email] >= 5) {
+        loginAttempts[email] = 0;
+        const ck = await fetch('/api/auth', {
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({action:'check_email', email})
+        });
+        const cd = await ck.json();
+        await enviarCodigoRecuperacao(email, cd.nome || '');
+        mostrarPainelCodigo(email);
+        return;
+      }
+      setStatus(status, 'error',
+        data.error?.includes('não encontrado')
+          ? 'E-mail não encontrado. Cadastre-se.'
+          : rest > 0 ? `Senha incorreta. ${rest} tentativa${rest!==1?'s':''} restante${rest!==1?'s':''}.`
+          : 'Senha incorreta.'
+      );
+      document.getElementById('loginSenha').value = '';
+      document.getElementById('loginSenha').focus();
+      return;
+    }
+
+    loginAttempts[email] = 0;
+    const u = data.user;
+    setStatus(status, 'ok', `Bem-vindo, ${u.nome.split(' ')[0]}! Entrando...`);
+    setTimeout(() => entrarPortal(u), 700);
+
+  } catch(e) {
+    setStatus(status, 'error', 'Erro de conexão. Tente novamente.');
+  }
+}
+
+// ── CADASTRO ──
+function abrirCadastro() {
+  document.getElementById('authMain').style.display = 'none';
+  document.getElementById('painelCadastro').style.display = 'flex';
+  document.getElementById('cadNome').focus();
+}
+
+function fecharCadastro() {
+  document.getElementById('painelCadastro').style.display = 'none';
+  document.getElementById('authMain').style.display = 'flex';
+  ['cadNome','cadData','cadEmail','cadSenha','cadSenhaConf',
+].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  document.getElementById('cadSexo').selectedIndex = 0;
+  document.getElementById('cadastroStatus').textContent = '';
+}
+
+function validarEmailCadastro(inp) {
+  const email = inp.value.trim();
+  const st = document.getElementById('cadastroStatus');
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return;
+  st.className = 'status'; st.textContent = 'Verificando e-mail...';
+  fetch('/api/auth', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({action:'check_email', email})
+  }).then(r=>r.json()).then(d => {
+    if (d.exists) {
+      setStatus(st, 'warn', 'E-mail já cadastrado. Redirecionando para login...');
+      ['cadSenha','cadSenhaConf'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) { el.value = ''; el.disabled = true; }
+      });
+      setTimeout(() => {
+        fecharCadastro();
+        document.getElementById('loginEmail').value = email;
+        document.getElementById('loginSenha').focus();
+        setStatus(document.getElementById('authStatus'), 'warn',
+          'Este e-mail já está cadastrado. Digite sua senha.');
+      }, 1500);
+    } else {
+      setStatus(st, 'ok', 'E-mail disponível.');
+      ['cadSenha','cadSenhaConf'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.disabled = false;
+      });
+      setTimeout(()=>{ if(st.textContent==='E-mail disponível.') st.textContent=''; }, 2000);
+    }
+  }).catch(()=>{ st.textContent=''; });
+}
+
+async function handleCadastro() {
+  const nome    = document.getElementById('cadNome').value.trim();
+  const data    = document.getElementById('cadData').value.trim();
+  const sexo    = document.getElementById('cadSexo').value;
+  const email   = document.getElementById('cadEmail').value.trim();
+  const senha   = document.getElementById('cadSenha').value;
+  const conf    = document.getElementById('cadSenhaConf').value;
+  const st = document.getElementById('cadastroStatus');
+
+  if (!nome || nome.length < 2) { setStatus(st,'error','Digite seu nome completo.'); return; }
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setStatus(st,'error','E-mail inválido.'); return; }
+  if (!senha || senha.length < 4) { setStatus(st,'error','Senha com pelo menos 4 caracteres.'); return; }
+  if (senha !== conf) { setStatus(st,'error','As senhas não conferem.'); return; }
+
+  setStatus(st,'','Registrando...');
+  const hash = await hashPassword(senha);
+
+  try {
+    const resp = await fetch('/api/auth', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({action:'cadastro', nome, email, senha_hash:hash,
+        data_nascimento:data, sexo})
+    });
+    const result = await resp.json();
+
+    if (!resp.ok) {
+      if (resp.status === 409) {
+        fecharCadastro();
+        document.getElementById('loginEmail').value = email;
+        document.getElementById('loginSenha').focus();
+        setStatus(document.getElementById('authStatus'),'warn','E-mail já cadastrado. Digite sua senha.');
+        return;
+      }
+      setStatus(st,'error', result.error || 'Erro ao criar conta.'); return;
+    }
+
+    setStatus(st,'ok','Conta criada!');
+    setTimeout(() => {
+      fecharCadastro();
+      document.getElementById('loginEmail').value = email;
+      document.getElementById('loginSenha').focus();
+      setStatus(document.getElementById('authStatus'),'ok','Conta criada! Faça login para entrar.');
+    }, 1000);
+
+  } catch(e) {
+    setStatus(st,'error','Erro de conexão. Tente novamente.');
+  }
+}
+
+// ── RESET SENHA ──
+async function iniciarResetSenha() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const status = document.getElementById('authStatus');
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    setStatus(status,'warn','Digite seu e-mail acima primeiro.');
+    document.getElementById('loginEmail').focus(); return;
+  }
+  setStatus(status,'','Verificando...');
+  try {
+    const r = await fetch('/api/auth', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({action:'check_email', email})
+    });
+    const d = await r.json();
+    if (!d.exists) { setStatus(status,'error','E-mail não encontrado.'); return; }
+    await enviarCodigoRecuperacao(email, d.nome || '');
+    mostrarPainelCodigo(email);
+  } catch(e) {
+    setStatus(status,'error','Erro de conexão.');
+  }
+}
+
+async function enviarCodigoRecuperacao(email, nome) {
+  const codigo = String(Math.floor(100000 + Math.random() * 900000));
+  const expira = Date.now() + 15 * 60 * 1000;
+  try { sessionStorage.setItem('akashic_reset', JSON.stringify({email, codigo, expira})); } catch {}
+
+  const firstName = nome ? nome.trim().split(/\s+/)[0] : 'viajante';
+  const corpo = `Olá ${firstName},\n\nSeu código de recuperação é:\n\n${codigo}\n\nVálido por 15 minutos.\n\nPortal dos Registros Akáshicos`;
+
+  try {
+    await fetch('/api/email', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({to:email, subject:'Código de Recuperação — Portal Akáshico', body:corpo})
+    });
+  } catch(e) {}
+  return codigo;
+}
+
+function mostrarPainelCodigo(email) {
+  const status = document.getElementById('authStatus');
+  setStatus(status,'ok','Código enviado para ' + email + '. Verifique sua caixa de entrada.');
+
+  const antigo = document.getElementById('painelReset');
+  antigo.innerHTML = '';
+
+  const lCod = document.createElement('label');
+  lCod.textContent = 'Código recebido por e-mail';
+  lCod.style.cssText = 'font-size:.82rem;color:rgba(196,181,253,.8);';
+  const iCod = document.createElement('input');
+  iCod.id = 'codigoReset'; iCod.type = 'text'; iCod.inputMode = 'numeric';
+  iCod.placeholder = '000000'; iCod.maxLength = 6;
+  iCod.style.cssText = 'letter-spacing:.3em;text-align:center;font-size:1.2rem;';
+
+  const stCod = document.createElement('div');
+  stCod.id = 'resetStatus'; stCod.className = 'status';
+
+  const btnV = document.createElement('button');
+  btnV.id = 'btnVerificarCodigo'; btnV.type = 'button';
+  btnV.textContent = 'Verificar Código';
+  btnV.onclick = resetVerificarCodigo;
+  btnV.className = 'btn-sec';
+
+  const wSenha = document.createElement('div');
+  wSenha.id = 'novaSenhaWrap'; wSenha.style.display = 'none';
+  wSenha.className = 'stack';
+
+  ['Nova senha','Confirmar nova senha'].forEach(function(lbl,idx) {
+    const l = document.createElement('label');
+    l.textContent = lbl; l.style.cssText = 'font-size:.82rem;color:rgba(196,181,253,.8);';
+    const inp = document.createElement('input');
+    inp.id = idx===0 ? 'novaSenha' : 'novaSenhaConf';
+    inp.type = 'password'; inp.placeholder = lbl; inp.maxLength = 72;
+    wSenha.appendChild(l); wSenha.appendChild(inp);
+  });
+
+  const stS = document.createElement('div');
+  stS.id = 'novaSenhaStatus'; stS.className = 'status';
+  wSenha.appendChild(stS);
+
+  const btnS = document.createElement('button');
+  btnS.type = 'button'; btnS.textContent = 'Redefinir Senha';
+  btnS.onclick = resetSalvarSenha;
+  wSenha.appendChild(btnS);
+
+  antigo.appendChild(lCod); antigo.appendChild(iCod);
+  antigo.appendChild(stCod); antigo.appendChild(btnV);
+  antigo.appendChild(wSenha);
+  antigo.style.display = 'flex';
+  document.getElementById('authMain').style.display = 'none';
+  setTimeout(() => iCod.focus(), 100);
+}
+
+function resetVerificarCodigo() {
+  const iCod = document.getElementById('codigoReset');
+  const stCod = document.getElementById('resetStatus');
+  const codigo = iCod ? iCod.value.replace(/\D/g,'') : '';
+
+  if (codigo.length !== 6) { setStatus(stCod,'error','Digite os 6 dígitos.'); return; }
+
+  var dados = null;
+  try { dados = JSON.parse(sessionStorage.getItem('akashic_reset')); } catch {}
+
+  if (!dados || !dados.codigo || !dados.email) {
+    setStatus(stCod,'error','Sessão expirada. Clique em "Esqueceu sua senha?" novamente.'); return;
+  }
+  if (Date.now() > dados.expira) {
+    sessionStorage.removeItem('akashic_reset');
+    setStatus(stCod,'error','Código expirado. Solicite um novo.'); return;
+  }
+  if (codigo !== String(dados.codigo)) {
+    iCod.value = ''; iCod.focus();
+    setStatus(stCod,'error','Código incorreto. Verifique o e-mail.'); return;
+  }
+
+  setStatus(stCod,'ok','✓ Código correto! Crie sua nova senha.');
+  document.getElementById('btnVerificarCodigo').style.display = 'none';
+  document.getElementById('novaSenhaWrap').style.display = 'flex';
+  document.getElementById('novaSenha').focus();
+}
+
+async function resetSalvarSenha() {
+  const s1 = document.getElementById('novaSenha').value;
+  const s2 = document.getElementById('novaSenhaConf').value;
+  const st = document.getElementById('novaSenhaStatus');
+
+  if (!s1 || s1.length < 4) { setStatus(st,'error','Mínimo 4 caracteres.'); return; }
+  if (s1 !== s2) { setStatus(st,'error','As senhas não conferem.'); return; }
+
+  var dados = null;
+  try { dados = JSON.parse(sessionStorage.getItem('akashic_reset')); } catch {}
+  if (!dados || !dados.email) { setStatus(st,'error','Sessão expirada.'); return; }
+
+  setStatus(st,'','Salvando...');
+  const hash = await hashPassword(s1);
+
+  try {
+    const r = await fetch('/api/auth', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({action:'reset_senha', email:dados.email, senha_hash:hash})
+    });
+    const d = await r.json();
+    if (!d.success) throw new Error(d.error);
+  } catch(e) { setStatus(st,'error','Erro ao salvar. Tente novamente.'); return; }
+
+  sessionStorage.removeItem('akashic_reset');
+  setStatus(st,'ok','✓ Senha redefinida!');
+  const emailReset = dados.email;
+  setTimeout(() => {
+    document.getElementById('painelReset').style.display = 'none';
+    document.getElementById('authMain').style.display = 'flex';
+    document.getElementById('loginEmail').value = emailReset;
+    document.getElementById('loginSenha').focus();
+    setStatus(document.getElementById('authStatus'),'ok','✓ Senha redefinida. Digite sua nova senha.');
+  }, 1000);
+}
+
+// Formata data
+document.getElementById('cadData').addEventListener('input', e => {
+  let v = e.target.value.replace(/\D/g,'');
+  if (v.length >= 2) v = v.slice(0,2)+'/'+v.slice(2);
+  if (v.length >= 5) v = v.slice(0,5)+'/'+v.slice(5,9);
+  e.target.value = v;
+});
+</script>
+
+<style id="gold-buttons-global">
+/* ── Bordas amarelas em todos os botões ── */
+button:not([disabled]):not(.tab),
+a[class*="btn"],
+input[type="submit"],
+input[type="button"],
+.btn-ouvir, .btn-ouvir-med, .btn-ouvir-sonho,
+.ouvir-btn, .ouvir-secao,
+[onclick*="ouvir"], [onclick*="Ouvir"] {
+  border-color: rgba(240,201,107,.4) !important;
+  animation: btnPulseGold 2s ease-in-out infinite !important;
+}
+button:not([disabled]):not(.tab):hover,
+a[class*="btn"]:hover,
+input[type="submit"]:hover,
+.btn-ouvir:hover, .btn-ouvir-med:hover, .btn-ouvir-sonho:hover {
+  animation: btnPulseGoldHover .8s ease-in-out infinite !important;
+  border-color: #f0c96b !important;
+  color: #f0c96b !important;
+}
+</style>
+</body>
+</html>
