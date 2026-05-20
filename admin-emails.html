@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Portal dos Registros Akáshicos</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:linear-gradient(135deg,#1a0533,#0d0521);min-height:100vh;padding:0;color:#e2e0f0;}
+    .container{width:min(1000px,calc(100% - 24px));margin:0 auto;padding:20px 0;}
+    h1{font-size:1.8rem;color:#c4b5fd;margin-bottom:4px;}
+    .subtitle{color:rgba(196,181,253,.6);margin-bottom:24px;font-size:.9rem;}
+    .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:24px;}
+    .stat-card{background:rgba(109,40,217,.2);border:1px solid rgba(139,92,246,.3);border-radius:14px;padding:18px;text-align:center;}
+    .stat-num{font-size:2rem;font-weight:700;color:#f0c96b;}
+    .stat-label{font-size:.7rem;color:rgba(196,181,253,.7);margin-top:4px;letter-spacing:.06em;text-transform:uppercase;}
+    .top-actions{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
+    .btn{padding:10px 20px;border-radius:10px;font-size:.8rem;font-weight:600;cursor:pointer;border:none;transition:all .2s;}
+    .btn-primary{background:linear-gradient(135deg,#7c3aed,#6d28d9);color:white;}
+    .btn-primary:hover{background:linear-gradient(135deg,#8b5cf6,#7c3aed);transform:translateY(-1px);}
+    .btn-green{background:linear-gradient(135deg,#059669,#047857);color:white;}
+    .btn-red{background:linear-gradient(135deg,#dc2626,#b91c1c);color:white;}
+    .btn-sm{padding:5px 12px;font-size:.72rem;border-radius:8px;cursor:pointer;border:none;font-weight:600;transition:all .2s;}
+    .btn-ghost{background:rgba(196,181,253,.1);color:rgba(196,181,253,.8);border:1px solid rgba(196,181,253,.2);}
+    .btn-ghost:hover{background:rgba(196,181,253,.2);}
+    .btn-or{background:transparent;color:rgba(239,68,68,.85);border:1px solid rgba(239,68,68,.35);}
+    .btn-or:hover{background:rgba(239,68,68,.12);}
+    .btn-oa{background:transparent;color:rgba(251,191,36,.85);border:1px solid rgba(251,191,36,.35);}
+    .btn-oa:hover{background:rgba(251,191,36,.1);}
+    .search-wrap{margin-bottom:16px;}
+    .search-wrap input{width:100%;padding:11px 16px;background:rgba(255,255,255,.06);border:1px solid rgba(196,181,253,.2);border-radius:12px;color:#e2e0f0;font-size:.9rem;outline:none;}
+    .search-wrap input:focus{border-color:rgba(196,181,253,.5);}
+    .search-wrap input::placeholder{color:rgba(196,181,253,.4);}
+    .c-card{background:rgba(14,12,28,.85);border:1px solid rgba(196,181,253,.12);border-radius:16px;margin-bottom:14px;overflow:hidden;}
+    .c-header{display:flex;align-items:center;gap:12px;padding:16px 18px;cursor:pointer;flex-wrap:wrap;}
+    .c-header:hover{background:rgba(196,181,253,.04);}
+    .c-info{flex:1;min-width:180px;}
+    .c-nome{font-size:.95rem;font-weight:600;color:#c4b5fd;}
+    .c-email{font-size:.78rem;color:rgba(196,181,253,.55);margin-top:1px;}
+    .c-badges{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;}
+    .badge{font-size:.62rem;padding:2px 9px;border-radius:20px;font-weight:600;letter-spacing:.05em;}
+    .bc{background:rgba(139,92,246,.2);color:#c4b5fd;border:1px solid rgba(139,92,246,.3);}
+    .bm{background:rgba(240,201,107,.15);color:#f0c96b;border:1px solid rgba(240,201,107,.3);}
+    .bk{background:rgba(16,185,129,.15);color:#6ee7b7;border:1px solid rgba(16,185,129,.3);}
+    .c-meta{font-size:.7rem;color:rgba(196,181,253,.4);text-align:right;white-space:nowrap;}
+    .chevron{color:rgba(196,181,253,.4);transition:transform .2s;font-size:.9rem;}
+    .chevron.open{transform:rotate(180deg);}
+    .c-body{display:none;border-top:1px solid rgba(196,181,253,.1);}
+    .c-body.open{display:block;}
+    .bulk-row{display:flex;align-items:center;gap:8px;padding:10px 18px;background:rgba(0,0,0,.2);flex-wrap:wrap;border-bottom:1px solid rgba(196,181,253,.08);}
+    .bulk-lbl{font-size:.68rem;color:rgba(196,181,253,.4);letter-spacing:.08em;text-transform:uppercase;margin-right:4px;}
+    .tabs{display:flex;border-bottom:1px solid rgba(196,181,253,.1);padding:0 18px;}
+    .tab{padding:11px 16px;font-size:.78rem;color:rgba(196,181,253,.5);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;}
+    .tab:hover{color:rgba(196,181,253,.8);}
+    .tab.active{color:#c4b5fd;border-bottom-color:#c4b5fd;}
+    .tab-content{padding:14px 18px 18px;}
+    .tab-panel{display:none;}
+    .tab-panel.active{display:block;}
+    .item{background:rgba(255,255,255,.03);border:1px solid rgba(196,181,253,.08);border-radius:10px;padding:12px 14px;margin-bottom:10px;}
+    .item-header{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+    .item-title{font-size:.82rem;color:rgba(196,181,253,.9);font-weight:500;}
+    .item-sub{font-size:.75rem;color:rgba(196,181,253,.5);margin-top:2px;}
+    .item-prev{font-size:.8rem;color:rgba(196,181,253,.65);margin-top:8px;line-height:1.5;cursor:pointer;border-top:1px solid rgba(196,181,253,.07);padding-top:8px;}
+    .item-full{display:none;margin-top:8px;}
+    .item-full.open{display:block;}
+    .sec-lbl{font-size:.62rem;letter-spacing:.14em;color:#f0c96b;text-transform:uppercase;margin-bottom:4px;margin-top:10px;}
+    .sec-txt{font-size:.8rem;color:rgba(196,181,253,.75);line-height:1.7;}
+    .modal-overlay{position:fixed;inset:0;background:rgba(5,4,15,.85);display:flex;align-items:center;justify-content:center;z-index:9999;padding:20px;}
+    .modal-box{background:rgba(14,12,28,.98);border:1px solid rgba(196,181,253,.2);border-radius:20px;padding:32px;max-width:420px;width:100%;text-align:center;}
+    .modal-titulo{font-size:1rem;color:#c4b5fd;margin-bottom:12px;font-weight:600;}
+    .modal-texto{font-size:.85rem;color:rgba(196,181,253,.7);margin-bottom:24px;line-height:1.6;}
+    .modal-btns{display:flex;gap:10px;}
+    .empty{text-align:center;padding:32px;color:rgba(196,181,253,.4);font-size:.85rem;}
+    .loading{text-align:center;padding:40px;color:rgba(196,181,253,.5);}
+    .spinner{border:2px solid rgba(196,181,253,.1);border-top-color:rgba(196,181,253,.7);border-radius:50%;width:32px;height:32px;animation:spin 1s linear infinite;margin:0 auto 12px;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>⚙ Administração do Portal</h1>
+  <p class="subtitle">Gerencie consulentes, consultas, mentorias e mapas akáshicos</p>
+  <div class="stats">
+    <div class="stat-card"><div class="stat-num" id="stTotal">—</div><div class="stat-label">Consulentes</div></div>
+    <div class="stat-card"><div class="stat-num" id="stConsultas">—</div><div class="stat-label">Consultas</div></div>
+    <div class="stat-card"><div class="stat-num" id="stMentorias">—</div><div class="stat-label">Mentorias</div></div>
+    <div class="stat-card"><div class="stat-num" id="stMapas">—</div><div class="stat-label">Mapas</div></div>
+  </div>
+  <div class="top-actions">
+    <button class="btn btn-primary" onclick="init()">🔄 Atualizar</button>
+    <button class="btn btn-green" onclick="downloadCSV()">⬇ Baixar CSV</button>
+    <button class="btn btn-green" onclick="copiarEmails()">📋 Copiar E-mails</button>
+  </div>
+  <div class="search-wrap"><input type="text" id="busca" placeholder="🔍 Buscar por nome ou e-mail..." oninput="filtrar()"/></div>
+  <div id="lista"><div class="loading"><div class="spinner"></div>Carregando...</div></div>
+</div>
+
+<div class="modal-overlay" id="modal" style="display:none;">
+  <div class="modal-box">
+    <div class="modal-titulo" id="mTitulo"></div>
+    <div class="modal-texto" id="mTexto"></div>
+    <div class="modal-btns">
+      <button class="btn btn-ghost" style="flex:1" onclick="fecharModal()">Cancelar</button>
+      <button class="btn btn-red" style="flex:1" id="mOk">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SB='https://opykejeaxehvzogrrwto.supabase.co';
+const SK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9weWtlamVheGVodnpvZ3Jyd3RvIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NTY4OTIxMiwiZXhwIjoyMDYxMjY1MjEyfQ.yqy9dWHMl49xIhN0jLGGwJexmDoHWN3_V7UBD3qYZT8';
+let todos=[],dados={};
+
+async function sbGet(path){
+  const r=await fetch(SB+'/rest/v1'+path,{headers:{apikey:SK,Authorization:'Bearer '+SK,'Content-Type':'application/json'}});
+  const t=await r.text();try{return JSON.parse(t);}catch{return[];}
+}
+async function sbDel(path){
+  return fetch(SB+'/rest/v1'+path,{method:'DELETE',headers:{apikey:SK,Authorization:'Bearer '+SK,'Content-Type':'application/json',Prefer:'return=minimal'}});
+}
+
+async function init(){
+  document.getElementById('lista').innerHTML='<div class="loading"><div class="spinner"></div>Carregando...</div>';
+  dados={};
+  const[rc,rq,rm,rk]=await Promise.all([
+    sbGet('/consulentes?select=id,nome,email,created_at&order=created_at.desc'),
+    sbGet('/consultas?select=id,email,tema,estado,pergunta,revelation,earth_future,other_civilizations,warning,action,created_at&order=created_at.desc'),
+    sbGet('/mentorias?select=id,email,role,content,consulta_tema,consulta_pergunta,created_at&order=created_at.asc'),
+    sbGet('/mapas?select=id,email,dados,created_at&order=created_at.desc')
+  ]);
+  todos=Array.isArray(rc)?rc:[];
+  const consultas=Array.isArray(rq)?rq:[];
+  const mentorias=Array.isArray(rm)?rm:[];
+  const mapas=Array.isArray(rk)?rk:[];
+
+  function agrupar(msgs){
+    const s={};
+    msgs.forEach(m=>{
+      const k=m.consulta_pergunta||m.created_at?.slice(0,10)||'—';
+      if(!s[k])s[k]={pergunta:k,tema:m.consulta_tema,msgs:[],created_at:m.created_at};
+      s[k].msgs.push(m);
+    });
+    return Object.values(s);
+  }
+
+  todos.forEach(c=>{
+    dados[c.email]={
+      consultas:consultas.filter(x=>x.email===c.email),
+      sessoes:agrupar(mentorias.filter(x=>x.email===c.email)),
+      mapas:mapas.filter(x=>x.email===c.email)
+    };
+  });
+
+  document.getElementById('stTotal').textContent=todos.length;
+  document.getElementById('stConsultas').textContent=consultas.length;
+  document.getElementById('stMentorias').textContent=[...new Set(mentorias.map(m=>m.consulta_pergunta))].length;
+  document.getElementById('stMapas').textContent=mapas.length;
+  renderLista(todos);
+}
+
+function eid(email){return email.replace(/[@.]/g,'_');}
+
+function renderLista(lista){
+  const el=document.getElementById('lista');
+  if(!lista.length){el.innerHTML='<div class="empty">Nenhum consulente encontrado.</div>';return;}
+  el.innerHTML=lista.map(c=>{
+    const d=dados[c.email]||{consultas:[],sessoes:[],mapas:[]};
+    const dt=c.created_at?new Date(c.created_at).toLocaleDateString('pt-BR'):'—';
+    const id=eid(c.email);
+    const nomeEsc=c.nome.replace(/'/g,"\\'");
+    const emailEsc=c.email.replace(/'/g,"\\'");
+    return `<div class="c-card">
+      <div class="c-header" onclick="toggleCard('${id}')">
+        <div class="c-info">
+          <div class="c-nome">${c.nome}</div>
+          <div class="c-email">${c.email}</div>
+          <div class="c-badges">
+            <span class="badge bc">${d.consultas.length} consulta${d.consultas.length!==1?'s':''}</span>
+            <span class="badge bm">${d.sessoes.length} mentoria${d.sessoes.length!==1?'s':''}</span>
+            <span class="badge bk">${d.mapas.length} mapa${d.mapas.length!==1?'s':''}</span>
+          </div>
+        </div>
+        <div class="c-meta">Desde ${dt}</div>
+        <span class="chevron" id="chev-${id}">▾</span>
+      </div>
+      <div class="c-body" id="body-${id}">
+        <div class="bulk-row">
+          <span class="bulk-lbl">Excluir em bloco:</span>
+          <button class="btn-sm btn-oa" onclick="conf('Apagar todas as consultas de ${nomeEsc}?','',()=>apagarBloco('consultas','${emailEsc}'))">🗑 Consultas</button>
+          <button class="btn-sm btn-oa" onclick="conf('Apagar todas as mentorias de ${nomeEsc}?','',()=>apagarBloco('mentorias','${emailEsc}'))">🗑 Mentorias</button>
+          <button class="btn-sm btn-oa" onclick="conf('Apagar todos os mapas de ${nomeEsc}?','',()=>apagarBloco('mapas','${emailEsc}'))">🗑 Mapas</button>
+          <button class="btn-sm btn-red" style="margin-left:auto" onclick="conf('EXCLUIR ${nomeEsc} COMPLETAMENTE?','Apagará a conta e todo o histórico. Ação irreversível.',()=>excluirConsulente('${emailEsc}'))">💀 Excluir Consulente</button>
+        </div>
+        <div class="tabs">
+          <div class="tab active" onclick="switchTab('${id}','consultas',this)">📜 Consultas (${d.consultas.length})</div>
+          <div class="tab" onclick="switchTab('${id}','mentorias',this)">✦ Mentorias (${d.sessoes.length})</div>
+          <div class="tab" onclick="switchTab('${id}','mapas',this)">🌌 Mapas (${d.mapas.length})</div>
+        </div>
+        <div class="tab-content">
+          <div class="tab-panel active" id="tab-${id}-consultas">
+            ${d.consultas.length?d.consultas.map(q=>`
+              <div class="item">
+                <div class="item-header">
+                  <div><div class="item-title">${q.tema||'—'} · ${q.estado||'—'}</div><div class="item-sub">${q.created_at?new Date(q.created_at).toLocaleString('pt-BR'):'—'}</div></div>
+                  <button class="btn-sm btn-or" onclick="conf('Excluir esta consulta?','',()=>apagarConsulta('${q.id}'))">🗑</button>
+                </div>
+                <div class="item-prev" onclick="this.querySelector('.item-full').classList.toggle('open')">
+                  <strong>Pergunta:</strong> ${(q.pergunta||'').slice(0,120)}${(q.pergunta||'').length>120?'...':''}
+                  <div class="item-full">
+                    <div class="sec-lbl">Pergunta</div><div class="sec-txt">${q.pergunta||'—'}</div>
+                    <div class="sec-lbl">Revelação</div><div class="sec-txt">${q.revelation||'—'}</div>
+                    <div class="sec-lbl">Futuro</div><div class="sec-txt">${q.earth_future||'—'}</div>
+                    <div class="sec-lbl">Evolução</div><div class="sec-txt">${q.other_civilizations||'—'}</div>
+                    <div class="sec-lbl">Advertência</div><div class="sec-txt">${q.warning||'—'}</div>
+                    <div class="sec-lbl">Ação</div><div class="sec-txt">${q.action||'—'}</div>
+                  </div>
+                </div>
+              </div>`).join(''):'<div class="empty">Nenhuma consulta.</div>'}
+          </div>
+          <div class="tab-panel" id="tab-${id}-mentorias">
+            ${d.sessoes.length?d.sessoes.map(s=>{
+              const pEsc=(s.pergunta||'').replace(/'/g,"\\'");
+              return `<div class="item">
+                <div class="item-header">
+                  <div><div class="item-title">${s.tema||'Mentoria'}</div><div class="item-sub">${s.created_at?new Date(s.created_at).toLocaleString('pt-BR'):'—'} · ${s.msgs.length} msg</div></div>
+                  <button class="btn-sm btn-or" onclick="conf('Excluir esta sessão de mentoria?','',()=>apagarSessao('${emailEsc}','${pEsc}'))">🗑</button>
+                </div>
+                <div class="item-prev" onclick="this.querySelector('.item-full').classList.toggle('open')">
+                  <strong>Tema:</strong> ${(s.pergunta||'').slice(0,100)}
+                  <div class="item-full">
+                    ${s.msgs.map(m=>`<div style="margin-bottom:8px;padding:8px 10px;border-radius:8px;background:${m.role==='user'?'rgba(196,181,253,.08)':'rgba(240,201,107,.06)'};border:1px solid ${m.role==='user'?'rgba(196,181,253,.12)':'rgba(240,201,107,.1)'}">
+                      <div style="font-size:.62rem;letter-spacing:.1em;color:${m.role==='user'?'#c4b5fd':'#f0c96b'};margin-bottom:3px">${m.role==='user'?'CONSULENTE':'MENTOR'}</div>
+                      <div style="font-size:.79rem;color:rgba(196,181,253,.8);line-height:1.6">${(m.content||'').slice(0,300)}${(m.content||'').length>300?'...':''}</div>
+                    </div>`).join('')}
+                  </div>
+                </div>
+              </div>`;}).join(''):'<div class="empty">Nenhuma mentoria.</div>'}
+          </div>
+          <div class="tab-panel" id="tab-${id}-mapas">
+            ${d.mapas.length?d.mapas.map(k=>{
+              let dd={};try{dd=JSON.parse(k.dados||'{}');}catch{}
+              const secs=[['essencia','Essência da Alma'],['missao','Missão Espiritual'],['bloqueios','Bloqueios Akáshicos'],['amor','Linha do Amor'],['prosperidade','Linha da Prosperidade'],['ancestral','Linha Ancestral'],['mentores','Conselho dos Mentores'],['ritual','Ritual Personalizado']];
+              return `<div class="item">
+                <div class="item-header">
+                  <div><div class="item-title">Mapa Akáshico</div><div class="item-sub">${k.created_at?new Date(k.created_at).toLocaleString('pt-BR'):'—'}</div></div>
+                  <button class="btn-sm btn-or" onclick="conf('Excluir este Mapa Akáshico?','',()=>apagarMapa('${k.id}','${emailEsc}'))">🗑</button>
+                </div>
+                <div class="item-prev" onclick="this.querySelector('.item-full').classList.toggle('open')">
+                  <strong>Essência:</strong> ${(dd.essencia||'').slice(0,100)}...
+                  <div class="item-full">
+                    ${secs.map(([key,lbl])=>dd[key]?`<div class="sec-lbl">${lbl}</div><div class="sec-txt">${dd[key]}</div>`:'').join('')}
+                  </div>
+                </div>
+              </div>`;}).join(''):'<div class="empty">Nenhum mapa.</div>'}
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleCard(id){
+  document.getElementById('body-'+id).classList.toggle('open');
+  document.getElementById('chev-'+id).classList.toggle('open');
+}
+function switchTab(id,tab,el){
+  document.querySelectorAll('[id^="tab-'+id+'-"]').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab-'+id+'-'+tab).classList.add('active');
+  el.closest('.tabs').querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+}
+function filtrar(){
+  const q=document.getElementById('busca').value.toLowerCase();
+  renderLista(todos.filter(c=>c.nome.toLowerCase().includes(q)||c.email.toLowerCase().includes(q)));
+}
+
+function conf(titulo,texto,fn){
+  document.getElementById('mTitulo').textContent=titulo;
+  document.getElementById('mTexto').textContent=texto;
+  document.getElementById('modal').style.display='flex';
+  document.getElementById('mOk').onclick=()=>{fecharModal();fn();};
+}
+function fecharModal(){document.getElementById('modal').style.display='none';}
+
+async function apagarConsulta(id){
+  await fetch('/api/consultas',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'apagar_consulta',id})});
+  await init();
+}
+async function apagarMapa(id,email){
+  await fetch('/api/mapas',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'apagar_um',id,email})});
+  await init();
+}
+async function apagarSessao(email,pergunta){
+  await fetch('/api/mentorias',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'apagar_sessao',email,consulta_pergunta:pergunta})});
+  await init();
+}
+async function apagarBloco(tipo,email){
+  if(tipo==='consultas')await fetch('/api/consultas',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'apagar_consulente',email})});
+  else if(tipo==='mentorias')await fetch('/api/mentorias',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'apagar',email})});
+  else if(tipo==='mapas')await fetch('/api/mapas',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'apagar',email})});
+  await init();
+}
+async function excluirConsulente(email){
+  await fetch('/api/consultas',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'apagar_consulente',email})});
+  await fetch('/api/mentorias',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'apagar',email})});
+  await fetch('/api/mapas',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'apagar',email})});
+  await sbDel('/consulentes?email=eq.'+encodeURIComponent(email));
+  await init();
+}
+function downloadCSV(){
+  if(!todos.length){alert('Nenhum dado.');return;}
+  let csv='Nome,Email,Cadastro,Consultas,Mentorias,Mapas\n';
+  todos.forEach(c=>{const d=dados[c.email]||{};csv+='"'+c.nome+'","'+c.email+'","'+(c.created_at||'').slice(0,10)+'","'+(d.consultas?.length||0)+'","'+(d.sessoes?.length||0)+'","'+(d.mapas?.length||0)+'"\n';});
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download='portal-admin-'+new Date().toISOString().slice(0,10)+'.csv';document.body.appendChild(a);a.click();document.body.removeChild(a);
+}
+function copiarEmails(){
+  navigator.clipboard.writeText(todos.map(c=>c.email).join(', ')).then(()=>alert(todos.length+' e-mails copiados!'));
+}
+init();
+
+// Shift+Ctrl+K — limpa todos os campos de senha
+document.addEventListener('keydown', function(e) {
+  if (e.shiftKey && e.ctrlKey && e.key === 'K') {
+    document.querySelectorAll('input[type="password"]').forEach(function(inp) {
+      inp.value = '';
+    });
+  }
+});
+</script>
+</body>
+</html>
