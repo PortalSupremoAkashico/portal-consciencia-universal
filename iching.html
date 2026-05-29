@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>I Ching — Portal Akáshico</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Noto+Serif:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #06050f;
+      --ink: #0a0816;
+      --paper: rgba(20,15,35,0.92);
+      --border: rgba(180,140,80,.22);
+      --gold: #c9a84c;
+      --gold-bright: #e8c96a;
+      --gold-dim: rgba(201,168,76,.65);
+      --jade: #5a9a7a;
+      --jade-dim: rgba(90,154,122,.6);
+      --text: #ede4cc;
+      --muted: rgba(220,205,170,.6);
+      --accent: #a07840;
+      --radius: 4px;
+      --font-display: 'Cinzel', serif;
+      --font-body: 'Noto Serif', serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--font-body); color: var(--text); background: #020108; min-height: 100vh; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+
+    /* ── Fundo ── */
+    #bgCanvas { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+
+    .container { width: min(1060px, calc(100% - 24px)); margin: 0 auto; padding: 32px 0 60px; position: relative; z-index: 1; }
+
+    /* ── Header ── */
+    .site-header { text-align: center; padding: 40px 20px 32px; position: relative; }
+    .header-badge {
+      display: inline-block; font-family: var(--font-display); font-size: .62rem;
+      letter-spacing: .22em; color: var(--gold-dim); border: 1px solid rgba(201,168,76,.25);
+      border-radius: 2px; padding: 4px 16px; margin-bottom: 16px; text-transform: uppercase;
+    }
+    .site-header h1 {
+      font-family: var(--font-display); font-size: clamp(1.4rem,4vw,2.2rem); font-weight: 600;
+      letter-spacing: .12em; color: var(--gold-bright);
+      text-shadow: 0 0 40px rgba(201,168,76,.4), 0 0 80px rgba(201,168,76,.15);
+    }
+    .header-chinese {
+      font-size: 2.8rem; color: rgba(201,168,76,.25); letter-spacing: .3em;
+      margin: 8px 0 4px; line-height: 1;
+    }
+    .header-sub { font-size: .95rem; color: rgba(220,205,170,.85); margin-top: 8px; font-style: italic; }
+
+    /* ── Botão som ── */
+    #btnSom { position: fixed; top: 14px; right: 16px; z-index: 998; background: rgba(10,8,22,.8); border: 1px solid rgba(201,168,76,.25); border-radius: 20px; padding: 5px 11px; cursor: pointer; display: flex; align-items: center; transition: all .2s; }
+    #btnSom:hover { border-color: rgba(201,168,76,.6); }
+
+    /* ── Nav ── */
+    .nav-link { display: inline-flex; align-items: center; gap: 6px; font-size: .78rem; color: var(--muted); text-decoration: none; padding: 7px 14px; border: 1px solid rgba(201,168,76,.2); border-radius: 2px; transition: all .2s; font-family: var(--font-display); letter-spacing: .06em; }
+    .nav-link:hover { color: var(--gold-bright); border-color: rgba(201,168,76,.5); }
+
+    /* ── Card principal ── */
+    .oracle-card {
+      background: rgba(18,13,38,.92);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      backdrop-filter: blur(20px);
+      margin-bottom: 20px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0,0,0,.6), 0 0 0 1px rgba(201,168,76,.08);
+    }
+    .oracle-card::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(201,168,76,.06) 0%, transparent 40%, rgba(90,154,122,.04) 100%);
+      pointer-events: none;
+    }
+    .oracle-card::after {
+      content: "";
+      position: absolute; inset: -1px;
+      border-radius: inherit; padding: 1px;
+      background: linear-gradient(135deg, rgba(201,168,76,0) 0%, rgba(201,168,76,.5) 25%, rgba(240,201,107,.4) 50%, rgba(201,168,76,.5) 75%, rgba(201,168,76,0) 100%);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor; mask-composite: exclude;
+      pointer-events: none;
+      animation: borderGlow 3.5s ease-in-out infinite;
+    }
+    @keyframes borderGlow { 0%,100%{opacity:.4;} 50%{opacity:1;} }
+    .card-body { padding: 36px 44px; }
+    @media(max-width:600px) { .card-body { padding: 22px 18px; } }
+
+    /* ── Seção pergunta ── */
+    .section-title {
+      font-family: var(--font-display); font-size: .78rem; letter-spacing: .2em;
+      color: var(--gold-bright); text-transform: uppercase; margin-bottom: 14px;
+      text-shadow: 0 0 16px rgba(201,168,76,.5);
+    }
+    .oracle-input {
+      width: 100%; background: rgba(6,5,15,.6); border: 1px solid rgba(201,168,76,.25);
+      border-radius: var(--radius); padding: 14px 16px; color: rgba(237,228,204,.98);
+      font-family: var(--font-body); font-size: 1rem; line-height: 1.7;
+      resize: vertical; min-height: 80px; transition: border-color .2s;
+    }
+    .oracle-input:focus { outline: none; border-color: rgba(201,168,76,.6); }
+    .oracle-input::placeholder { color: rgba(220,205,170,.4); font-style: italic; }
+
+    /* ── Botão consultar ── */
+    .btn-consultar {
+      display: inline-flex; align-items: center; justify-content: center;
+      margin-top: 16px; padding: 14px 32px;
+      background: linear-gradient(135deg, rgba(201,168,76,.15), rgba(201,168,76,.08));
+      border: 1px solid rgba(201,168,76,.5); border-radius: 20px;
+      color: var(--gold-bright); font-family: var(--font-display); font-size: .92rem;
+      letter-spacing: .18em; text-transform: uppercase; cursor: pointer; transition: all .25s;
+      animation: btnPulse 2.5s ease-in-out infinite;
+    }
+    .btn-consultar:hover:not(:disabled) {
+      background: linear-gradient(135deg, rgba(201,168,76,.28), rgba(201,168,76,.15));
+      border-color: var(--gold-bright); box-shadow: 0 0 32px rgba(201,168,76,.4);
+      transform: translateY(-2px) scale(1.03); animation: none;
+    }
+    .btn-consultar:disabled { opacity: .5; cursor: not-allowed; animation: none; }
+    .btn-consultar-wrap { text-align: center; margin-top: 16px; }
+
+    /* ── Animação de moedas ── */
+    #moedas-wrap { display: none; }
+    .moedas-container { display: flex; justify-content: center; gap: 28px; margin-bottom: 32px; }
+    .moeda-wrap { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+    .moeda {
+      width: 88px; height: 88px; border-radius: 50%; position: relative;
+      background: radial-gradient(circle at 32% 28%, #fff9d6 0%, #e8c96a 18%, #c9a84c 38%, #8a5e18 62%, #5a3a08 82%, #2a1804 100%);
+      border: 3px solid rgba(232,201,106,.7);
+      box-shadow: 0 6px 28px rgba(0,0,0,.75), 0 2px 8px rgba(201,168,76,.4), inset 0 2px 4px rgba(255,255,255,.25), inset 0 -2px 6px rgba(0,0,0,.4);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem; cursor: default;
+      transition: transform .1s;
+    }
+    .moeda::after {
+      content: ''; position: absolute; inset: 4px; border-radius: 50%;
+      border: 1px solid rgba(255,255,255,.12);
+      background: radial-gradient(circle at 30% 25%, rgba(255,255,255,.18) 0%, transparent 55%);
+      pointer-events: none;
+    }
+    .moeda-label { font-family: var(--font-display); font-size: .82rem; letter-spacing: .18em; color: var(--gold-bright); margin-top: 6px; text-shadow: 0 0 10px rgba(201,168,76,.5); }
+    @keyframes moedaFlip {
+      0%   { transform: rotateY(0deg) scale(1) translateY(0); }
+      15%  { transform: rotateY(90deg) scale(1.15) translateY(-12px); }
+      30%  { transform: rotateY(0deg) scale(1.08) translateY(-6px); }
+      45%  { transform: rotateY(90deg) scale(1.12) translateY(-10px); }
+      60%  { transform: rotateY(0deg) scale(1.05) translateY(-4px); }
+      75%  { transform: rotateY(90deg) scale(1.08) translateY(-7px); }
+      88%  { transform: rotateY(0deg) scale(1.03) translateY(-2px); }
+      100% { transform: rotateY(0deg) scale(1) translateY(0); }
+    }
+    .moeda.girando { animation: moedaFlip var(--dur, 1.8s) cubic-bezier(.4,0,.2,1) forwards; }
+
+    /* ── Hexagrama sendo construído ── */
+    /* ── Hexagrama sendo construído ── */
+    #hexBuild {
+      display: flex; flex-direction: column-reverse; gap: 10px;
+      align-items: center; margin: 0 auto 28px; min-height: 130px;
+    }
+    .hb-linha {
+      display: flex; gap: 12px; align-items: center;
+      opacity: 0; transform: translateY(6px);
+      transition: opacity .35s ease, transform .35s ease;
+    }
+    .hb-linha.show { opacity: 1; transform: translateY(0); }
+    .hb-seg {
+      height: 14px; border-radius: 4px;
+      box-shadow: 0 0 14px currentColor;
+      transition: width .25s ease;
+    }
+    .hb-seg.yang { width: 140px; background: linear-gradient(90deg,#b8882a,#e8c96a,#f0d878,#e8c96a,#b8882a); color: rgba(201,168,76,.7); }
+    .hb-seg.yin  { width: 62px;  background: linear-gradient(90deg,#b8882a,#e8c96a,#f0d878,#e8c96a,#b8882a); color: rgba(201,168,76,.7); }
+    .hb-seg.yang.mut { background: linear-gradient(90deg,#2a7a5a,#5a9a7a,#7abf9a,#5a9a7a,#2a7a5a); color: rgba(90,154,122,.7); }
+    .hb-seg.yin.mut  { background: linear-gradient(90deg,#2a7a5a,#5a9a7a,#7abf9a,#5a9a7a,#2a7a5a); color: rgba(90,154,122,.7); }
+    .hb-num { font-family: var(--font-display); font-size: .9rem; color: var(--gold-bright); width: 20px; text-align: right; flex-shrink: 0; text-shadow: 0 0 8px rgba(201,168,76,.5); }
+    .hb-tipo { font-size: .9rem; color: rgba(237,228,204,.92); width: 140px; text-align: left; flex-shrink: 0; }
+    .hb-tipo.mut { color: rgba(120,220,170,.95); font-weight: 600; }
+
+    .spinner-text { font-family: var(--font-display); font-size: 1.05rem; letter-spacing: .15em; color: var(--gold-bright); margin-top: 14px; text-shadow: 0 0 16px rgba(201,168,76,.5); animation: spinnerFade 2s ease-in-out infinite; }
+    @keyframes spinnerFade { 0%,100%{opacity:.7;} 50%{opacity:1;} }
+
+    @keyframes btnLancarPulse {
+      0%,100% { box-shadow: 0 0 28px rgba(201,168,76,.4), 0 0 56px rgba(201,168,76,.15); border-color: rgba(201,168,76,.7); }
+      50%      { box-shadow: 0 0 44px rgba(201,168,76,.7), 0 0 80px rgba(201,168,76,.3); border-color: var(--gold-bright); }
+    }
+
+    /* ── Resultado ── */
+    #resultado-wrap { display: none; }
+
+    .hexagrama-display {
+      display: flex; gap: 36px; align-items: center; flex-wrap: wrap;
+      margin-bottom: 32px; padding: 28px 24px;
+      border: 1px solid rgba(201,168,76,.18);
+      border-radius: 16px;
+      background: rgba(6,5,15,.5);
+      box-shadow: inset 0 1px 0 rgba(201,168,76,.08);
+    }
+    .hex-visual { flex-shrink: 0; }
+    .hex-linhas { display: flex; flex-direction: column-reverse; gap: 10px; }
+    .hex-linha {
+      width: 140px; height: 16px; position: relative;
+      display: flex; gap: 10px;
+    }
+    .hex-linha.yang::before {
+      content: ''; display: block; width: 100%; height: 100%;
+      background: linear-gradient(90deg, #c9a84c, #e8c96a, #c9a84c);
+      border-radius: 4px; box-shadow: 0 0 14px rgba(201,168,76,.7);
+    }
+    .hex-linha.yin::before {
+      content: ''; position: absolute; left: 0; width: 60px; height: 100%;
+      background: linear-gradient(90deg, #c9a84c, #e8c96a, #c9a84c);
+      border-radius: 4px; box-shadow: 0 0 14px rgba(201,168,76,.7);
+    }
+    .hex-linha.yin::after {
+      content: ''; position: absolute; right: 0; width: 60px; height: 100%;
+      background: linear-gradient(90deg, #c9a84c, #e8c96a, #c9a84c);
+      border-radius: 4px; box-shadow: 0 0 14px rgba(201,168,76,.7);
+    }
+    .hex-linha.mutante::before, .hex-linha.mutante::after {
+      background: linear-gradient(90deg, #5a9a7a, #7abf9a, #5a9a7a);
+      box-shadow: 0 0 14px rgba(90,154,122,.8);
+    }
+    .hex-info { flex: 1; min-width: 180px; }
+    .hex-numero { font-size: .75rem; color: var(--muted); letter-spacing: .12em; margin-bottom: 6px; }
+    .hex-nome { font-family: var(--font-display); font-size: 1.4rem; color: var(--gold-bright); margin-bottom: 4px; }
+    .hex-titulo { font-size: 1.08rem; color: var(--text); font-style: italic; margin-bottom: 8px; }
+    .hex-elemento { font-size: .82rem; color: var(--jade-dim); letter-spacing: .08em; }
+
+    .seta-mutacao {
+      display: flex; align-items: center; justify-content: center;
+      padding: 0 8px; color: var(--jade-dim); font-size: 2rem;
+      align-self: center;
+    }
+
+    /* ── Seções de texto ── */
+    .secao { margin-bottom: 28px; }
+    .secao-label {
+      font-family: var(--font-display); font-size: .72rem; letter-spacing: .18em;
+      color: var(--gold-bright); text-transform: uppercase; margin-bottom: 12px;
+      display: flex; align-items: center; gap: 10px;
+      text-shadow: 0 0 16px rgba(201,168,76,.5);
+    }
+    .secao-label span.label-text { flex-shrink: 0; }
+    .secao-label .label-line {
+      flex: 1; height: 1px;
+      background: linear-gradient(90deg, rgba(201,168,76,.4), transparent);
+    }
+    .secao-texto {
+      font-size: 1.05rem; color: rgba(237,228,204,.95); line-height: 2;
+    }
+    .secao-texto p { margin-bottom: 16px; }
+
+    /* ── Título da leitura ── */
+    .leitura-titulo {
+      font-family: var(--font-display); font-size: clamp(1rem,2.5vw,1.3rem);
+      color: var(--gold-bright); text-align: center; margin-bottom: 28px;
+      padding: 16px; border-top: 1px solid rgba(201,168,76,.15);
+      border-bottom: 1px solid rgba(201,168,76,.15);
+      letter-spacing: .06em; min-height: 24px;
+    }
+
+    /* ── Ornamentos ── */
+    .ornamento { text-align: center; color: rgba(201,168,76,.3); font-size: .9rem; letter-spacing: .4em; margin: 20px 0; }
+
+    /* ── Mensagem central ── */
+    .mensagem-card {
+      background: linear-gradient(135deg, rgba(90,154,122,.12), rgba(201,168,76,.08));
+      border: 1px solid rgba(90,154,122,.35); border-radius: 16px;
+      padding: 22px 26px; margin-top: 8px;
+      box-shadow: 0 0 24px rgba(90,154,122,.12), inset 0 1px 0 rgba(201,168,76,.1);
+    }
+
+    /* ── Botão ouvir ── */
+    .btn-ouvir {
+      display: inline-flex; align-items: center; gap: 6px; margin-top: 12px;
+      padding: 7px 16px; background: rgba(201,168,76,.08);
+      border: 1px solid rgba(201,168,76,.25); border-radius: 2px;
+      color: var(--gold-dim); font-size: .72rem; font-family: var(--font-display);
+      letter-spacing: .1em; cursor: pointer; transition: all .2s;
+    }
+    .btn-ouvir:hover { border-color: rgba(201,168,76,.6); color: var(--gold-bright); }
+
+    /* ── Nova consulta ── */
+    .btn-nova {
+      display: inline-flex; align-items: center; justify-content: center;
+      margin-top: 24px; padding: 13px 28px;
+      background: transparent; border: 1px solid rgba(201,168,76,.35); border-radius: 20px;
+      color: rgba(220,205,170,.8); font-family: var(--font-display); font-size: .78rem;
+      letter-spacing: .15em; text-transform: uppercase; cursor: pointer; transition: all .22s;
+      animation: btnPulse 2.5s ease-in-out infinite;
+    }
+    .btn-nova:hover { border-color: var(--gold-bright); color: var(--gold-bright); transform: translateY(-1px) scale(1.02); animation: none; }
+    .btn-nova-wrap { text-align: center; }
+
+    /* ── Animações globais ── */
+    @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+    .fade-up { animation: fadeUp .5s ease both; }
+
+    @keyframes btnPulse {
+      0%,100% { box-shadow: 0 0 6px rgba(201,168,76,.2); border-color: rgba(201,168,76,.45); }
+      50%      { box-shadow: 0 0 18px rgba(201,168,76,.5); border-color: rgba(201,168,76,.8); }
+    }
+    .btn-consultar:not(:disabled) { animation: btnPulse 2.5s ease-in-out infinite; }
+
+    /* ── Typewriter cursor ── */
+    .cursor-blink { animation: blink .7s step-end infinite; }
+    @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0;} }
+
+    .empty { text-align:center; padding:40px; color:var(--muted); font-size:.88rem; }
+    .spinner-sm { width:28px; height:28px; border:2px solid rgba(201,168,76,.15); border-top-color:var(--gold); border-radius:50%; animation:spin 1s linear infinite; margin:0 auto 12px; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    /* ── Pergunta exibida no resultado ── */
+    .pergunta-display {
+      padding: 12px 16px; background: rgba(201,168,76,.05);
+      border-left: 2px solid rgba(201,168,76,.3); border-radius: 0 2px 2px 0;
+      margin-bottom: 24px; font-style: italic; color: var(--muted); font-size: .88rem;
+    }
+
+    /* Botões gerais */
+    @keyframes btnPulseGold { 0%,100%{box-shadow:0 0 6px rgba(201,168,76,.25);border-color:rgba(201,168,76,.5);}50%{box-shadow:0 0 16px rgba(201,168,76,.55);border-color:rgba(201,168,76,.85);} }
+    button:not([disabled]):not(.btn-consultar) { animation: btnPulseGold 2s ease-in-out infinite; }
+    button:not([disabled]):hover { border-color: var(--gold-bright) !important; color: var(--gold-bright) !important; box-shadow: 0 0 24px rgba(201,168,76,.5) !important; transform: translateY(-1px) !important; }
+  </style>
+</head>
+<body>
+
+<button id="btnSom" onclick="toggleSound()" title="Som ambiente"></button>
+<audio id="ambientAudio" loop preload="none" src="/soul-frequencies.mp3"></audio>
+<canvas id="bgCanvas"></canvas>
+
+<div class="container">
+
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:8px;">
+    <a href="/perfil" class="nav-link">← Voltar</a>
+    <span id="userGreeting" style="font-size:.78rem;color:var(--muted);font-style:italic;"></span>
+  </div>
+
+  <header class="site-header">
+    <div class="header-badge">Portal Akáshico</div>
+    <div class="header-chinese">易經</div>
+    <h1>I Ching</h1>
+    <p class="header-sub">O Livro das Mutações · Oráculo dos Ancestrais</p>
+  </header>
+
+  <!-- ── Tela de pergunta ── -->
+  <div id="tela-pergunta">
+    <div class="oracle-card fade-up" style="animation-delay:.1s;">
+      <div class="card-body">
+        <div class="section-title">☯ O Método das Três Moedas</div>
+        <p style="font-size:1.05rem;color:rgba(237,228,204,.95);line-height:1.95;">
+          Três moedas são lançadas seis vezes, construindo o hexagrama de baixo para cima.
+          Cara (Yang, valor 3) e Coroa (Yin, valor 2) determinam cada linha — fixa ou mutante.
+          Linhas mutantes revelam o movimento, a transformação em curso, o hexagrama futuro emergindo do presente.
+        </p>
+        <div style="display:flex;gap:28px;margin-top:20px;flex-wrap:wrap;">
+          <div style="font-size:1rem;color:rgba(237,228,204,.95);line-height:2.1;">
+            <div>⚊ &nbsp;<span style="color:var(--gold-bright);font-weight:600;">Yang fixo (9)</span> — força estável</div>
+            <div>⚋ &nbsp;<span style="color:var(--gold-bright);font-weight:600;">Yin fixo (6)</span> — receptividade estável</div>
+          </div>
+          <div style="font-size:1rem;color:rgba(120,220,170,.95);line-height:2.1;">
+            <div>⚊→⚋ &nbsp;<strong>Yang mutante (7)</strong> — yang que se torna yin</div>
+            <div>⚋→⚊ &nbsp;<strong>Yin mutante (8)</strong> — yin que se torna yang</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="oracle-card fade-up">
+      <div class="card-body">
+        <div class="section-title">☯ Formule sua Pergunta</div>
+        <p style="font-size:1.05rem;color:rgba(237,228,204,.95);margin-bottom:18px;line-height:1.95;">
+          Acalme a mente. Respire. Deixe a pergunta emergir do coração — não da mente ansiosa.<br>
+          O I Ching responde com maior clareza a perguntas sobre <em>como navegar</em>, não sobre o que vai acontecer.
+        </p>
+        <textarea id="perguntaInput" class="oracle-input" placeholder="O que os Ancestrais revelam sobre este momento da minha vida?..." rows="3"></textarea>
+        <div class="btn-consultar-wrap">
+          <button class="btn-consultar" id="btnConsultar" onclick="iniciarConsulta()">
+            ☰ &nbsp; Lançar as Moedas Sagradas &nbsp; ☰
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Tela de lançamento manual ── -->
+  <div id="moedas-wrap">
+    <div class="oracle-card">
+      <div class="card-body" style="text-align:center;padding:44px 28px;">
+        <div style="font-family:var(--font-display);font-size:.88rem;letter-spacing:.22em;color:var(--gold-bright);margin-bottom:10px;text-shadow:0 0 20px rgba(201,168,76,.6);">LANÇAMENTO DAS MOEDAS</div>
+        <div id="lanceContador" style="font-family:var(--font-display);font-size:1.2rem;color:rgba(237,228,204,.95);margin-bottom:28px;letter-spacing:.1em;text-shadow:0 0 12px rgba(201,168,76,.35);">Lançamento 1 de 6</div>
+
+        <!-- Moedas grandes -->
+        <div class="moedas-container" style="margin-bottom:28px;">
+          <div class="moeda-wrap">
+            <div class="moeda" id="moeda0">
+              <svg width="44" height="44" viewBox="0 0 44 44"><circle cx="22" cy="22" r="20" fill="none" stroke="rgba(255,240,180,.25)" stroke-width="1"/><text x="22" y="29" text-anchor="middle" font-size="20" fill="rgba(255,240,160,.85)">☯</text></svg>
+            </div>
+            <div class="moeda-label">MOEDA 1</div>
+          </div>
+          <div class="moeda-wrap">
+            <div class="moeda" id="moeda1">
+              <svg width="44" height="44" viewBox="0 0 44 44"><circle cx="22" cy="22" r="20" fill="none" stroke="rgba(255,240,180,.25)" stroke-width="1"/><text x="22" y="29" text-anchor="middle" font-size="20" fill="rgba(255,240,160,.85)">☯</text></svg>
+            </div>
+            <div class="moeda-label">MOEDA 2</div>
+          </div>
+          <div class="moeda-wrap">
+            <div class="moeda" id="moeda2">
+              <svg width="44" height="44" viewBox="0 0 44 44"><circle cx="22" cy="22" r="20" fill="none" stroke="rgba(255,240,180,.25)" stroke-width="1"/><text x="22" y="29" text-anchor="middle" font-size="20" fill="rgba(255,240,160,.85)">☯</text></svg>
+            </div>
+            <div class="moeda-label">MOEDA 3</div>
+          </div>
+        </div>
+
+        <!-- Botão redondo de lançamento -->
+        <div style="margin-bottom:32px;">
+          <button id="btnLancar" onclick="lancarRodada()" style="
+            width:90px;height:90px;border-radius:50%;
+            background:linear-gradient(135deg,rgba(201,168,76,.3),rgba(201,168,76,.15));
+            border:2.5px solid rgba(201,168,76,.7);
+            color:var(--gold-bright);font-size:1.8rem;
+            cursor:pointer;display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+            box-shadow:0 0 28px rgba(201,168,76,.4),0 0 56px rgba(201,168,76,.15);
+            animation:btnLancarPulse 1.5s ease-in-out infinite;
+            transition:all .2s;
+          ">
+            <span>🪙</span>
+            <span style="font-family:var(--font-display);font-size:.45rem;letter-spacing:.1em;">LANÇAR</span>
+          </button>
+        </div>
+
+        <!-- Hexagrama sendo construído -->
+        <div style="font-family:var(--font-display);font-size:.78rem;letter-spacing:.18em;color:var(--gold-bright);margin-bottom:16px;text-shadow:0 0 14px rgba(201,168,76,.5);" id="hexBuildLabel" style="visibility:hidden;">HEXAGRAMA EM FORMAÇÃO</div>
+        <div id="hexBuild"></div>
+
+        <div class="spinner-text" id="spinnerText" style="display:none;">Consultando os Registros Akáshicos...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Resultado ── -->
+  <div id="resultado-wrap">
+    <div class="oracle-card fade-up">
+      <div class="card-body">
+        <div class="leitura-titulo" id="leituraTitulo">—</div>
+        <div id="perguntaExibida" class="pergunta-display"></div>
+
+        <!-- Hexagramas -->
+        <div class="hexagrama-display" id="hexagramaDisplay">
+          <div class="hex-visual" id="hexVisualPrincipal">
+            <div class="hex-linhas" id="hexLinhasPrincipal"></div>
+          </div>
+          <div class="hex-info" id="hexInfoPrincipal"></div>
+          <div class="seta-mutacao" id="setaMutacao" style="display:none;">→</div>
+          <div class="hex-visual" id="hexVisualMutacao" style="display:none;">
+            <div class="hex-linhas" id="hexLinhasMutacao"></div>
+          </div>
+          <div class="hex-info" id="hexInfoMutacao" style="display:none;"></div>
+        </div>
+
+        <div class="ornamento">· · ·</div>
+
+        <!-- Hexagrama Presente -->
+        <div class="secao" id="secaoPresente">
+          <div class="secao-label">
+            <span class="label-text">☰ O Momento Presente</span>
+            <span class="label-line"></span>
+            <button class="btn-ouvir" onclick="ouvirSecao('txtPresente', this)">🔊 Ouvir</button>
+          </div>
+          <div class="secao-texto" id="txtPresente"></div>
+        </div>
+
+        <!-- Linhas Mutantes -->
+        <div class="secao" id="secaoMutantes">
+          <div class="secao-label">
+            <span class="label-text">☯ As Linhas em Movimento</span>
+            <span class="label-line"></span>
+            <button class="btn-ouvir" onclick="ouvirSecao('txtMutantes', this)">🔊 Ouvir</button>
+          </div>
+          <div class="secao-texto" id="txtMutantes"></div>
+        </div>
+
+        <!-- Hexagrama Futuro -->
+        <div class="secao" id="secaoFuturo">
+          <div class="secao-label">
+            <span class="label-text">☷ O Futuro Emergente</span>
+            <span class="label-line"></span>
+            <button class="btn-ouvir" onclick="ouvirSecao('txtFuturo', this)">🔊 Ouvir</button>
+          </div>
+          <div class="secao-texto" id="txtFuturo"></div>
+        </div>
+
+        <div class="ornamento">· · ·</div>
+
+        <!-- Mensagem Central -->
+        <div class="secao">
+          <div class="secao-label">
+            <span class="label-text">✦ Mensagem dos Ancestrais</span>
+            <span class="label-line"></span>
+            <button class="btn-ouvir" onclick="ouvirSecao('txtMensagem', this)">🔊 Ouvir</button>
+          </div>
+          <div class="mensagem-card">
+            <div class="secao-texto" id="txtMensagem"></div>
+          </div>
+        </div>
+
+        <div class="btn-nova-wrap">
+          <button class="btn-nova" onclick="novaConsulta()">☯ &nbsp; Nova Consulta</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── Fundo cósmico igual ao Runas ──
+(function(){
+  const canvas = document.getElementById('bgCanvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, stars=[], nebulae=[], galaxies=[], spaceships=[], starClusters=[], t=0;
+  function resize(){ W=canvas.width=window.innerWidth; H=canvas.height=window.innerHeight; initScene(); }
+  function rand(a,b){ return a+Math.random()*(b-a); }
+  function initScene(){
+    stars=[];
+    const count=Math.floor((W*H)/600);
+    for(let i=0;i<count;i++){
+      const spd=rand(0.3,1.2);
+      stars.push({x:rand(0,W),y:rand(0,H),r:rand(0.5,2.2),alpha:rand(0.4,1),speed:rand(0.0003,0.0012),phase:rand(0,Math.PI*2),color:Math.random()<0.20?`hsl(${rand(200,280)},85%,92%)`:'#fff',dx:spd*0.7,dy:spd*0.2});
+    }
+    const brightCount=Math.floor((W*H)/80000);
+    for(let i=0;i<brightCount;i++){
+      const spd=rand(0.2,0.8),size=rand(2.5,7);
+      stars.push({x:rand(0,W),y:rand(0,H),r:size,alpha:1,speed:rand(0.0005,0.0015),phase:rand(0,Math.PI*2),color:'#ffffff',dx:spd*0.5,dy:spd*0.15,isBright:true});
+    }
+    starClusters=[];
+    if(Math.random()<0.3){
+      const cl={x:rand(0,W),y:rand(H*0.2,H*0.8),radius:rand(40,100),dx:rand(0.3,0.8),stars:[]};
+      const ns=Math.floor(rand(12,25));
+      for(let s=0;s<ns;s++){const a=Math.random()*Math.PI*2,d=Math.random()*cl.radius;cl.stars.push({offsetX:Math.cos(a)*d,offsetY:Math.sin(a)*d,size:rand(0.3,1.0),alpha:rand(0.2,0.5),color:Math.random()<0.3?`hsl(${rand(200,280)},70%,85%)`:'rgba(255,255,255,0.6)'});}
+      starClusters.push(cl);
+    }
+    nebulae=[];
+    const cols=[[120,70,200],[60,100,255],[200,80,160],[30,120,220],[160,60,220],[80,160,255],[255,140,80],[100,200,255]];
+    for(let i=0;i<15;i++){
+      const [r,g,b]=cols[i%cols.length];
+      nebulae.push({x:rand(0,W),y:rand(0,H),rx:rand(W*.15,W*.5),ry:rand(H*.12,H*.4),alpha:rand(0.08,0.18),angle:rand(0,Math.PI),r,g,b,driftX:rand(-0.03,0.03),driftY:rand(-0.02,0.02),rotSpeed:rand(-0.00005,0.00005),pulseSpeed:rand(0.0003,0.0008),pulsePhase:rand(0,Math.PI*2)});
+    }
+    spaceships=[];
+  }
+  function createSpaceship(){
+    if(Math.random()<0.004&&spaceships.length<2){
+      const dir=Math.random()<0.5?1:-1;
+      spaceships.push({x:dir>0?-50:W+50,y:rand(H*0.2,H*0.8),size:rand(8,14),speed:rand(15,25)*dir,lightPhase:rand(0,Math.PI*2),lightSpeed:rand(0.2,0.3),color:Math.random()<0.5?[100,200,255]:[200,100,255],trail:[]});
+    }
+  }
+  function drawSpaceships(){
+    spaceships.forEach((ship,idx)=>{
+      ship.trail.push({x:ship.x,y:ship.y,alpha:1});
+      if(ship.trail.length>15)ship.trail.shift();
+      ship.trail.forEach((point,i)=>{
+        const alpha=(i/ship.trail.length)*point.alpha,size=ship.size*0.3*(i/ship.trail.length);
+        ctx.save();ctx.globalAlpha=alpha*0.6;ctx.shadowBlur=15;ctx.shadowColor=`rgba(${ship.color[0]},${ship.color[1]},${ship.color[2]},${alpha})`;
+        const g=ctx.createRadialGradient(point.x,point.y,0,point.x,point.y,size*3);
+        g.addColorStop(0,`rgba(255,255,255,${alpha*0.8})`);g.addColorStop(0.5,`rgba(${ship.color[0]},${ship.color[1]},${ship.color[2]},${alpha*0.6})`);g.addColorStop(1,`rgba(${ship.color[0]},${ship.color[1]},${ship.color[2]},0)`);
+        ctx.fillStyle=g;ctx.beginPath();ctx.arc(point.x,point.y,size*3,0,Math.PI*2);ctx.fill();ctx.restore();
+        point.alpha*=0.95;
+      });
+      ctx.save();ctx.translate(ship.x,ship.y);
+      ctx.fillStyle=`rgba(${ship.color[0]},${ship.color[1]},${ship.color[2]},0.9)`;ctx.shadowBlur=12;ctx.shadowColor=`rgba(${ship.color[0]},${ship.color[1]},${ship.color[2]},0.8)`;
+      ctx.beginPath();ctx.ellipse(0,-ship.size*0.15,ship.size*0.5,ship.size*0.25,0,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle=`rgba(${ship.color[0]-30},${ship.color[1]-30},${ship.color[2]-30},0.8)`;
+      ctx.beginPath();ctx.ellipse(0,0,ship.size*0.8,ship.size*0.3,0,0,Math.PI*2);ctx.fill();
+      const lb=Math.sin(ship.lightPhase)*0.5+0.5;
+      ctx.fillStyle=`rgba(255,255,200,${lb})`;ctx.shadowBlur=8;ctx.shadowColor=`rgba(255,255,200,${lb})`;
+      ctx.beginPath();ctx.arc(0,0,ship.size*0.15,0,Math.PI*2);ctx.fill();ctx.restore();
+      ship.x+=ship.speed;ship.lightPhase+=ship.lightSpeed;
+      if(ship.x<-100||ship.x>W+100)spaceships.splice(idx,1);
+    });
+  }
+  function createStarCluster(){
+    if(Math.random()<0.0015&&starClusters.length<2){
+      const cl={x:-100,y:rand(H*0.2,H*0.8),radius:rand(40,100),dx:rand(0.3,0.8),stars:[]};
+      const ns=Math.floor(rand(12,25));
+      for(let s=0;s<ns;s++){const a=Math.random()*Math.PI*2,d=Math.random()*cl.radius;cl.stars.push({offsetX:Math.cos(a)*d,offsetY:Math.sin(a)*d,size:rand(0.3,1.0),alpha:rand(0.2,0.5),color:Math.random()<0.3?`hsl(${rand(200,280)},70%,85%)`:'rgba(255,255,255,0.6)'});}
+      starClusters.push(cl);
+    }
+  }
+  function drawStarClusters(){
+    starClusters.forEach((cl,idx)=>{
+      cl.x+=cl.dx;
+      if(cl.x>W+cl.radius*2)starClusters.splice(idx,1);
+      cl.stars.forEach(s=>{
+        const sx=cl.x+s.offsetX,sy=cl.y+s.offsetY;
+        ctx.globalAlpha=s.alpha;ctx.fillStyle=s.color;
+        ctx.beginPath();ctx.arc(sx,sy,s.size,0,Math.PI*2);ctx.fill();
+        if(s.size>0.7){const g=ctx.createRadialGradient(sx,sy,0,sx,sy,s.size*2);g.addColorStop(0,`rgba(255,255,255,${s.alpha*0.3})`);g.addColorStop(1,'transparent');ctx.fillStyle=g;ctx.beginPath();ctx.arc(sx,sy,s.size*2,0,Math.PI*2);ctx.fill();}
+      });
+      ctx.globalAlpha=1;
+    });
+  }
+  function drawBg(){
+    const bg=ctx.createRadialGradient(W*.5,H*.4,0,W*.5,H*.5,Math.max(W,H)*.8);
+    bg.addColorStop(0,'#0d0820');bg.addColorStop(0.4,'#060314');bg.addColorStop(1,'#020108');
+    ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+  }
+  function drawNebulae(){
+    nebulae.forEach(n=>{
+      const pulse=Math.sin(t*n.pulseSpeed+n.pulsePhase)*0.4+0.8;
+      ctx.save();ctx.translate(n.x,n.y);ctx.rotate(n.angle);
+      ctx.shadowBlur=50;ctx.shadowColor=`rgba(${n.r},${n.g},${n.b},${n.alpha*0.5})`;
+      const g=ctx.createRadialGradient(0,0,0,0,0,n.rx);
+      const a=n.alpha*pulse;
+      g.addColorStop(0,`rgba(${n.r},${n.g},${n.b},${a})`);g.addColorStop(0.3,`rgba(${n.r},${n.g},${n.b},${a*0.7})`);g.addColorStop(0.6,`rgba(${n.r},${n.g},${n.b},${a*0.4})`);g.addColorStop(1,`rgba(${n.r},${n.g},${n.b},0)`);
+      ctx.scale(1,n.ry/n.rx);ctx.beginPath();ctx.arc(0,0,n.rx,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();ctx.restore();
+      n.x+=n.driftX;n.y+=n.driftY;n.angle+=n.rotSpeed;
+      if(n.x<-n.rx)n.x=W+n.rx;if(n.x>W+n.rx)n.x=-n.rx;if(n.y<-n.ry)n.y=H+n.ry;if(n.y>H+n.ry)n.y=-n.ry;
+    });
+  }
+  function drawStars(){
+    stars.forEach(s=>{
+      s.x+=s.dx;s.y+=s.dy;
+      if(s.x<-2)s.x=W+2;if(s.x>W+2)s.x=-2;if(s.y<-2)s.y=H+2;if(s.y>H+2)s.y=-2;
+      if(s.isBright){
+        const bg2=ctx.createRadialGradient(s.x,s.y,0,s.x,s.y,s.r*8);
+        bg2.addColorStop(0,`rgba(255,255,255,0.4)`);bg2.addColorStop(0.3,`rgba(200,220,255,0.2)`);bg2.addColorStop(1,'transparent');
+        ctx.fillStyle=bg2;ctx.beginPath();ctx.arc(s.x,s.y,s.r*8,0,Math.PI*2);ctx.fill();
+        ctx.shadowBlur=20;ctx.shadowColor='rgba(255,255,255,1)';
+        ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle='#ffffff';ctx.globalAlpha=1;ctx.fill();
+        ctx.shadowBlur=0;ctx.globalAlpha=1;
+      } else {
+        const fl=Math.sin(t*s.speed*1000+s.phase)*0.35+0.65;
+        ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle=s.color;ctx.globalAlpha=s.alpha*fl;ctx.fill();
+        if(s.r>1.2){const g=ctx.createRadialGradient(s.x,s.y,0,s.x,s.y,s.r*4);g.addColorStop(0,`rgba(255,255,255,${0.15*fl})`);g.addColorStop(1,'transparent');ctx.beginPath();ctx.arc(s.x,s.y,s.r*4,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();}
+        ctx.globalAlpha=1;
+      }
+    });
+  }
+  function drawVignette(){
+    const v=ctx.createRadialGradient(W*.5,H*.5,H*.2,W*.5,H*.5,Math.max(W,H)*.75);
+    v.addColorStop(0,'transparent');v.addColorStop(1,'rgba(2,1,8,0.72)');
+    ctx.fillStyle=v;ctx.fillRect(0,0,W,H);
+  }
+  function loop(ts){
+    t=ts;ctx.clearRect(0,0,W,H);drawBg();
+    createStarCluster();drawStarClusters();drawNebulae();drawStars();
+    createSpaceship();drawSpaceships();drawVignette();
+    requestAnimationFrame(loop);
+  }
+  window.addEventListener('resize',resize);resize();requestAnimationFrame(loop);
+})();
+
+// ── Som ──
+(function(){
+  const audio = document.getElementById('ambientAudio');
+  const btn = document.getElementById('btnSom');
+  let playing = false;
+  const MUDO = '<svg width="18" height="18" viewBox="-28 -24 56 48"><polygon points="-18,-12 -18,12 -6,12 8,22 8,-22 -6,-12" fill="rgba(201,168,76,0.55)"/><line x1="12" y1="-12" x2="22" y2="12" stroke="rgba(255,100,100,0.9)" stroke-width="2.5" stroke-linecap="round"/><line x1="22" y1="-12" x2="12" y2="12" stroke="rgba(255,100,100,0.9)" stroke-width="2.5" stroke-linecap="round"/></svg>';
+  const ATIVO = '<svg width="18" height="18" viewBox="-28 -28 56 56"><polygon points="-18,-12 -18,12 -6,12 8,22 8,-22 -6,-12" fill="rgba(201,168,76,0.85)"/><path d="M12,-14 Q22,0 12,14" fill="none" stroke="rgba(201,168,76,0.9)" stroke-width="2.2" stroke-linecap="round"/><path d="M18,-22 Q34,0 18,22" fill="none" stroke="rgba(201,168,76,0.55)" stroke-width="1.5" stroke-linecap="round"/></svg>';
+  btn.innerHTML = MUDO;
+  window.toggleSound = function() {
+    if (playing) { audio.pause(); btn.innerHTML = MUDO; playing = false; }
+    else {
+      audio.volume = 0; audio.play().then(() => {
+        let v = 0; const iv = setInterval(() => { v = Math.min(.35, v+.015); audio.volume = v; if(v>=.35) clearInterval(iv); }, 100);
+        btn.innerHTML = ATIVO; playing = true;
+      }).catch(() => {});
+    }
+  };
+  document.addEventListener('DOMContentLoaded', () => { window.toggleSound(); });
+})();
+
+// ── Dados do usuário ──
+const _u = JSON.parse(localStorage.getItem('akashic_user') || sessionStorage.getItem('akashic_user') || '{}');
+if (!_u.email) window.location.href = '/login';
+const firstName = (_u.nome||'').trim().split(/\s+/)[0] || 'consulente';
+document.getElementById('userGreeting').textContent = firstName;
+
+// ── Estado ──
+var hexData = null;
+var ichingData = {};
+var _audioAtual = null;
+
+const SB_URL = 'https://opykejeaxehvzogrrwto.supabase.co';
+const SB_KEY = 'sb_publishable_4tsCDVnvSP-bCuhrRS95Ww_H5MsDnwB';
+
+// ── Funções de navegação ──
+function ir(tela) {
+  document.getElementById('tela-pergunta').style.display  = tela === 'tela-pergunta'  ? 'block' : 'none';
+  document.getElementById('moedas-wrap').style.display    = tela === 'moedas-wrap'    ? 'block' : 'none';
+  document.getElementById('resultado-wrap').style.display = tela === 'resultado-wrap' ? 'block' : 'none';
+}
+
+function novaConsulta() {
+  document.getElementById('perguntaInput').value = '';
+  document.getElementById('leituraTitulo').textContent = '—';
+  ['txtPresente','txtMutantes','txtFuturo','txtMensagem'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = '';
+  });
+  hexData = null; ichingData = {};
+  _twFila = []; _twAtivo = false;
+  _lancamentos = []; _lanceAtual = 0; _lançandoAgora = false;
+  ir('tela-pergunta');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── Renderizar hexagrama visual ──
+function renderHexVisual(containerLinhas, linhas, mutantes, isMutacao) {
+  containerLinhas.innerHTML = '';
+  // linhas: array de 0/1, índice 0 = linha inferior
+  for (let i = 5; i >= 0; i--) {
+    const div = document.createElement('div');
+    const isMut = mutantes && mutantes.includes(i);
+    // Se for o hexagrama de mutação, as linhas já estão mutadas
+    const val = linhas[i];
+    div.className = 'hex-linha ' + (val === 1 ? 'yang' : 'yin') + (isMut ? ' mutante' : '');
+    containerLinhas.appendChild(div);
+  }
+}
+
+function renderHexInfo(container, hex, label) {
+  container.innerHTML = `
+    <div class="hex-numero">${label} · Hexagrama ${hex.id}</div>
+    <div class="hex-nome">${hex.nome}</div>
+    <div class="hex-titulo">"${hex.titulo}"</div>
+    <div class="hex-elemento">${hex.elemento}</div>
+  `;
+}
+
+// ── Estado dos lançamentos manuais ──
+var _lancamentos = [];   // array de 6 valores (6=yin mut, 7=yang, 8=yin, 9=yang mut)
+var _lanceAtual = 0;
+var _lançandoAgora = false;
+var _perguntaAtual = '';
+
+function iniciarLancamentos(pergunta) {
+  _lancamentos = [];
+  _lanceAtual = 0;
+  _lançandoAgora = false;
+  _perguntaAtual = pergunta;
+  document.getElementById('hexBuild').innerHTML = '';
+  document.getElementById('lanceContador').textContent = 'Lançamento 1 de 6';
+  document.getElementById('hexBuildLabel').style.visibility = 'hidden';
+  document.getElementById('spinnerText').style.display = 'none';
+  const btn = document.getElementById('btnLancar');
+  btn.disabled = false;
+  btn.style.animation = 'btnLancarPulse 1.5s ease-in-out infinite';
+  btn.style.opacity = '1';
+}
+
+function lancarRodada() {
+  if (_lançandoAgora || _lanceAtual >= 6) return;
+  _lançandoAgora = true;
+
+  const btn = document.getElementById('btnLancar');
+  btn.disabled = true;
+  btn.style.animation = 'none';
+
+  // Sortear 3 moedas: cara=3, coroa=2
+  const moedas = [0,1,2].map(() => Math.random() < 0.5 ? 3 : 2);
+  const soma = moedas.reduce((a,b) => a+b, 0); // 6,7,8,9
+  _lancamentos.push(soma);
+
+  const linhaVal = (soma === 7 || soma === 9) ? 1 : 0;  // yang ou yin
+  const isMut = (soma === 6 || soma === 9);
+
+  // Montar resultado visual das moedas
+  const resultados = moedas.map(m => m === 3 ? 'cara' : 'coroa');
+  animarMoedas(linhaVal, isMut, resultados);
+
+  // Após animação das moedas, mostrar linha no hexagrama
+  const maxDur = 2500; // aguarda a última moeda parar (máx 2.4s)
+  setTimeout(() => {
+    document.getElementById('hexBuildLabel').style.visibility = 'visible';
+    adicionarLinhaHex(_lanceAtual, linhaVal, isMut);
+    _lanceAtual++;
+
+    if (_lanceAtual < 6) {
+      document.getElementById('lanceContador').textContent = `Lançamento ${_lanceAtual + 1} de 6`;
+      btn.disabled = false;
+      btn.style.animation = 'btnLancarPulse 1.5s ease-in-out infinite';
+      _lançandoAgora = false;
+    } else {
+      // 6 lançamentos completos — enviar para IA
+      document.getElementById('lanceContador').textContent = 'Hexagrama completo — consultando os Ancestrais...';
+      btn.style.opacity = '0.3';
+      document.getElementById('spinnerText').style.display = 'block';
+      _lançandoAgora = false;
+      setTimeout(() => enviarParaIA(), 0);
+    }
+  }, maxDur);
+}
+
+function adicionarLinhaHex(idx, linhaVal, isMut) {
+  const container = document.getElementById('hexBuild');
+  const div = document.createElement('div');
+  div.className = 'hb-linha';
+  const numEl = `<span class="hb-num">${idx+1}</span>`;
+  const tipoTxt = isMut ? (linhaVal===1 ? 'Yang mutante →' : 'Yin mutante →') : (linhaVal===1 ? 'Yang fixo' : 'Yin fixo');
+  const tipoEl = `<span class="hb-tipo${isMut?' mut':''}">${tipoTxt}</span>`;
+  if (linhaVal === 1) {
+    div.innerHTML = `${numEl}<div class="hb-seg yang${isMut?' mut':''}"></div>${tipoEl}`;
+  } else {
+    div.innerHTML = `${numEl}<div style="display:flex;gap:12px;"><div class="hb-seg yin${isMut?' mut':''}"></div><div class="hb-seg yin${isMut?' mut':''}"></div></div>${tipoEl}`;
+  }
+  container.insertBefore(div, container.firstChild);
+  requestAnimationFrame(() => requestAnimationFrame(() => div.classList.add('show')));
+}
+
+async function enviarParaIA() {
+  const btn = document.getElementById('btnConsultar');
+  try {
+    const resp = await fetch('/api/iching-leitura', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        nome: _u.nome||'Alma',
+        email: _u.email||'',
+        pergunta: _perguntaAtual,
+        lancamentos: _lancamentos
+      })
+    });
+    if (!resp.ok) {
+      const errTxt = await resp.text();
+      throw new Error('API ' + resp.status + ': ' + errTxt.slice(0,200));
+    }
+    const reader = resp.body.getReader();
+    const dec = new TextDecoder();
+    let bufIA = '', fullText = '';
+    const jaRend = new Set();  // controla o que já foi enfileirado
+    const ordem = ['titulo','hexagrama_presente','linhas_mutantes','hexagrama_futuro','mensagem_central'];
+
+    function renderSecaoLocal(key, valor) {
+      if (jaRend.has(key)) return;
+      jaRend.add(key);
+      ichingData[key] = valor;
+
+      if (key === 'titulo') {
+        document.getElementById('leituraTitulo').textContent = valor;
+        document.getElementById('perguntaExibida').textContent = '"' + _perguntaAtual + '"';
+        if (hexData) {
+          const p = hexData.principal;
+          const m = hexData.mutacao;
+          const linhas = hexData.linhas;
+          const mutantes = hexData.mutantes;
+          renderHexVisual(document.getElementById('hexLinhasPrincipal'), linhas, mutantes, false);
+          renderHexInfo(document.getElementById('hexInfoPrincipal'), p, 'Presente');
+          if (m && mutantes.length > 0) {
+            const linhasMutadas = [...linhas];
+            mutantes.forEach(i => { linhasMutadas[i] = linhasMutadas[i] === 1 ? 0 : 1; });
+            document.getElementById('setaMutacao').style.display = '';
+            document.getElementById('hexVisualMutacao').style.display = '';
+            document.getElementById('hexInfoMutacao').style.display = '';
+            renderHexVisual(document.getElementById('hexLinhasMutacao'), linhasMutadas, [], false);
+            renderHexInfo(document.getElementById('hexInfoMutacao'), m, 'Futuro');
+          }
+        }
+        // ← Mostrar resultado IMEDIATAMENTE quando título chega
+        ir('resultado-wrap');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+      const mapa = { hexagrama_presente:'txtPresente', linhas_mutantes:'txtMutantes', hexagrama_futuro:'txtFuturo', mensagem_central:'txtMensagem' };
+      const elId = mapa[key];
+      if (elId) twEnqueue(elId, valor);
+    }
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      bufIA += dec.decode(value, { stream: true });
+      const lines = bufIA.split('\n');
+      bufIA = lines.pop();
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        const raw = line.slice(6).trim();
+        if (!raw) continue;
+        try {
+          const ev = JSON.parse(raw);
+          if (ev.hexagrama && !hexData) {
+            hexData = ev.hexagrama;
+          }
+          if (ev.delta) {
+            fullText += ev.delta;
+            for (const k of ordem) {
+              if (!jaRend.has(k)) {
+                const v = extrairChave(fullText, k);
+                if (v) renderSecaoLocal(k, v);
+              }
+            }
+          }
+          if (ev.done) {
+            for (const k of ordem) {
+              if (!jaRend.has(k)) {
+                const v = extrairChave(fullText, k);
+                if (v) renderSecaoLocal(k, v);
+              }
+            }
+            setTimeout(() => { if (!_twAtivo) twProxima(); }, 50);
+            if (_u.email) {
+              try {
+                const clean = fullText.replace(/```json|```/g,'').trim();
+                const parsed = JSON.parse(clean);
+                const dadosSalvar = {
+                  titulo: parsed.titulo||'',
+                  pergunta: _perguntaAtual,
+                  hexagrama_principal: hexData?.principal||null,
+                  hexagrama_mutacao: hexData?.mutacao||null,
+                  linhas_tiradas: hexData?.linhas||[],
+                  mutantes: hexData?.mutantes||[],
+                  hexagrama_presente: parsed.hexagrama_presente||'',
+                  linhas_mutantes: parsed.linhas_mutantes||'',
+                  hexagrama_futuro: parsed.hexagrama_futuro||'',
+                  mensagem_central: parsed.mensagem_central||''
+                };
+                fetch(SB_URL+'/rest/v1/leituras_iching', {
+                  method:'POST',
+                  headers:{'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Prefer':'return=minimal'},
+                  body: JSON.stringify({ email: _u.email, dados: JSON.stringify(dadosSalvar) })
+                }).catch(e => console.error('Salvar iching:', e));
+              } catch(e) { console.error('Parse iching:', e); }
+            }
+          }
+        } catch(e) {}
+      }
+    }
+  } catch(e) {
+    console.error('iching erro:', e);
+    alert('Erro: ' + e.message);
+    ir('tela-pergunta');
+    if (btn) btn.disabled = false;
+  }
+}
+
+const CARA_SVG = `<svg width="44" height="44" viewBox="0 0 44 44">
+  <circle cx="22" cy="22" r="18" fill="none" stroke="rgba(255,240,180,.3)" stroke-width="1.5"/>
+  <text x="22" y="17" text-anchor="middle" font-size="9" fill="rgba(255,240,160,.7)" font-family="serif" letter-spacing="1">CARA</text>
+  <text x="22" y="30" text-anchor="middle" font-size="16" fill="rgba(255,240,160,.9)">☀</text>
+</svg>`;
+
+const COROA_SVG = `<svg width="44" height="44" viewBox="0 0 44 44">
+  <circle cx="22" cy="22" r="18" fill="none" stroke="rgba(255,240,180,.3)" stroke-width="1.5"/>
+  <text x="22" y="17" text-anchor="middle" font-size="9" fill="rgba(255,240,160,.7)" font-family="serif" letter-spacing="1">COROA</text>
+  <text x="22" y="30" text-anchor="middle" font-size="16" fill="rgba(255,240,160,.9)">☽</text>
+</svg>`;
+
+function animarMoedas(linhaVal, isMut, resultados) {
+
+  [0,1,2].forEach((idx) => {
+    const m = document.getElementById('moeda' + idx);
+    if (!m) return;
+    // Duração aleatória entre 1.4s e 2.4s para cada moeda
+    const dur = (1.4 + Math.random() * 1.0).toFixed(2) + 's';
+    setTimeout(() => {
+      m.classList.remove('girando');
+      void m.offsetWidth;
+      m.style.setProperty('--dur', dur);
+      m.classList.add('girando');
+      // Mostrar resultado só quando a animação terminar
+      setTimeout(() => {
+        m.innerHTML = resultados[idx] === 'cara' ? CARA_SVG : COROA_SVG;
+        m.style.boxShadow = isMut
+          ? '0 6px 28px rgba(0,0,0,.75), 0 0 24px rgba(90,154,122,.6), inset 0 2px 4px rgba(255,255,255,.25)'
+          : '0 6px 28px rgba(0,0,0,.75), 0 2px 8px rgba(201,168,76,.4), inset 0 2px 4px rgba(255,255,255,.25)';
+      }, parseFloat(dur) * 1000 - 80);
+    }, idx * 120);
+  });
+}
+
+// ── Typewriter ──
+function typewrite(el, texto, onDone) {
+  el.innerHTML = '';
+  const paras = texto.split(/\n+/).filter(Boolean);
+  let pIdx = 0, cIdx = 0;
+  const CPS = 90;
+  let lastTs = null;
+
+  function frame(ts) {
+    if (!lastTs) lastTs = ts;
+    const toAdd = Math.floor((ts - lastTs) * CPS / 1000);
+    if (toAdd > 0) {
+      cIdx = Math.min(cIdx + toAdd, paras[pIdx]?.length || 0);
+      lastTs = ts;
+    }
+    // Render
+    let html = paras.slice(0, pIdx).map(p => `<p>${p}</p>`).join('');
+    if (pIdx < paras.length) {
+      const parcial = paras[pIdx].slice(0, cIdx);
+      html += `<p>${parcial}<span class="cursor-blink">|</span></p>`;
+    }
+    el.innerHTML = html;
+
+    if (pIdx < paras.length && cIdx >= paras[pIdx].length) {
+      pIdx++; cIdx = 0;
+    }
+    if (pIdx < paras.length) requestAnimationFrame(frame);
+    else { el.innerHTML = paras.map(p => `<p>${p}</p>`).join(''); if (onDone) onDone(); }
+  }
+  requestAnimationFrame(frame);
+}
+
+// ── Extrair chave do JSON parcial ──
+function extrairChave(txt, key) {
+  const busca = '"' + key + '":';
+  const idx = txt.indexOf(busca);
+  if (idx < 0) return null;
+  let pos = idx + busca.length;
+  while (pos < txt.length && txt[pos] === ' ') pos++;
+  if (txt[pos] !== '"') return null;
+  pos++;
+  let out = '';
+  while (pos < txt.length) {
+    const ch = txt[pos];
+    if (ch === '"') return out.length > 5 ? out : null;
+    if (ch === '\\' && pos+1 < txt.length) {
+      const nx = txt[pos+1];
+      if(nx==='n'){out+='\n';pos+=2;}
+      else if(nx==='"'){out+='"';pos+=2;}
+      else if(nx==='\\'){out+='\\';pos+=2;}
+      else{out+=nx;pos+=2;}
+    } else { out+=ch; pos++; }
+  }
+  return null;
+}
+
+// ── Iniciar consulta ──
+// ── Fila sequencial de typewriter (global) ──
+var _twFila = [];
+var _twAtivo = false;
+function twEnqueue(elId, texto) {
+  _twFila.push({ elId, texto });
+  if (!_twAtivo) twProxima();
+}
+function twProxima() {
+  if (_twFila.length === 0) { _twAtivo = false; return; }
+  _twAtivo = true;
+  const { elId, texto } = _twFila.shift();
+  const el = document.getElementById(elId);
+  if (!el) { twProxima(); return; }
+  typewrite(el, texto, () => setTimeout(twProxima, 180));
+}
+
+function renderSecao(key, valor, pergunta) {
+  ichingData[key] = valor;
+  if (key === 'titulo') {
+    document.getElementById('leituraTitulo').textContent = valor;
+    document.getElementById('perguntaExibida').textContent = '"' + pergunta + '"';
+    if (hexData) {
+      const p = hexData.principal;
+      const m = hexData.mutacao;
+      const linhas = hexData.linhas;
+      const mutantes = hexData.mutantes;
+      renderHexVisual(document.getElementById('hexLinhasPrincipal'), linhas, mutantes, false);
+      renderHexInfo(document.getElementById('hexInfoPrincipal'), p, 'Presente');
+      if (m && mutantes.length > 0) {
+        const linhasMutadas = [...linhas];
+        mutantes.forEach(i => { linhasMutadas[i] = linhasMutadas[i] === 1 ? 0 : 1; });
+        document.getElementById('setaMutacao').style.display = '';
+        document.getElementById('hexVisualMutacao').style.display = '';
+        document.getElementById('hexInfoMutacao').style.display = '';
+        renderHexVisual(document.getElementById('hexLinhasMutacao'), linhasMutadas, [], false);
+        renderHexInfo(document.getElementById('hexInfoMutacao'), m, 'Futuro');
+      }
+    }
+    return;
+  }
+  const mapa = { hexagrama_presente:'txtPresente', linhas_mutantes:'txtMutantes', hexagrama_futuro:'txtFuturo', mensagem_central:'txtMensagem' };
+  const elId = mapa[key];
+  if (elId) twEnqueue(elId, valor);
+}
+
+function iniciarConsulta() {
+  const pergunta = document.getElementById('perguntaInput').value.trim();
+  if (!pergunta) { document.getElementById('perguntaInput').focus(); return; }
+  // Resetar fila de typewriter
+  _twFila = []; _twAtivo = false;
+  hexData = null; ichingData = {};
+  // Ir para tela de lançamento manual
+  ir('moedas-wrap');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  iniciarLancamentos(pergunta);
+}
+
+// ── TTS ──
+async function ouvirSecao(elId, btn) {
+  if (_audioAtual) { _audioAtual.pause(); _audioAtual = null; }
+  if (btn._tocando) { btn._tocando = false; btn.innerHTML = '🔊 Ouvir'; return; }
+  document.querySelectorAll('.btn-ouvir').forEach(b => { b._tocando = false; b.innerHTML = '🔊 Ouvir'; });
+  const el = document.getElementById(elId);
+  if (!el) return;
+  const texto = el.innerText.trim();
+  if (!texto) return;
+  btn._tocando = true; btn.innerHTML = '⏸ Pausar';
+  const CHUNK = 800;
+  const chunks = [];
+  for (let i = 0; i < texto.length; i += CHUNK) { const c = texto.slice(i, i+CHUNK).trim(); if(c) chunks.push(c); }
+  let idx = 0;
+  async function tocarProx() {
+    if (!btn._tocando || idx >= chunks.length) { btn._tocando = false; btn.innerHTML = '🔊 Ouvir'; return; }
+    try {
+      const r = await fetch('/api/tts', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({text: chunks[idx++]}) });
+      if (!r.ok) { tocarProx(); return; }
+      const blob = await r.blob();
+      const url = URL.createObjectURL(blob);
+      _audioAtual = new Audio(url);
+      _audioAtual.onended = tocarProx;
+      _audioAtual.play();
+    } catch(e) { tocarProx(); }
+  }
+  tocarProx();
+}
+</script>
+</body>
+</html>
