@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Gerador de Sons — Portal Akáshico</title>
+<style>
+  body { font-family: sans-serif; background: #1a1025; color: #e0d4f7; padding: 40px; max-width: 640px; margin: 0 auto; }
+  h2 { color: #f0c96b; margin-bottom: 6px; }
+  p.info { background: #1e3a2f; border-radius: 8px; padding: 14px; font-size: .9rem; color: #6ee7b7; line-height: 1.6; margin-bottom: 24px; }
+  .item { background: #2a1a3a; border-radius: 10px; padding: 18px 20px; margin: 12px 0; display:flex; align-items:center; gap:16px; }
+  .frase { flex:1; font-size: .95rem; color: #c4b5fd; font-style: italic; }
+  .nome  { font-size: .78rem; color: #888; margin-top: 4px; }
+  button { background: #7c3aed; color: #fff; border: none; border-radius: 6px; padding: 9px 18px; font-size: .88rem; cursor: pointer; white-space: nowrap; }
+  button:hover { background: #6d28d9; }
+  button:disabled { background: #444; cursor: default; }
+  .ok { color: #6ee7b7; font-size: .82rem; margin-top: 6px; }
+  .err { color: #f87171; font-size: .82rem; margin-top: 6px; }
+  .col { display:flex; flex-direction:column; flex:1; }
+</style>
+</head>
+<body>
+<h2>🔊 Gerador de Sons Fixos</h2>
+<p class="info">
+  Gere cada MP3 uma única vez e suba na pasta <strong>sons/</strong> do GitHub.<br>
+  Depois disso essas frases não custam nenhum token — para nenhum consulente, para sempre.
+</p>
+<div id="lista"></div>
+
+<script>
+const FRASES = [
+  { id:'bem-vindo-novo',     texto:'Bem vindo ao Portal dos Registros Akáshicos, inicie agora seu protocolo de consulta Akáshica.' },
+  { id:'bem-vindo-retorno',  texto:'Bem vindo ao seu Portal Akáshico.'                                                           },
+  { id:'concentre-se',       texto:'Agora, pare e concentre-se bem na sua pergunta. Depois embaralhe 3 vezes.'                   },
+  { id:'concentre-se-iching',texto:'Agora, pare e concentre-se bem na sua pergunta. Depois clique no botão 6 vezes.'             },
+  { id:'agora-clique-baralho',texto:'Agora clique no baralho.'                                                                   },
+  { id:'clique-mais-uma-vez', texto:'Clique mais uma vez.'                                                                       },
+];
+
+FRASES.forEach(function(f) {
+  var div = document.createElement('div');
+  div.className = 'item';
+  div.innerHTML =
+    '<div class="col">' +
+      '<div class="frase">"' + f.texto + '"</div>' +
+      '<div class="nome">📁 sons/' + f.id + '.mp3</div>' +
+      '<div id="st_' + f.id + '"></div>' +
+    '</div>' +
+    '<button id="btn_' + f.id + '" onclick="gerar(\'' + f.id + '\')">⬇ Baixar MP3</button>';
+  document.getElementById('lista').appendChild(div);
+});
+
+function gerar(id) {
+  var f = FRASES.find(function(x){ return x.id === id; });
+  var btn = document.getElementById('btn_' + id);
+  var st  = document.getElementById('st_'  + id);
+  btn.disabled = true; btn.textContent = 'Gerando...';
+  st.className = ''; st.textContent = '';
+
+  fetch('/api/tts', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text: f.texto, speed: 0.85 })
+  })
+  .then(function(r){ return r.ok ? r.blob() : Promise.reject(r.status); })
+  .then(function(blob){
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = f.id + '.mp3'; a.click();
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 2000);
+    st.className = 'ok'; st.textContent = '✓ Baixado! Suba em sons/' + f.id + '.mp3';
+    btn.textContent = '🔄 Gerar novamente'; btn.disabled = false;
+  })
+  .catch(function(e){
+    st.className = 'err'; st.textContent = '✗ Erro: ' + e;
+    btn.textContent = '⬇ Baixar MP3'; btn.disabled = false;
+  });
+}
+</script>
+</body>
+</html>
