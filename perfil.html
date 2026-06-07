@@ -423,28 +423,26 @@
 
     <!-- COLUNA ESQUERDA: Consulente + Dados Complementares -->
     <div>
-      <div style="display:flex;justify-content:flex-end;margin-bottom:6px;">
-        <a href="/historico" style="display:inline-flex;align-items:center;gap:5px;font-family:var(--font-display);font-size:.62rem;letter-spacing:.08em;color:rgba(196,181,253,.65);text-decoration:none;padding:5px 12px;border:1px solid rgba(196,181,253,.2);border-radius:20px;background:rgba(255,255,255,.03);transition:all .2s;text-transform:uppercase;"
-          onmouseover="this.style.color='#c4b5fd';this.style.borderColor='rgba(196,181,253,.5)'"
-          onmouseout="this.style.color='rgba(196,181,253,.65)';this.style.borderColor='rgba(196,181,253,.2)'">
-          <span style="font-size:.85rem;">📜</span> Histórico
-        </a>
-      </div>
       <div class="card">
         <div class="card-body">
           <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;">
             <div class="avatar" id="avatarInitial" onclick="document.getElementById('fotoInput').click()"
               style="cursor:pointer;" title="Clique para trocar sua foto">?</div>
             <input type="file" id="fotoInput" accept="image/*" style="display:none;" onchange="uploadFoto(this)" />
-            <div>
+            <div style="flex:1;">
               <div id="uploadStatus" style="font-size:.72rem;color:rgba(196,181,253,.72);margin-top:4px;"></div>
               <div style="font-family:var(--font-display);font-size:.7rem;letter-spacing:.12em;color:var(--gold);margin-bottom:4px;">CONSULENTE</div>
               <div style="font-size:1.1rem;color:var(--accent-bright);font-weight:500;" id="profileNome">—</div>
             </div>
+            <a href="/historico" style="display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;text-decoration:none;padding:8px 13px;border:1px solid rgba(56,189,248,.45);border-radius:14px;background:rgba(14,40,80,.5);color:rgba(125,211,252,.9);font-family:var(--font-display);font-size:.58rem;letter-spacing:.08em;text-transform:uppercase;transition:all .25s;flex-shrink:0;"
+              onmouseover="this.style.borderColor='rgba(125,211,252,.8)';this.style.boxShadow='0 0 14px rgba(56,189,248,.4)';this.style.color='#7dd3fc'"
+              onmouseout="this.style.borderColor='rgba(56,189,248,.45)';this.style.boxShadow='none';this.style.color='rgba(125,211,252,.9)'">
+              <span style="font-size:1rem;">📜</span>
+              Histórico
+            </a>
           </div>
           <div class="info-row"><div class="info-label">E-mail</div><div class="info-value" id="profileEmail">—</div></div>
           <div class="info-row"><div class="info-label">Data de nascimento</div><div class="info-value" id="profileData">—</div></div>
-          <div class="info-row"><div class="info-label">Hora de nascimento</div><div class="info-value" id="profileHora" style="color:rgba(196,181,253,.65);font-size:.82rem;">—</div></div>
           <div class="info-row"><div class="info-label">Signo</div><div class="info-value" id="profileSigno">—</div></div>
           <div class="info-row"><div class="info-label">Dias de vida</div><div class="info-value" id="profileDiasVida">—</div></div>
           <div class="info-row"><div class="info-label">Sexo</div><div class="info-value" id="profileSexo">—</div></div>
@@ -457,6 +455,7 @@
             <button id="btnEditarCad" type="button" onclick="alternarEdicaoCadastro()" style="padding:4px 12px;font-size:.7rem;background:rgba(196,181,253,0.08);border:1px solid rgba(196,181,253,0.2);color:rgba(196,181,253,0.6);border-radius:14px;cursor:pointer;transition:all .2s;">&#9999;&#65039; Editar</button>
           </div>
           <div id="cadVisualizar">
+            <div class="info-row"><div class="info-label">Hora de nascimento</div><div class="info-value" id="profileHora">—</div></div>
             <div class="info-row"><div class="info-label">Cidade natal</div><div class="info-value" id="cadVCidade">—</div></div>
             <div class="info-row"><div class="info-label">Estado natal</div><div class="info-value" id="cadVEstado">—</div></div>
             <div class="info-row"><div class="info-label">País natal</div><div class="info-value" id="cadVPais">—</div></div>
@@ -529,7 +528,7 @@
             <a href="/mentor-ufologico" class="portal-btn portal-btn-wide portal-btn-mentor" style="grid-column:1/-1;animation-delay:0s;">
               <span class="portal-btn-icon" style="font-size:1.8rem;">🛸</span>
               <div style="display:flex;flex-direction:column;align-items:flex-start;gap:2px;">
-                <span class="portal-btn-label" style="font-size:.78rem;letter-spacing:.1em;">Mentor Ufológico IA</span>
+                <span class="portal-btn-label" style="font-size:.78rem;letter-spacing:.1em;">Mentor Ufológico</span>
                 <span style="font-size:.6rem;color:rgba(125,211,252,.65);font-family:var(--font-body);letter-spacing:.06em;text-transform:none;">Notícias · Vídeos · Debates · UAPs em tempo real</span>
               </div>
             </a>
