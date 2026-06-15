@@ -250,25 +250,27 @@
       display:inline-block;
       margin:10px 0 6px;
       font-family:var(--font-d);
-      font-size:.6rem;
+      font-size:.72rem;
+      font-weight:700;
       letter-spacing:.18em;
-      color:rgba(240,201,107,.85);
+      color:rgba(240,201,107,.95);
       background:rgba(240,201,107,.07);
-      border:1px solid rgba(240,201,107,.25);
+      border:1px solid rgba(240,201,107,.3);
       border-radius:20px;
-      padding:3px 12px;
+      padding:4px 14px;
       text-transform:uppercase;
     }
     .debate-question {
       font-size:.88rem;
       line-height:1.65;
-      color:rgba(196,181,253,.95);
+      color:rgba(240,201,107,.97);
       font-style:italic;
       margin:6px 0 10px;
       padding:10px 14px;
-      border-left:2px solid rgba(240,201,107,.4);
-      background:rgba(240,201,107,.04);
+      border-left:2px solid rgba(240,201,107,.5);
+      background:rgba(240,201,107,.05);
       border-radius:0 8px 8px 0;
+      text-shadow:0 0 12px rgba(240,201,107,.2);
     }
     .post-actions { display: flex; align-items: center; gap: 12px; margin-top: 10px; }
     .btn-delete-post { display:inline-flex;align-items:center;gap:4px;font-size:.86rem;color:rgba(239,68,68,.92);text-shadow:0 0 6px rgba(239,68,68,.4);background:none;border:1px solid rgba(239,68,68,.15);border-radius:20px;padding:3px 10px;cursor:pointer;transition:all .2s;margin-left:auto; }
@@ -1229,7 +1231,7 @@ async function carregarForum(append=false){
         ${(function(){
           var pd = extrairPerguntaDebate(post.resposta||'');
           if(!pd) return '';
-          return '<div class="debate-label">❓ PERGUNTA PARA DEBATE</div>'
+          return '<div class="debate-label">PERGUNTA PARA DEBATE</div>'
                + '<div class="debate-question">' + escHtml(pd) + '</div>';
         })()}
         <div class="post-resposta collapsed" id="${respostaId}">${formatResposta(post.resposta||'')}</div>
