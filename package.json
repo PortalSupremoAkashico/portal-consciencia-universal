@@ -1,9 +1,0 @@
-{
-  "name": "portal-akashico",
-  "version": "1.0.0",
-  "type": "module",
-  "dependencies": {
-    "hash-wasm": "^4.11.0",
-    "@supabase/supabase-js": "^2.104.1"
-  }
-}
