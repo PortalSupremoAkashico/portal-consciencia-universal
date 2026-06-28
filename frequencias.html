@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Frequências de Cura — Portal da Consciência Universal</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<script src="/presenca.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Cormorant Garamond',serif;background:#07050f;color:rgba(196,181,253,.85);min-height:100vh;overflow-x:hidden}
+#starsCanvas{position:fixed;inset:0;z-index:0;pointer-events:none}
+.wrap{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:0 16px 60px}
+
+/* NAV */
+nav{width:100%;max-width:700px;padding:18px 0 0;display:flex;align-items:center;gap:12px}
+.nav-back{font-family:'Cinzel',serif;font-size:.95rem;letter-spacing:.1em;color:rgba(196,181,253,.5);cursor:pointer;text-decoration:none;transition:color .2s}
+.nav-back:hover{color:rgba(196,181,253,.9)}
+.nav-sep{color:rgba(196,181,253,.2);font-size:.95rem}
+.nav-current{font-family:'Cinzel',serif;font-size:.95rem;letter-spacing:.1em;color:rgba(240,201,107,.7)}
+
+/* HEADER */
+.page-header{text-align:center;margin:36px 0 32px}
+.page-title{font-family:'Cinzel',serif;font-size:2rem;letter-spacing:.14em;color:rgba(240,201,107,.9);text-shadow:0 0 30px rgba(240,201,107,.3)}
+.page-sub{font-size:1.15rem;color:rgba(196,181,253,.55);margin-top:10px;font-style:italic;letter-spacing:.04em}
+
+/* FORM */
+#formView{width:100%;max-width:600px}
+.field{margin-bottom:22px}
+.field label{display:block;font-family:'Cinzel',serif;font-size:.9rem;letter-spacing:.1em;color:rgba(240,201,107,.7);margin-bottom:10px}
+.field textarea,.field input[type=text]{width:100%;background:rgba(109,40,217,.08);border:1px solid rgba(196,181,253,.18);border-radius:12px;padding:14px 16px;color:rgba(196,181,253,.9);font-family:'Cormorant Garamond',serif;font-size:1.15rem;line-height:1.7;resize:vertical;outline:none;transition:border-color .2s}
+.field textarea:focus,.field input[type=text]:focus{border-color:rgba(240,201,107,.4)}
+.field textarea{min-height:90px}
+
+.timer-row{display:flex;gap:10px;margin-bottom:22px}
+.timer-btn{flex:1;padding:10px;background:rgba(109,40,217,.1);border:1px solid rgba(196,181,253,.18);border-radius:10px;color:rgba(196,181,253,.65);font-family:'Cinzel',serif;font-size:.9rem;letter-spacing:.08em;cursor:pointer;transition:all .2s}
+.timer-btn.active,.timer-btn:hover{background:rgba(240,201,107,.15);border-color:rgba(240,201,107,.4);color:rgba(240,201,107,.9)}
+
+.binaural-row{display:flex;align-items:center;gap:10px;margin-bottom:28px;padding:12px 16px;background:rgba(109,40,217,.06);border:1px solid rgba(196,181,253,.12);border-radius:10px;cursor:pointer}
+.binaural-row input{accent-color:#f0c96b;width:16px;height:16px;cursor:pointer}
+.binaural-label{font-size:1.05rem;color:rgba(196,181,253,.7);line-height:1.4}
+.binaural-hint{font-size:.9rem;color:rgba(196,181,253,.4);margin-top:2px}
+
+.btn-main{width:100%;padding:16px;background:linear-gradient(135deg,rgba(240,201,107,.25),rgba(240,201,107,.1));border:1px solid rgba(240,201,107,.45);border-radius:14px;color:#f0c96b;font-family:'Cinzel',serif;font-size:1rem;letter-spacing:.12em;cursor:pointer;transition:all .25s;box-shadow:0 0 20px rgba(240,201,107,.1)}
+.btn-main:hover:not(:disabled){background:linear-gradient(135deg,rgba(240,201,107,.35),rgba(240,201,107,.15));box-shadow:0 0 30px rgba(240,201,107,.2)}
+.btn-main:disabled{opacity:.5;cursor:not-allowed}
+
+/* SESSION */
+#sessionView{width:100%;max-width:820px;display:none;flex-direction:column;align-items:center}
+
+.freq-display{text-align:center;margin:24px 0 20px}
+.freq-hz{font-family:'Cinzel',serif;font-size:5.5rem;font-weight:700;color:#f0c96b;text-shadow:0 0 40px rgba(240,201,107,.5);line-height:1}
+.freq-unit{font-family:'Cinzel',serif;font-size:1.3rem;letter-spacing:.2em;color:rgba(240,201,107,.5);margin-left:4px}
+.freq-nome{font-family:'Cinzel',serif;font-size:1.1rem;letter-spacing:.15em;color:rgba(240,201,107,.7);margin-top:8px;text-transform:uppercase}
+.geo-nome{font-size:1rem;letter-spacing:.1em;color:rgba(196,181,253,.5);margin-top:4px;font-style:italic}
+
+/* GEOMETRY IMAGE */
+#geoWrap{position:relative;width:320px;height:320px;margin:10px 0}
+#geoImg{width:100%;height:100%;object-fit:contain;border-radius:50%;
+  filter:drop-shadow(0 0 24px rgba(240,201,107,.3))}
+
+/* CONTROLS */
+.controls{display:flex;align-items:center;gap:16px;margin:20px 0}
+.btn-play{padding:12px 32px;background:rgba(240,201,107,.15);border:1px solid rgba(240,201,107,.4);border-radius:30px;color:#f0c96b;font-family:'Cinzel',serif;font-size:1rem;letter-spacing:.1em;cursor:pointer;transition:all .2s}
+.btn-play:hover{background:rgba(240,201,107,.25);box-shadow:0 0 16px rgba(240,201,107,.3)}
+.btn-play.playing{background:rgba(240,100,100,.2);border-color:rgba(240,100,100,.4);color:rgba(240,160,160,.9)}
+.timer-display{font-family:'Cinzel',serif;font-size:2.2rem;color:rgba(240,201,107,.8);min-width:80px;text-align:center}
+
+/* READING CARD */
+.reading{width:100%;max-width:780px;margin-top:36px}
+.read-card{
+  background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.01)),
+  rgba(14,10,30,.85);
+  border:1px solid rgba(196,181,253,.18);
+  border-radius:20px;
+  padding:36px 40px;
+  margin-bottom:20px;
+  backdrop-filter:blur(12px);
+  box-shadow:0 8px 40px rgba(0,0,0,.4),0 0 0 1px rgba(196,181,253,.06);
+  position:relative;overflow:hidden;
+}
+.read-card::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(120deg,transparent 0%,rgba(255,255,255,.03) 40%,transparent 70%);
+  pointer-events:none;
+}
+.read-label{
+  font-family:'Cinzel',serif;font-size:.82rem;letter-spacing:.22em;
+  color:rgba(240,201,107,.65);margin-bottom:20px;text-transform:uppercase;
+  display:flex;align-items:center;gap:10px;
+}
+.read-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(240,201,107,.3),transparent)}
+.read-text{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.35rem;line-height:2.05;
+  color:rgba(220,210,255,.9);
+}
+.read-text p{margin-bottom:18px}
+.read-text p:last-child{margin-bottom:0}
+
+.btn-nova{margin-top:20px;padding:11px 28px;background:transparent;border:1px solid rgba(196,181,253,.25);border-radius:24px;color:rgba(196,181,253,.55);font-family:'Cinzel',serif;font-size:.9rem;letter-spacing:.1em;cursor:pointer;transition:all .2s}
+.btn-nova:hover{border-color:rgba(196,181,253,.5);color:rgba(196,181,253,.85)}
+
+/* SPINNER */
+.spinner{display:none;text-align:center;padding:40px 0}
+.spin-ring{width:48px;height:48px;border:2px solid rgba(240,201,107,.15);border-top-color:rgba(240,201,107,.7);border-radius:50%;animation:spin .9s linear infinite;margin:0 auto 16px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin-text{font-family:'Cinzel',serif;font-size:.9rem;letter-spacing:.12em;color:rgba(240,201,107,.6)}
+
+@keyframes geoBreath{0%,100%{opacity:.82;transform:scale(.97)}50%{opacity:1;transform:scale(1.04)}}
+@keyframes geoGlow{0%,100%{filter:drop-shadow(0 0 14px rgba(240,201,107,.25))}50%{filter:drop-shadow(0 0 36px rgba(240,201,107,.6))}}
+.geo-breath{animation:geoBreath 4s ease-in-out infinite,geoGlow 4s ease-in-out infinite}
+
+@media(max-width:600px){.freq-hz{font-size:4rem}#geoWrap{width:240px;height:240px}.read-card{padding:24px 20px}.read-text{font-size:1.15rem}}
+</style>
+</head>
+<body>
+<canvas id="starsCanvas"></canvas>
+<div class="wrap">
+  <nav>
+    <a class="nav-back" onclick="window.location.href='/perfil'">← Perfil</a>
+    <span class="nav-sep">·</span>
+    <span class="nav-current">Frequências de Cura</span>
+  </nav>
+
+  <div class="page-header">
+    <div class="page-title">FREQUÊNCIAS DE CURA</div>
+    <div class="page-sub">A IA sintoniza a frequência e a geometria sagrada do seu momento</div>
+  </div>
+
+  <!-- FORM -->
+  <div id="formView">
+    <div class="field">
+      <label>O QUE VOCÊ ESTÁ VIVENDO AGORA</label>
+      <textarea id="estado" placeholder="Descreva o que está sentindo, atravessando ou buscando neste momento..."></textarea>
+    </div>
+    <div class="field">
+      <label>INTENÇÃO PARA ESTA SESSÃO (opcional)</label>
+      <textarea id="intencao" placeholder="O que você quer curar, liberar, expandir ou integrar..." style="min-height:70px"></textarea>
+    </div>
+    <div style="font-family:'Cinzel',serif;font-size:.9rem;letter-spacing:.1em;color:rgba(240,201,107,.7);margin-bottom:12px">DURAÇÃO DA SESSÃO</div>
+    <div class="timer-row">
+      <button class="timer-btn" data-min="10">10 min</button>
+      <button class="timer-btn active" data-min="20">20 min</button>
+      <button class="timer-btn" data-min="30">30 min</button>
+    </div>
+    <div class="binaural-row" onclick="document.getElementById('binaural').click()">
+      <input type="checkbox" id="binaural">
+      <div>
+        <div class="binaural-label">Ativar Batida Binaural</div>
+        <div class="binaural-hint">O cérebro gera uma terceira frequência interna — use fones de ouvido</div>
+      </div>
+    </div>
+    <button class="btn-main" id="btnIniciar" onclick="iniciarSessao()">✦ Sintonizar Frequência</button>
+  </div>
+
+  <!-- SPINNER -->
+  <div class="spinner" id="spinner">
+    <div class="spin-ring"></div>
+    <div class="spin-text">A CONSCIÊNCIA ESTÁ SINTONIZANDO...</div>
+  </div>
+
+  <!-- SESSION -->
+  <div id="sessionView">
+    <div class="freq-display">
+      <div><span id="freqHz" class="freq-hz">528</span><span class="freq-unit">Hz</span></div>
+      <div class="freq-nome" id="freqNome">Amor e Milagres</div>
+      <div class="geo-nome" id="geoNome">Flor da Vida</div>
+    </div>
+
+    <div id="geoWrap">
+      <img id="geoImg" src="" alt="Geometria Sagrada" />
+    </div>
+
+    <div class="controls">
+      <button class="btn-play" id="btnPlay" onclick="togglePlay()">▶ Iniciar</button>
+      <div class="timer-display" id="timerDisplay">20:00</div>
+    </div>
+
+    <div class="reading" id="reading">
+      <div class="read-card">
+        <div class="read-label">Por que esta frequência</div>
+        <div class="read-text" id="readEscolha"></div>
+      </div>
+      <div class="read-card">
+        <div class="read-label">O que ela cura e transforma</div>
+        <div class="read-text" id="readCura"></div>
+      </div>
+      <div class="read-card">
+        <div class="read-label">Como trabalha sua intenção</div>
+        <div class="read-text" id="readIntencao"></div>
+      </div>
+    </div>
+
+    <button class="btn-nova" onclick="novaSessao()">Nova Sessão</button>
+  </div>
+</div>
+
+<script>
+// ── Stars ──
+(function(){
+  var c=document.getElementById('starsCanvas'),ctx=c.getContext('2d'),stars=[];
+  function resize(){c.width=window.innerWidth;c.height=window.innerHeight;}
+  resize();window.addEventListener('resize',resize);
+  for(var i=0;i<160;i++)stars.push({x:Math.random(),y:Math.random(),r:Math.random()*1.2+.3,a:Math.random(),da:(Math.random()-.5)*.003});
+  function draw(){ctx.clearRect(0,0,c.width,c.height);stars.forEach(function(s){s.a=Math.max(0.1,Math.min(1,s.a+s.da));if(s.a<=0.1||s.a>=1)s.da*=-1;ctx.beginPath();ctx.arc(s.x*c.width,s.y*c.height,s.r,0,Math.PI*2);ctx.fillStyle='rgba(196,181,253,'+s.a+')';ctx.fill();});requestAnimationFrame(draw);}
+  draw();
+})();
+
+// ── Auth ──
+var _user = null;
+(function(){
+  try{_user=JSON.parse(localStorage.getItem('akashic_user')||sessionStorage.getItem('akashic_user')||'null');}catch(e){}
+  if(!_user||!_user.email){window.location.href='/login';return;}
+})();
+
+// ── Timer selection ──
+var _durMin = 20;
+document.querySelectorAll('.timer-btn').forEach(function(b){
+  b.addEventListener('click',function(){
+    document.querySelectorAll('.timer-btn').forEach(function(x){x.classList.remove('active');});
+    b.classList.add('active');
+    _durMin = parseInt(b.dataset.min);
+    updateTimerDisplay(_durMin*60);
+  });
+});
+function updateTimerDisplay(secs){
+  var m=Math.floor(secs/60),s=secs%60;
+  document.getElementById('timerDisplay').textContent=(m<10?'0':'')+m+':'+(s<10?'0':'')+s;
+}
+updateTimerDisplay(_durMin*60);
+
+// ── Áudio — Síntese de Taça Tibetana ──
+// Harmônicos inarmônicos reais de bowl tibetano, reverb por delay realimentado,
+// drone suave contínuo com LFO, golpes periódicos automáticos.
+var _audioCtx=null,_masterGain=null,_oscs=[],_playing=false;
+var _timerInt=null,_timerSecs=0,_strikeTimers=[];
+
+// Razões de parciais de uma taça de cristal/tibetana (não são múltiplos inteiros)
+var BOWL_PARTIALS=[
+  {ratio:1,     amp:.50, decay:9.0},
+  {ratio:2.756, amp:.28, decay:5.5},
+  {ratio:5.404, amp:.14, decay:3.0},
+  {ratio:8.933, amp:.07, decay:1.8}
+];
+
+function _criarReverb(ctx){
+  var delay=ctx.createDelay(2.0);
+  delay.delayTime.setValueAtTime(0.38,ctx.currentTime);
+  var fb=ctx.createGain(); fb.gain.setValueAtTime(0.38,ctx.currentTime);
+  var cut=ctx.createBiquadFilter(); cut.type='lowpass'; cut.frequency.setValueAtTime(2400,ctx.currentTime);
+  delay.connect(cut); cut.connect(fb); fb.connect(delay);
+  return delay; // entrada e saída = mesmo nó
+}
+
+function _golpe(ctx,freqHz,masterGain,reverb,binaural,binauralOffset){
+  var t=ctx.currentTime+0.01;
+  BOWL_PARTIALS.forEach(function(p){
+    var f=freqHz*p.ratio;
+    if(binaural){
+      // Canal esquerdo: freq normal, direito: freq+offset binaural
+      var merger=ctx.createChannelMerger(2);merger.connect(masterGain);merger.connect(reverb);
+      [0,1].forEach(function(ch){
+        var osc=ctx.createOscillator(); osc.type='sine';
+        osc.frequency.setValueAtTime(f+(ch===1?binauralOffset:0),t);
+        var g=ctx.createGain();
+        g.gain.setValueAtTime(0,t);
+        g.gain.linearRampToValueAtTime(p.amp*0.55,t+0.012);
+        g.gain.setTargetAtTime(0.0001,t+0.012,p.decay*0.38);
+        osc.connect(g); g.connect(merger,0,ch);
+        osc.start(t); osc.stop(t+p.decay*2.5);
+        _oscs.push(osc);
+      });
+    } else {
+      var osc=ctx.createOscillator(); osc.type='sine';
+      osc.frequency.setValueAtTime(f,t);
+      var g=ctx.createGain();
+      g.gain.setValueAtTime(0,t);
+      g.gain.linearRampToValueAtTime(p.amp*0.55,t+0.012);
+      g.gain.setTargetAtTime(0.0001,t+0.012,p.decay*0.38);
+      osc.connect(g); g.connect(masterGain); g.connect(reverb);
+      osc.start(t); osc.stop(t+p.decay*2.5);
+      _oscs.push(osc);
+    }
+  });
+}
+
+function startAudio(freqHz,binaural){
+  _audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+  _masterGain=_audioCtx.createGain();
+  _masterGain.gain.setValueAtTime(0,_audioCtx.currentTime);
+  _masterGain.gain.linearRampToValueAtTime(0.72,_audioCtx.currentTime+2.5);
+  _masterGain.connect(_audioCtx.destination);
+
+  // Reverb
+  var reverb=_criarReverb(_audioCtx);
+  var reverbOut=_audioCtx.createGain(); reverbOut.gain.setValueAtTime(0.45,_audioCtx.currentTime);
+  reverb.connect(reverbOut); reverbOut.connect(_audioCtx.destination);
+
+  // Offset binaural baseado na frequência (ondas cerebrais recomendadas)
+  var binOffset=freqHz<400?4:freqHz<600?7:freqHz<800?10:8;
+
+  // Drone contínuo muito suave (frequência base, volume baixo)
+  var drone=_audioCtx.createOscillator(); drone.type='sine';
+  drone.frequency.setValueAtTime(freqHz,_audioCtx.currentTime);
+  var droneGain=_audioCtx.createGain(); droneGain.gain.setValueAtTime(0.045,_audioCtx.currentTime);
+  // LFO suave no drone para respiração sonora
+  var lfo=_audioCtx.createOscillator(); lfo.type='sine'; lfo.frequency.setValueAtTime(0.08,_audioCtx.currentTime);
+  var lfoGain=_audioCtx.createGain(); lfoGain.gain.setValueAtTime(0.025,_audioCtx.currentTime);
+  lfo.connect(lfoGain); lfoGain.connect(droneGain.gain);
+  drone.connect(droneGain); droneGain.connect(_masterGain);
+  drone.start(); lfo.start();
+  _oscs.push(drone,lfo);
+
+  // Primeiro golpe imediato
+  _golpe(_audioCtx,freqHz,_masterGain,reverb,binaural,binOffset);
+
+  // Golpes periódicos a cada ~11s
+  var INTERVAL=11000;
+  for(var i=1;i<=180;i++){
+    (function(idx){
+      var tid=setTimeout(function(){
+        if(_playing&&_audioCtx) _golpe(_audioCtx,freqHz,_masterGain,reverb,binaural,binOffset);
+      },idx*INTERVAL);
+      _strikeTimers.push(tid);
+    })(i);
+  }
+}
+
+function stopAudio(){
+  _strikeTimers.forEach(function(t){clearTimeout(t);}); _strikeTimers=[];
+  if(_audioCtx){
+    try{_masterGain.gain.setValueAtTime(_masterGain.gain.value,_audioCtx.currentTime);
+    _masterGain.gain.linearRampToValueAtTime(0,_audioCtx.currentTime+2);}catch(e){}
+    setTimeout(function(){
+      _oscs.forEach(function(o){try{o.stop();}catch(e){}});_oscs=[];
+      try{_audioCtx.close();}catch(e){}
+      _audioCtx=null;_masterGain=null;
+    },2100);
+  }
+}
+
+function togglePlay(){
+  var btn=document.getElementById('btnPlay');
+  var audio=document.getElementById('mantraAudio');
+  if(_playing){
+    _playing=false;
+    stopAudio();
+    audio.pause();
+    if(_freqAudio){try{_freqAudio.pause();_freqAudio.src='';}catch(e){}  _freqAudio=null;}
+    clearInterval(_timerInt);
+    btn.textContent='▶ Retomar';btn.classList.remove('playing');
+    document.getElementById('geoImg').style.animationPlayState='paused';
+  } else {
+    _playing=true;
+    // Toca mantra dos monges
+    if(audio.src && audio.src !== window.location.href){
+      audio.volume=0.80;
+      audio.play().catch(function(e){console.warn('[mantra]',e.message);});
+    }
+    // Toca frequência pré-gravada por baixo (zero custo API)
+    var freqFile = FREQ_AUDIO[window._sessao.frequencia_hz];
+    if(freqFile){
+      _freqAudio = new Audio('/frequencias/'+freqFile);
+      _freqAudio.loop = true;
+      _freqAudio.volume = 0.45;
+      _freqAudio.play().catch(function(e){
+        // Fallback: Web Audio API se arquivo não existir ainda
+        console.warn('[freq] arquivo não encontrado, usando síntese');
+        startAudio(window._sessao.frequencia_hz, document.getElementById('binaural').checked);
+      });
+    } else {
+      startAudio(window._sessao.frequencia_hz, document.getElementById('binaural').checked);
+    }
+    startTimer();
+    btn.textContent='⏹ Parar';btn.classList.add('playing');
+    document.getElementById('geoImg').style.animationPlayState='running';
+  }
+}
+
+function startTimer(){
+  clearInterval(_timerInt);
+  _timerInt=setInterval(function(){
+    _timerSecs--;
+    updateTimerDisplay(Math.max(0,_timerSecs));
+    if(_timerSecs<=0){
+      clearInterval(_timerInt);
+      // Fade out
+      if(_audioCtx&&_masterGain){
+        _masterGain.gain.setValueAtTime(_masterGain.gain.value,_audioCtx.currentTime);
+        _masterGain.gain.linearRampToValueAtTime(0,_audioCtx.currentTime+5);
+        setTimeout(function(){_oscs.forEach(function(o){try{o.stop();}catch(e){}});},6000);
+      }
+      _playing=false;
+      document.getElementById('btnPlay').textContent='✓ Concluído';
+      document.getElementById('btnPlay').classList.remove('playing');
+      document.getElementById('mantraAudio').pause();
+      if(_freqAudio){try{_freqAudio.pause();}catch(e){}_freqAudio=null;}
+      salvarSessao();
+    }
+  },1000);
+}
+
+// ── Frequências pré-gravadas — zero custo de API ──
+var FREQ_AUDIO = {
+  174: 'freq-174Hz.mp3',
+  285: 'freq-285Hz.mp3',
+  396: 'freq-396Hz.mp3',
+  417: 'freq-417Hz.mp3',
+  528: 'freq-528Hz.mp3',
+  639: 'freq-639Hz.mp3',
+  741: 'freq-741Hz.mp3',
+  852: 'freq-852Hz.mp3',
+  963: 'freq-963Hz.mp3'
+};
+var _freqAudio = null;
+
+// ── Mantras — mapeamento geometria → MP3 em /musicas-mantras/ ──
+var MANTRAS={
+  'Flor da Vida':        'Flor_da_Vida-528Hz.mp3',
+  'Semente da Vida':     'Semente_da_Vida-285_Hz.mp3',
+  'Vesica Piscis':       'Vesica_Piscis-396_Hz.mp3',
+  'Espiral Áurea':       'Espiral_%C3%81urea-528_Hz.mp3',
+  'Cubo de Metatron':    'Cubo_de_Metatron-963_Hz.mp3',
+  'Merkaba':             'Merkaba-417_Hz.mp3',
+  'Sri Yantra':          'Sri_Yantra-852_Hz.mp3',
+  'Torus':               'Torus-174_Hz.mp3',
+  'Fruto da Vida':       'Fruto_da_Vida-963_Hz.mp3',
+  'Tetraedro Sagrado':   'Tetraedro_Sagrado-396Hz.mp3',
+  'Triquetra':           'Triquetra-No_Celta-639_Hz.mp3',
+  'Triskelion':          'Espiral_Tripla-Triskelion-417_Hz.mp3',
+  'Estrela de 8 Pontas': 'Estrela_de_8_Pontas-741_Hz.mp3',
+  'Lotus de 8 Pétalas':  'Lotus_de_8_P%C3%A9talas-528_Hz.mp3',
+  'Cruz Solar Celta':    'Cruz_Solar_Celta-417_Hz.mp3',
+  'Hexagrama':           'Hexagrama-Estrela_de_Davi-639_Hz.mp3',
+  'Dodecaedro':          'Dodecaedro-963_Hz.mp3',
+  'Icosaedro':           'Icosaedro-285_Hz.mp3',
+  'Tetractys':           'Tetractys-396_Hz.mp3',
+  'Yantra da Lua':       'Yantra_da_Lua-852_Hz.mp3'
+};
+
+// ── Sacred Geometries ──
+var GEO_IMGS={
+  'Flor da Vida':        'Flor_da_Vida.png',
+  'Semente da Vida':     'Semente_da_Vida.png',
+  'Vesica Piscis':       'Vesica_Piscis.png',
+  'Espiral Áurea':       'Espiral_Aurea.png',
+  'Cubo de Metatron':    'Cubo_de_Metatron.png',
+  'Merkaba':             'Merkaba.png',
+  'Sri Yantra':          'Sri_Yantra.png',
+  'Torus':               'Torus.png',
+  'Fruto da Vida':       'Fruto_da_Vida.png',
+  'Tetraedro Sagrado':   'Tetraedro_Sagrado.png',
+  'Triquetra':           'Triquetra-No_Celta.png',
+  'Triskelion':          'Espiral_Tripla-Triskelion.png',
+  'Estrela de 8 Pontas': 'Estrela_de_8_Pontas.png',
+  'Lotus de 8 Pétalas':  'Lotus_de_8_Petalas.png',
+  'Cruz Solar Celta':    'Cruz_Solar_Celta.png',
+  'Hexagrama':           'Hexagrama-Estrela_de_Davi.png',
+  'Dodecaedro':          'Dodecaedro.png',
+  'Icosaedro':           'Icosaedro.png',
+  'Tetractys':           'Tetractys.png',
+  'Yantra da Lua':       'Yantra_da_Lua.png'
+};
+
+function renderGeo(nome){
+  var img=document.getElementById('geoImg');
+  var file=GEO_IMGS[nome]||'Flor_da_Vida.png';
+  img.src='/geometria-sagrada/'+file;
+  img.className='geo-breath';
+  img.style.animationPlayState='paused';
+}
+
+// ── API ──
+window._sessao = null;
+
+async function iniciarSessao(){
+  var estado=document.getElementById('estado').value.trim();
+  if(!estado){alert('Descreva o que está vivendo.');return;}
+  document.getElementById('formView').style.display='none';
+  document.getElementById('spinner').style.display='block';
+  document.getElementById('btnIniciar').disabled=true;
+  try{
+    var resp=await fetch('/api/frequencias',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'gerar',nome:_user.nome||_user.email,email:_user.email,estado:estado,intencao:document.getElementById('intencao').value.trim()})});
+    var data=await resp.json();
+    if(!data.success){throw new Error(data.error||'Erro');}
+    window._sessao=data;
+    document.getElementById('spinner').style.display='none';
+    mostrarSessao(data);
+  }catch(e){
+    document.getElementById('spinner').style.display='none';
+    document.getElementById('formView').style.display='block';
+    document.getElementById('btnIniciar').disabled=false;
+    alert('Erro ao sintonizar: '+e.message);
+  }
+}
+
+function mostrarSessao(data){
+  document.getElementById('freqHz').textContent=data.frequencia_hz;
+  document.getElementById('freqNome').textContent=data.frequencia_nome;
+  document.getElementById('geoNome').textContent=data.geometria;
+  renderGeo(data.geometria);
+  // Carregar mantra correspondente
+  var mantraFile=MANTRAS[data.geometria];
+  var audioEl=document.getElementById('mantraAudio');
+  if(mantraFile){
+    audioEl.src='/musicas-mantras/'+mantraFile;
+    audioEl.load();
+  }
+  _timerSecs=_durMin*60;
+  updateTimerDisplay(_timerSecs);
+  // Reading
+  function fmtParas(t){
+    if(!t)return'';
+    return '<p>'+t.replace(/\\n\\n/g,'</p><p>').replace(/\\n/g,' ').replace(/\n\n/g,'</p><p>').replace(/\n/g,' ')+'</p>';
+  }
+  document.getElementById('readEscolha').innerHTML=fmtParas(data.leitura.escolha||'');
+  document.getElementById('readCura').innerHTML=fmtParas(data.leitura.cura||'');
+  document.getElementById('readIntencao').innerHTML=fmtParas(data.leitura.intencao||'');
+  var sv=document.getElementById('sessionView');
+  sv.style.display='flex';
+}
+
+async function salvarSessao(){
+  if(!_user||!window._sessao)return;
+  try{
+    await fetch('/api/frequencias',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'salvar',email:_user.email,dados:JSON.stringify({
+        frequencia_hz:window._sessao.frequencia_hz,frequencia_nome:window._sessao.frequencia_nome,
+        geometria:window._sessao.geometria,duracao_min:_durMin,
+        leitura:window._sessao.leitura,created_at:new Date().toISOString()
+      })})});
+  }catch(e){console.warn('[freq] salvar erro:',e.message);}
+}
+
+function novaSessao(){
+  if(_playing){stopAudio();}clearInterval(_timerInt);_playing=false;
+  document.getElementById('sessionView').style.display='none';
+  document.getElementById('formView').style.display='block';
+  document.getElementById('btnIniciar').disabled=false;
+  document.getElementById('btnPlay').textContent='▶ Iniciar';
+  document.getElementById('btnPlay').classList.remove('playing');
+  updateTimerDisplay(_durMin*60);
+  window._sessao=null;
+}
+</script>
+</body>
+</html>
