@@ -717,6 +717,8 @@ async function salvarSessao(){
     const payload={action:'salvar',email:_user.email,dados:JSON.stringify({
       frequencia_hz:window._sessao.frequencia_hz,frequencia_nome:window._sessao.frequencia_nome,
       geometria:window._sessao.geometria,duracao_min:_durMin,
+      mensagem:window._sessao.mensagem||'',
+      significado_geometria:window._sessao.significado_geometria||'',
       leitura:window._sessao.leitura,created_at:new Date().toISOString()
     })};
     console.log('[freq] enviando payload:', JSON.stringify(payload).slice(0,200));
