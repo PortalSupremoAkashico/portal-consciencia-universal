@@ -173,19 +173,38 @@
   shareBtn.type = 'button';
   shareBtn.innerHTML = svgIcon('share') + '<span>Compartilhar</span>';
   shareBtn.addEventListener('click', function () {
+    compartilharConvite();
+  });
+  nav.appendChild(shareBtn);
+
+  async function compartilharConvite() {
     var mensagem =
       'Encontrei um espaço lindo para quem busca autoconhecimento e conexão com o universo: ' +
       'o Portal da Consciência Universal. Tem Mentoria, Meditação Guiada, Análise de Sonhos, ' +
-      'Reflexões, Frequências e Geometria Sagrada. Vem conhecer! ' + SITE_URL;
+      'Reflexões, Frequências, Geometria Sagrada, Fórum Ufológico e Relatos Pessoais. ' +
+      'Vem conhecer! ' + SITE_URL;
+
+    var shareData = { title: 'Portal da Consciência Universal', text: mensagem };
+
+    try {
+      var resp = await fetch('/icons/icon-512.png');
+      var blob = await resp.blob();
+      var file = new File([blob], 'portal-consciencia-universal.png', { type: blob.type || 'image/png' });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        shareData.files = [file];
+      }
+    } catch (e) {
+      // Sem imagem, o compartilhamento continua só com o texto.
+    }
+
     if (navigator.share) {
-      navigator.share({ title: 'Portal da Consciência Universal', text: mensagem }).catch(function () {});
+      navigator.share(shareData).catch(function () {});
     } else if (navigator.clipboard) {
       navigator.clipboard.writeText(mensagem).then(function () {
         showToast('Convite copiado! Agora é só colar e enviar 💫');
       });
     }
-  });
-  nav.appendChild(shareBtn);
+  }
 
   var perfilLink = document.createElement('a');
   perfilLink.href = '/perfil';
