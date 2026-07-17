@@ -175,9 +175,10 @@
   shareBtn.addEventListener('click', function () {
     var mensagem =
       'Encontrei um espaço lindo para quem busca autoconhecimento e conexão com o universo: ' +
-      'o Portal da Consciência Universal. Vem conhecer! ' + SITE_URL;
+      'o Portal da Consciência Universal. Tem Mentoria, Meditação Guiada, Análise de Sonhos, ' +
+      'Reflexões, Frequências e Geometria Sagrada. Vem conhecer! ' + SITE_URL;
     if (navigator.share) {
-      navigator.share({ title: 'Portal da Consciência Universal', text: mensagem, url: SITE_URL }).catch(function () {});
+      navigator.share({ title: 'Portal da Consciência Universal', text: mensagem }).catch(function () {});
     } else if (navigator.clipboard) {
       navigator.clipboard.writeText(mensagem).then(function () {
         showToast('Convite copiado! Agora é só colar e enviar 💫');
