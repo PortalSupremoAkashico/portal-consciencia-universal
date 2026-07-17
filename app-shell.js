@@ -179,24 +179,12 @@
 
   async function compartilharConvite() {
     var mensagem =
-      '⚛️ ' +
       'Encontrei um espaço lindo para quem busca autoconhecimento e conexão com o universo: ' +
       'o Portal da Consciência Universal. Tem Mentoria, Meditação Guiada, Análise de Sonhos, ' +
       'Reflexões, Frequências, Geometria Sagrada, Fórum Ufológico e Relatos Pessoais. ' +
       'Vem conhecer! ' + SITE_URL;
 
     var shareData = { title: 'Portal da Consciência Universal', text: mensagem };
-
-    try {
-      var resp = await fetch('/icons/icon-512.png');
-      var blob = await resp.blob();
-      var file = new File([blob], 'portal-consciencia-universal.png', { type: blob.type || 'image/png' });
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        shareData.files = [file];
-      }
-    } catch (e) {
-      // Sem imagem, o compartilhamento continua só com o texto.
-    }
 
     if (navigator.share) {
       navigator.share(shareData).catch(function () {});
