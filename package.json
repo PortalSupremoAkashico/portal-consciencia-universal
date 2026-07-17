@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "type": "module",
   "dependencies": {
-    "hash-wasm": "^4.11.0",
+    "@vercel/functions": "^3.7.5",
     "@supabase/supabase-js": "^2.104.1",
+    "hash-wasm": "^4.11.0",
     "nodemailer": "^9.0.1"
   }
 }
