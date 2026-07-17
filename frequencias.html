@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>\n  <!-- Proteção de sessão: fallback no navegador -->\n  <style id="pcu-auth-style">html.pcu-auth-pending body{visibility:hidden!important}</style>\n  <script id="pcu-auth-guard">\n  document.documentElement.classList.add('pcu-auth-pending');\n  (async function(){\n    try {\n      const response = await fetch('/api/session', {\n        method: 'POST',\n        credentials: 'same-origin',\n        headers: {'Content-Type':'application/json'},\n        body: JSON.stringify({action:'verify'})\n      });\n      const data = await response.json().catch(function(){return {};});\n      if (!response.ok || !data.valid || !data.user) {\n        window.location.replace('/?acesso=restrito');\n        return;\n      }\n      try {\n        const old = JSON.parse(localStorage.getItem('akashic_user') || '{}');\n        localStorage.setItem('akashic_user', JSON.stringify(Object.assign({}, old, data.user)));\n      } catch(e) {}\n      document.documentElement.classList.remove('pcu-auth-pending');\n    } catch(e) {\n      window.location.replace('/?acesso=restrito');\n    }\n  })();\n  </script>
+<head>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#05040f">
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Portal">\n  <!-- Proteção de sessão: fallback no navegador -->\n  <style id="pcu-auth-style">html.pcu-auth-pending body{visibility:hidden!important}</style>\n  <script id="pcu-auth-guard">\n  document.documentElement.classList.add('pcu-auth-pending');\n  (async function(){\n    try {\n      const response = await fetch('/api/session', {\n        method: 'POST',\n        credentials: 'same-origin',\n        headers: {'Content-Type':'application/json'},\n        body: JSON.stringify({action:'verify'})\n      });\n      const data = await response.json().catch(function(){return {};});\n      if (!response.ok || !data.valid || !data.user) {\n        window.location.replace('/?acesso=restrito');\n        return;\n      }\n      try {\n        const old = JSON.parse(localStorage.getItem('akashic_user') || '{}');\n        localStorage.setItem('akashic_user', JSON.stringify(Object.assign({}, old, data.user)));\n      } catch(e) {}\n      document.documentElement.classList.remove('pcu-auth-pending');\n    } catch(e) {\n      window.location.replace('/?acesso=restrito');\n    }\n  })();\n  </script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Geometria Sagrada com Frequências e Mantras | Portal da Consciência Universal</title>
@@ -786,5 +792,6 @@ function novaSessao(){
 </script>
 <audio id="mantraAudio" loop preload="none"></audio>
 <script src="/heartbeat.js"></script>
+<script src="/app-shell.js" defer></script>
 </body>
 </html>
