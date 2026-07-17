@@ -1,0 +1,6 @@
+import { createHmac, timingSafeEqual } from "node:crypto";
+import { readFile } from "node:fs/promises";
+const SECRET=process.env.SESSION_SECRET||process.env.SUPABASE_SERVICE_ROLE_KEY;
+function cookies(req){return (req.headers.cookie||"").split(";").reduce((a,x)=>{const i=x.indexOf("=");if(i>-1)a[x.slice(0,i).trim()]=decodeURIComponent(x.slice(i+1).trim());return a;},{});}
+function verify(t){if(!SECRET||!t)return null;const p=t.split(".");if(p.length!==2)return null;const e=createHmac("sha256",SECRET).update(p[0]).digest("base64url");const a=Buffer.from(p[1]),b=Buffer.from(e);if(a.length!==b.length||!timingSafeEqual(a,b))return null;try{const d=JSON.parse(Buffer.from(p[0],"base64url").toString("utf8"));return d.email&&d.exp>Date.now()/1000?d:null;}catch{return null;}}
+export default async function handler(req,res){if(!verify(cookies(req).pcu_session)){res.setHeader("Cache-Control","no-store");res.setHeader("Location","/?acesso=restrito");return res.status(302).end();}try{const html=await readFile(new URL("../meditacao.html",import.meta.url),"utf8");res.setHeader("Content-Type","text/html; charset=utf-8");res.setHeader("Cache-Control","private, no-store");res.setHeader("X-Robots-Tag","noindex, nofollow, noarchive");return res.status(200).send(html);}catch(e){return res.status(500).send("Erro ao carregar página protegida.");}}
