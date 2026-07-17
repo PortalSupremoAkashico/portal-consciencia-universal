@@ -1,9 +1,0 @@
-CORREÇÃO DA TRANSIÇÃO LOGIN → CONSULTA
-
-Substitua estes arquivos no GitHub:
-- login.html
-- consulta.html
-- api/protected-page.js
-
-Não apague os demais arquivos. Após o deploy de produção, teste em janela anônima.
-A consulta agora é autenticada uma única vez no servidor e abre diretamente na tela de boas-vindas, sem a página intermediária.
