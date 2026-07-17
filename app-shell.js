@@ -179,6 +179,7 @@
 
   async function compartilharConvite() {
     var mensagem =
+      '⚛️ ' +
       'Encontrei um espaço lindo para quem busca autoconhecimento e conexão com o universo: ' +
       'o Portal da Consciência Universal. Tem Mentoria, Meditação Guiada, Análise de Sonhos, ' +
       'Reflexões, Frequências, Geometria Sagrada, Fórum Ufológico e Relatos Pessoais. ' +
