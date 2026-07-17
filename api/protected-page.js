@@ -104,7 +104,21 @@ export default async function handler(req, res) {
   if (!session) return redirectToIndex(res);
 
   try {
-    const html = await loadHtml(filename);
+    let html = await loadHtml(filename);
+
+    // A sessão já foi validada acima. Injeta apenas os dados mínimos necessários
+    // para a página iniciar imediatamente, sem uma segunda requisição e sem flash.
+    const sessionForPage = JSON.stringify({
+      id: String(session.sub || ''),
+      email: String(session.email || ''),
+      nome: String(session.nome || '')
+    }).replace(/</g, '\\u003c');
+
+    html = html.replace(
+      /<head([^>]*)>/i,
+      (headTag) => `${headTag}\n<script>window.__PCU_SERVER_SESSION__=${sessionForPage};<\/script>`
+    );
+
     res.statusCode = 200;
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.setHeader('Cache-Control', 'private, no-store, max-age=0');
