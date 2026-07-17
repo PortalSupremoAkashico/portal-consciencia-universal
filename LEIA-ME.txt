@@ -1,40 +1,36 @@
-PROTEÇÃO CORRIGIDA — TODAS AS PÁGINAS INTERNAS
+PROTEÇÃO DEFINITIVA — ROTAS DO SERVIDOR
 
-CAUSA DO PROBLEMA ANTERIOR
-O Vercel serve arquivos estáticos antes de aplicar rewrites. Por isso, consulta.html,
-mentoria.html e as demais páginas abriam diretamente.
+Esta versão NÃO depende do middleware para bloquear as páginas.
+O vercel.json envia todas as rotas internas para api/protected-page.js.
+A função verifica o cookie assinado pcu_session antes de entregar o HTML.
 
-CORREÇÃO
-Este pacote usa middleware.js na raiz. O middleware roda ANTES do arquivo estático,
-confere o cookie seguro pcu_session e redireciona para o index quando não houver
-sessão válida.
+SEM SESSÃO:
+/consulta, /consulta.html, /mentoria, /perfil e demais áreas internas
+retornam 302 para /?acesso=restrito.
 
-ARQUIVOS ESSENCIAIS
-- middleware.js (novo e indispensável)
-- package.json (inclui @vercel/functions)
+COM SESSÃO VÁLIDA:
+a função entrega o arquivo HTML normalmente.
+
+ARQUIVOS OBRIGATÓRIOS NA RAIZ:
 - vercel.json
-- api/session.js
+- package.json
+- middleware.js (neutraliza a versão anterior)
 - login.html
-- páginas internas incluídas
+- todos os HTML internos
+- pasta api com session.js e protected-page.js
 
-COMO PUBLICAR
-1. Descompacte o ZIP.
-2. Copie TODOS os arquivos para a raiz do projeto.
-3. Mantenha middleware.js no mesmo nível de package.json e vercel.json.
-4. Mantenha api/session.js dentro da pasta api.
-5. Não apague as outras páginas e APIs do portal.
-6. Faça um novo deploy de produção.
+IMPORTANTE:
+1. Substitua o vercel.json antigo.
+2. Substitua o middleware.js antigo pelo deste pacote.
+3. Envie api/protected-page.js e api/session.js.
+4. Faça um novo deploy de PRODUÇÃO.
+5. Teste em janela anônima, pois o navegador normal pode manter uma sessão válida por 12 horas.
 
-VARIÁVEIS DO VERCEL
-A sessão usa SESSION_SECRET. Se ela não existir, usa SUPABASE_SERVICE_ROLE_KEY.
-É recomendável criar SESSION_SECRET em Settings > Environment Variables com um
-valor longo e aleatório, e redeployar.
+TESTE:
+https://www.portaldaconscienciauniversal.com/consulta
+https://www.portaldaconscienciauniversal.com/consulta.html
+https://www.portaldaconscienciauniversal.com/mentoria
+https://www.portaldaconscienciauniversal.com/perfil
 
-TESTE CERTO
-1. Abra janela anônima.
-2. Acesse /consulta, /mentoria e /perfil.
-3. Todas devem ir para /?acesso=restrito (página inicial).
-4. Faça login; depois as páginas internas devem abrir.
-
-IMPORTANTE
-As páginas públicas de SEO (uaps-ovnis, registros-akashicos etc.) continuam abertas.
+Sem login, todas devem abrir:
+https://www.portaldaconscienciauniversal.com/?acesso=restrito

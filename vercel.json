@@ -1,22 +1,31 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "trailingSlash": false,
+  "functions": {
+    "api/protected-page.js": {
+      "includeFiles": "*.html"
+    }
+  },
+  "routes": [
+    { "src": "/consulta(?:\\.html)?", "dest": "/api/protected-page?file=consulta.html" },
+    { "src": "/mentoria(?:\\.html)?", "dest": "/api/protected-page?file=mentoria.html" },
+    { "src": "/historico(?:\\.html)?", "dest": "/api/protected-page?file=historico.html" },
+    { "src": "/perfil(?:\\.html)?", "dest": "/api/protected-page?file=perfil.html" },
+    { "src": "/reflexoes(?:\\.html)?", "dest": "/api/protected-page?file=reflexoes.html" },
+    { "src": "/meditacao(?:\\.html)?", "dest": "/api/protected-page?file=meditacao.html" },
+    { "src": "/sonho(?:\\.html)?", "dest": "/api/protected-page?file=sonho.html" },
+    { "src": "/mentor-ufologico(?:\\.html)?", "dest": "/api/protected-page?file=mentor-ufologico.html" },
+    { "src": "/frequencias(?:\\.html)?", "dest": "/api/protected-page?file=frequencias.html" },
+    { "src": "/gerar-cliques(?:\\.html)?", "dest": "/api/protected-page?file=gerar-cliques.html" },
+    { "src": "/gerar-sons(?:\\.html)?", "dest": "/api/protected-page?file=gerar-sons.html" },
+    { "src": "/(?:ritual|ritual-fala)(?:\\.html)?", "dest": "/api/protected-page?file=ritual-fala.html" },
+    { "src": "/(?:gerar-ritual|gerar-audio-ritual)(?:\\.html)?", "dest": "/api/protected-page?file=gerar-audio-ritual.html" }
+  ],
   "rewrites": [
     { "source": "/", "destination": "/index.html" },
     { "source": "/login", "destination": "/login.html" },
     { "source": "/planos", "destination": "/planos.html" },
-    { "source": "/consulta", "destination": "/consulta.html" },
-    { "source": "/mentoria", "destination": "/mentoria.html" },
-    { "source": "/historico", "destination": "/historico.html" },
-    { "source": "/perfil", "destination": "/perfil.html" },
-    { "source": "/reflexoes", "destination": "/reflexoes.html" },
-    { "source": "/meditacao", "destination": "/meditacao.html" },
-    { "source": "/sonho", "destination": "/sonho.html" },
-    { "source": "/mentor-ufologico", "destination": "/mentor-ufologico.html" },
-    { "source": "/gerar-cliques", "destination": "/gerar-cliques.html" },
-    { "source": "/gerar-sons", "destination": "/gerar-sons.html" },
-    { "source": "/ritual", "destination": "/ritual-fala.html" },
-    { "source": "/gerar-ritual", "destination": "/gerar-audio-ritual.html" },
-    { "source": "/frequencias", "destination": "/frequencias.html" },
     { "source": "/uaps-ovnis", "destination": "/uaps-ovnis.html" },
     { "source": "/discos-voadores-extraterrestres", "destination": "/discos-voadores-extraterrestres.html" },
     { "source": "/registros-akashicos", "destination": "/registros-akashicos.html" },
