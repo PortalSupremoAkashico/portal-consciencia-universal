@@ -43,7 +43,12 @@
 ══════════════════════════════════════════════════════════════════════════════
 -->
 <html lang="pt-BR">
-<head>\n  <!-- Proteção de sessão: fallback no navegador -->\n  <style id="pcu-auth-style">html.pcu-auth-pending body{visibility:hidden!important}</style>\n  <script id="pcu-auth-guard">\n  document.documentElement.classList.add('pcu-auth-pending');\n  (async function(){\n    try {\n      const response = await fetch('/api/session', {\n        method: 'POST',\n        credentials: 'same-origin',\n        headers: {'Content-Type':'application/json'},\n        body: JSON.stringify({action:'verify'})\n      });\n      const data = await response.json().catch(function(){return {};});\n      if (!response.ok || !data.valid || !data.user) {\n        window.location.replace('/?acesso=restrito');\n        return;\n      }\n      try {\n        const old = JSON.parse(localStorage.getItem('akashic_user') || '{}');\n        localStorage.setItem('akashic_user', JSON.stringify(Object.assign({}, old, data.user)));\n      } catch(e) {}\n      document.documentElement.classList.remove('pcu-auth-pending');\n    } catch(e) {\n      window.location.replace('/?acesso=restrito');\n    }\n  })();\n  </script>
+<head>
+  <!-- A rota já foi autenticada no servidor. Mantém apenas o fundo escuro até a tela final estar pronta. -->
+  <style id="pcu-boot-style">
+    html, body { background:#05040f; }
+    body { visibility:hidden; opacity:1; }
+  </style>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Portal dos Registros Akáshicos</title>
@@ -5632,11 +5637,9 @@ function enterPortal(user) {
   sessionStorage.removeItem('akashic_vindo_do_login');
   if(!irForm && vindoDoLogin){ window._deveTocBV = true; }
 
-    // Só revela após tudo estar no lugar certo
+  // Revela diretamente a tela final, sem página intermediária nem piscada.
   document.body.style.visibility = 'visible';
-  document.body.style.opacity = '0';
-  document.body.style.transition = 'opacity .3s ease';
-  setTimeout(function(){ document.body.style.opacity = '1'; }, 30);
+  document.body.style.opacity = '1';
 }
 
 // Tentativas erradas por email
@@ -6054,44 +6057,31 @@ window._authFns = {
   fechar:   () => fecharCadastroReal()
 };
 
-async function verificarSessaoSegura() {
-  const resp = await fetch('/api/session', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    credentials: 'same-origin',
-    body: JSON.stringify({ action: 'verify' })
-  });
-  const data = await resp.json().catch(() => ({}));
-  if (!resp.ok || !data.valid || !data.user || !data.user.email) {
-    throw new Error('Sessão inválida ou expirada.');
-  }
+function obterSessaoValidadaPeloServidor() {
+  const servidor = window.__PCU_SERVER_SESSION__;
+  if (!servidor || !servidor.email) return null;
 
   const salvo = getStoredUser() || {};
-  const user = Object.assign({}, salvo, data.user);
+  const user = Object.assign({}, salvo, servidor);
   saveStoredUser(user);
   sessionStorage.setItem('akashic_auth_token', 'server-session');
   return user;
 }
 
-document.addEventListener('DOMContentLoaded', async function initAuth() {
-  let user;
-  try {
-    user = await verificarSessaoSegura();
-  } catch (e) {
+document.addEventListener('DOMContentLoaded', function initAuth() {
+  const user = obterSessaoValidadaPeloServidor();
+  if (!user) {
     localStorage.removeItem('akashic_user');
     sessionStorage.removeItem('akashic_auth_token');
-    window.location.replace('/login?redirect=%2Fconsulta');
+    window.location.replace('/?acesso=restrito');
     return;
   }
 
-  // Usuário autenticado pelo servidor — inicializa com dados
+  // O servidor já confirmou a sessão antes de entregar este HTML.
+  // Inicializa e revela diretamente a tela de boas-vindas.
   enterPortal(user);
 
-
-
-
-
-  // Formata data no campo cadData
+  // Formata data no campo cadData, caso o elemento exista em versões antigas.
   document.getElementById('cadData')?.addEventListener('input', (e) => {
     let v = e.target.value.replace(/\D/g, '');
     if (v.length >= 2) v = v.slice(0, 2) + '/' + v.slice(2);
@@ -7236,7 +7226,7 @@ input[type="submit"]:hover,
     });
   }
   // Tenta imediatamente após a página revelar
-  setTimeout(tocarBemVindo, 600);
+  setTimeout(tocarBemVindo, 100);
   // Garante na primeira interação caso autoplay bloqueado (qualquer uma destas conta)
   document.addEventListener('click',      function(){ tocarBemVindo(); }, {once:true});
   document.addEventListener('mousedown',  function(){ tocarBemVindo(); }, {once:true});

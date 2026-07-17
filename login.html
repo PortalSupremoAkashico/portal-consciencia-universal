@@ -763,14 +763,14 @@ async function handleEntrar() {
 
   loginAttempts[email] = 0;
   const u = data.user;
-  setStatus(status, 'ok', `Bem-vindo, ${u.nome.split(' ')[0]}! Criando sessão segura...`);
-  setTimeout(() => {
-    entrarPortal(u, hash).catch((erro) => {
-      setStatus(status, 'error', erro.message || 'Não foi possível entrar. Tente novamente.');
-      document.getElementById('loginSenha').value = '';
-      document.getElementById('loginSenha').focus();
-    });
-  }, 700);
+  setStatus(status, 'ok', `Bem-vindo, ${u.nome.split(' ')[0]}! Abrindo o portal...`);
+  try {
+    await entrarPortal(u, hash);
+  } catch (erro) {
+    setStatus(status, 'error', erro.message || 'Não foi possível entrar. Tente novamente.');
+    document.getElementById('loginSenha').value = '';
+    document.getElementById('loginSenha').focus();
+  }
 }
 
 // ── CADASTRO ──
