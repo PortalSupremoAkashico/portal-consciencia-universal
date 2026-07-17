@@ -1,0 +1,104 @@
+{
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/login",
+      "destination": "/login.html"
+    },
+    {
+      "source": "/planos",
+      "destination": "/planos.html"
+    },
+    {
+      "source": "/consulta",
+      "destination": "/api/protected-consulta"
+    },
+    {
+      "source": "/consulta.html",
+      "destination": "/api/protected-consulta"
+    },
+    {
+      "source": "/mentoria",
+      "destination": "/api/protected-mentoria"
+    },
+    {
+      "source": "/mentoria.html",
+      "destination": "/api/protected-mentoria"
+    },
+    {
+      "source": "/historico",
+      "destination": "/api/protected-historico"
+    },
+    {
+      "source": "/historico.html",
+      "destination": "/api/protected-historico"
+    },
+    {
+      "source": "/perfil",
+      "destination": "/api/protected-perfil"
+    },
+    {
+      "source": "/perfil.html",
+      "destination": "/api/protected-perfil"
+    },
+    {
+      "source": "/reflexoes",
+      "destination": "/api/protected-reflexoes"
+    },
+    {
+      "source": "/reflexoes.html",
+      "destination": "/api/protected-reflexoes"
+    },
+    {
+      "source": "/meditacao",
+      "destination": "/api/protected-meditacao"
+    },
+    {
+      "source": "/meditacao.html",
+      "destination": "/api/protected-meditacao"
+    },
+    {
+      "source": "/sonho",
+      "destination": "/api/protected-sonho"
+    },
+    {
+      "source": "/sonho.html",
+      "destination": "/api/protected-sonho"
+    },
+    {
+      "source": "/mentor-ufologico",
+      "destination": "/api/protected-mentor-ufologico"
+    },
+    {
+      "source": "/mentor-ufologico.html",
+      "destination": "/api/protected-mentor-ufologico"
+    },
+    {
+      "source": "/frequencias",
+      "destination": "/api/protected-frequencias"
+    },
+    {
+      "source": "/frequencias.html",
+      "destination": "/api/protected-frequencias"
+    },
+    {
+      "source": "/gerar-cliques",
+      "destination": "/api/protected-gerar-cliques"
+    },
+    {
+      "source": "/gerar-cliques.html",
+      "destination": "/api/protected-gerar-cliques"
+    },
+    {
+      "source": "/gerar-audio-ritual",
+      "destination": "/api/protected-gerar-audio-ritual"
+    },
+    {
+      "source": "/gerar-audio-ritual.html",
+      "destination": "/api/protected-gerar-audio-ritual"
+    }
+  ]
+}

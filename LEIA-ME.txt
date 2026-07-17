@@ -1,0 +1,1 @@
+Sem sessão válida, todas as páginas internas redirecionam para o index. Teste em janela anônima; se estiver logado, elas abrirão normalmente.

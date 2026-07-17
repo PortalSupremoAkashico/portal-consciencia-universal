@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Gerar Sons de Clique</title>
+<style>
+  body { font-family: sans-serif; background: #1a1025; color: #e0d4f7; padding: 40px; max-width: 600px; margin: 0 auto; }
+  h2 { color: #f0c96b; }
+  .item { background: #2a1a3a; border-radius: 10px; padding: 18px 20px; margin: 12px 0; display:flex; align-items:center; gap:16px; }
+  .col { flex:1; }
+  .frase { font-size: .95rem; color: #c4b5fd; font-style: italic; }
+  .nome { font-size: .78rem; color: #888; margin-top: 4px; }
+  .st { font-size: .82rem; margin-top: 6px; }
+  .ok { color: #6ee7b7; }
+  .err { color: #f87171; }
+  button { background: #7c3aed; color: #fff; border: none; border-radius: 6px; padding: 9px 18px; font-size: .88rem; cursor: pointer; white-space: nowrap; }
+  button:hover { background: #6d28d9; }
+  button:disabled { background: #444; cursor: default; }
+</style>
+</head>
+<body>
+<h2>🔊 Gerar Sons de Clique</h2>
+<div id="lista"></div>
+<script>
+const FRASES = [
+  { id:'clique-1', texto:'Clique mais uma vez.'         },
+  { id:'clique-2', texto:'Clique novamente.'             },
+  { id:'clique-3', texto:'Clique para continuar.'       },
+  { id:'clique-4', texto:'Clique quando estiver pronto.'},
+  { id:'clique-5', texto:'Clique para prosseguir.'      },
+];
+FRASES.forEach(function(f){
+  var d = document.createElement('div');
+  d.className = 'item';
+  d.innerHTML = '<div class="col"><div class="frase">"'+f.texto+'"</div><div class="nome">'+f.id+'.mp3</div><div id="st_'+f.id+'" class="st"></div></div><button id="btn_'+f.id+'" onclick="gerar(\''+f.id+'\',\''+f.texto+'\')">⬇ Baixar</button>';
+  document.getElementById('lista').appendChild(d);
+});
+function gerar(id, texto){
+  var btn=document.getElementById('btn_'+id), st=document.getElementById('st_'+id);
+  btn.disabled=true; btn.textContent='Gerando...'; st.className='st'; st.textContent='';
+  fetch('/api/tts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:texto,speed:0.85})})
+  .then(function(r){return r.ok?r.blob():Promise.reject(r.status);})
+  .then(function(blob){
+    var url=URL.createObjectURL(blob), a=document.createElement('a');
+    a.href=url; a.download=id+'.mp3'; a.click();
+    setTimeout(function(){URL.revokeObjectURL(url);},2000);
+    st.className='st ok'; st.textContent='✓ Baixado!';
+    btn.textContent='🔄 Gerar novamente'; btn.disabled=false;
+  }).catch(function(e){st.className='st err'; st.textContent='✗ Erro: '+e; btn.textContent='⬇ Baixar'; btn.disabled=false;});
+}
+</script>
+</body>
+</html>
