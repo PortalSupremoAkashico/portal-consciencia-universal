@@ -1,6 +1,55 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+  <script id="pcu-index-logout">
+  // Ao abrir ou retornar ao index, encerra completamente o login do Portal.
+  (function () {
+    function limparLoginDoNavegador() {
+      try {
+        localStorage.removeItem('akashic_user');
+      } catch (e) {}
+
+      try {
+        [
+          'akashic_user',
+          'akashic_auth_token',
+          'akashic_portal_session',
+          'akashic_vindo_do_login',
+          'akashic_novo_cadastro',
+          'akashic_reset'
+        ].forEach(function (chave) {
+          sessionStorage.removeItem(chave);
+        });
+      } catch (e) {}
+    }
+
+    async function encerrarSessaoNoIndex() {
+      limparLoginDoNavegador();
+
+      try {
+        await fetch('/api/session', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'logout' }),
+          cache: 'no-store',
+          keepalive: true
+        });
+      } catch (e) {
+        // Mesmo sem conexão, os marcadores locais de login já foram apagados.
+      }
+
+      limparLoginDoNavegador();
+    }
+
+    window.__pcuIndexLogoutPromise = encerrarSessaoNoIndex();
+
+    // Também encerra ao voltar ao index pelos botões Voltar/Avançar do navegador.
+    window.addEventListener('pageshow', function () {
+      window.__pcuIndexLogoutPromise = encerrarSessaoNoIndex();
+    });
+  })();
+  </script>
   <meta charset="UTF-8">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">

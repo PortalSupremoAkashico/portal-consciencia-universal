@@ -1,0 +1,19 @@
+PROTEÇÃO: INDEX ENCERRA A SESSÃO
+
+Ao abrir, recarregar ou retornar para a página inicial, o index.html:
+1. solicita ao servidor a exclusão do cookie HttpOnly pcu_session;
+2. remove os marcadores de autenticação do sessionStorage;
+3. remove o usuário de login salvo em localStorage;
+4. mantém intactos históricos e conteúdos pessoais que não são credenciais.
+
+COMO PUBLICAR
+- Copie o conteúdo desta pasta para a raiz do projeto no GitHub.
+- Substitua os arquivos de mesmo nome.
+- Não apague imagens, áudios, páginas públicas ou outros arquivos que não estejam no pacote.
+- Faça um novo deploy de produção na Vercel.
+
+TESTE
+1. Faça login e abra uma página interna.
+2. Entre na página inicial (/).
+3. Tente abrir novamente /consulta ou /mentoria.
+4. O acesso deverá ser bloqueado porque a sessão foi encerrada ao entrar no index.
