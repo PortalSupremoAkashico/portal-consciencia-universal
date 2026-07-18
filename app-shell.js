@@ -248,8 +248,19 @@
       document.addEventListener('DOMContentLoaded', esconderPorTexto);
     }
     // Alguns botões "Voltar" só existem depois de trocas de tela via JS —
-    // reaplica a checagem sempre que o conteúdo da página mudar.
-    var observer = new MutationObserver(function () { esconderPorTexto(); });
+    // reaplica a checagem quando o conteúdo da página mudar, mas com um
+    // "debounce": só roda a varredura depois que o DOM parar de mudar por
+    // um instante, e só se algum elemento novo (nó) tiver sido de fato
+    // adicionado — evita travar a página em efeitos de texto "digitando".
+    var pcuVoltarTimer = null;
+    var observer = new MutationObserver(function (mutations) {
+      var teveNoElementoAdicionado = mutations.some(function (m) {
+        return m.addedNodes && m.addedNodes.length > 0;
+      });
+      if (!teveNoElementoAdicionado) return;
+      clearTimeout(pcuVoltarTimer);
+      pcuVoltarTimer = setTimeout(esconderPorTexto, 400);
+    });
     observer.observe(document.body || document.documentElement, { childList: true, subtree: true });
   }
   removerBotoesVoltar();
