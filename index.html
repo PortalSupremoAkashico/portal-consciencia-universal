@@ -564,6 +564,14 @@
       filter: brightness(1.35);
     }
     .cta-button-purple span { position: relative; z-index: 1; }
+
+    .pcu-dim {
+      filter: brightness(0.75) saturate(0.85) !important;
+      opacity: 0.8 !important;
+      animation: none !important;
+      transform: none !important;
+      transition: filter 0.3s ease, opacity 0.3s ease;
+    }
     @keyframes btnPulsePurple {
       0%,100%{
         box-shadow: 0 0 8px rgba(109,40,217,.5), 0 0 14px rgba(240,201,107,.8), 0 0 35px rgba(240,201,107,.45);
@@ -673,7 +681,7 @@
         </div>
       </section>
 
-      <a href="/login" class="cta-button-blue" aria-label="Entrar no Portal da Consciência Universal">
+      <a href="/login" id="btnEntrarPortal" class="cta-button-blue" aria-label="Entrar no Portal da Consciência Universal">
         <span><svg width="18" height="18" viewBox="-20 -20 40 40" style="display:inline-block;vertical-align:middle;"><polygon points="0,-16 3,-3 16,0 3,3 0,16 -3,3 -16,0 -3,-3" fill="rgba(240,201,107,0.2)" stroke="rgba(240,201,107,0.95)" stroke-width="2.2"/></svg> Entrar no Portal <svg width="18" height="18" viewBox="-20 -20 40 40" style="display:inline-block;vertical-align:middle;"><polygon points="0,-16 3,-3 16,0 3,3 0,16 -3,3 -16,0 -3,-3" fill="rgba(240,201,107,0.2)" stroke="rgba(240,201,107,0.95)" stroke-width="2.2"/></svg></span>
       </a>
 
@@ -703,6 +711,16 @@
           }
           return false;
         }
+
+        (function () {
+          var btnA = document.getElementById('btnEntrarPortal');
+          var btnB = document.getElementById('btnBaixarApp');
+          if (!btnA || !btnB) return;
+          btnA.addEventListener('mouseenter', function () { btnB.classList.add('pcu-dim'); });
+          btnA.addEventListener('mouseleave', function () { btnB.classList.remove('pcu-dim'); });
+          btnB.addEventListener('mouseenter', function () { btnA.classList.add('pcu-dim'); });
+          btnB.addEventListener('mouseleave', function () { btnA.classList.remove('pcu-dim'); });
+        })();
       </script>
 
       <p style="margin-top: 30px; font-size: 14px; color: var(--muted);">
