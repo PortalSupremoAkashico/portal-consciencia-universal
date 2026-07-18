@@ -211,6 +211,50 @@
     );
   }
 
+  // ---------- 6b. Modo app: remove botões "Voltar" e organiza o layout ----------
+  function ajustarModoApp() {
+    if (!isStandalone()) return;
+    document.documentElement.classList.add('pcu-app-mode');
+
+    var style2 = document.createElement('style');
+    style2.textContent = [
+      '.pcu-app-mode .btn-voltar,',
+      '.pcu-app-mode a.nav-link,',
+      '.pcu-app-mode [id*="Voltar"],',
+      '.pcu-app-mode [class*="voltar"]{display:none !important;}',
+      '.pcu-app-mode #btnVoltarFormulario{display:none !important;padding:0 !important;margin:0 !important;height:0 !important;}',
+      '.pcu-app-mode body{padding-top:env(safe-area-inset-top) !important;}'
+    ].join('');
+    document.head.appendChild(style2);
+
+    // Esconde qualquer link/botão cujo texto seja exatamente "Voltar",
+    // cobrindo casos não pegos pelos seletores de classe/id acima.
+    function esconderPorTexto() {
+      document.querySelectorAll('a, button').forEach(function (el) {
+        var txt = (el.textContent || '').replace(/\s+/g, ' ').trim();
+        if (/^voltar$/i.test(txt)) {
+          el.style.display = 'none';
+          var pai = el.parentElement;
+          // Se o botão era o único filho visível do pai, remove o espaço reservado dele também.
+          if (pai && pai.children.length === 1) {
+            pai.style.display = 'none';
+          }
+        }
+      });
+    }
+
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+      esconderPorTexto();
+    } else {
+      document.addEventListener('DOMContentLoaded', esconderPorTexto);
+    }
+    // Alguns botões "Voltar" só existem depois de trocas de tela via JS —
+    // reaplica a checagem sempre que o conteúdo da página mudar.
+    var observer = new MutationObserver(function () { esconderPorTexto(); });
+    observer.observe(document.body || document.documentElement, { childList: true, subtree: true });
+  }
+  ajustarModoApp();
+
   function isIos() {
     return /iphone|ipad|ipod/i.test(window.navigator.userAgent);
   }
