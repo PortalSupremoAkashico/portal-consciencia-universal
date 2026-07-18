@@ -227,12 +227,13 @@
     ].join('');
     document.head.appendChild(style2);
 
-    // Esconde qualquer link/botão cujo texto seja exatamente "Voltar",
+    // Esconde qualquer link/botão cujo texto contenha a palavra "voltar"
+    // (cobre variações como "Voltar", "‹ Voltar", "Voltar ao Portal" etc.),
     // cobrindo casos não pegos pelos seletores de classe/id acima.
     function esconderPorTexto() {
       document.querySelectorAll('a, button').forEach(function (el) {
         var txt = (el.textContent || '').replace(/\s+/g, ' ').trim();
-        if (/^voltar$/i.test(txt)) {
+        if (/\bvoltar\b/i.test(txt)) {
           el.style.display = 'none';
           var pai = el.parentElement;
           // Se o botão era o único filho visível do pai, remove o espaço reservado dele também.
