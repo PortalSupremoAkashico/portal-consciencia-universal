@@ -38,6 +38,7 @@
     ':root{--pcu-nav-h: 64px;}',
     'body{padding-bottom: calc(var(--pcu-nav-h) + env(safe-area-inset-bottom)) !important;}',
     '.pcu-navbar{position:fixed;left:0;right:0;bottom:0;z-index:9999;',
+    '-webkit-transform:translateZ(0);transform:translateZ(0);will-change:transform;',
     'display:flex;align-items:stretch;justify-content:space-around;',
     'height:var(--pcu-nav-h);padding-bottom:env(safe-area-inset-bottom);',
     'background:rgba(10,8,22,0.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);',
