@@ -3844,6 +3844,7 @@ if (new URLSearchParams(window.location.search).get('pagamento') === 'sucesso') 
               <div>
                 <button id="goToProtocolBtn" type="button" disabled>Ir para Protocolo de Preparação →</button>
               </div>
+              <div id="openStatus" class="status" style="display:none;"></div>
             </div>
           </div>
         </div>
@@ -5522,7 +5523,7 @@ function zerarFormulario() {
   if (goBtn) { goBtn.disabled = true; goBtn.classList.remove('btn-solid','btn-blink'); }
 
   const openStatus = document.getElementById('openStatus');
-  if (openStatus) { openStatus.textContent = 'Faça sua consulta agora.'; openStatus.className = 'status'; }
+  if (openStatus) { openStatus.textContent = ''; openStatus.className = 'status'; }
 }
 
 function voltarParaRitual() { voltarAoInicio(); }
