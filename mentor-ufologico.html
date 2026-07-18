@@ -1382,6 +1382,9 @@ async function executarPergunta(pergunta){
 
 // Formata resposta com selos coloridos
 function formatResposta(txt){
+  // Escapa HTML primeiro — impede que < ou > no texto da IA quebrem a página.
+  // Os padrões abaixo usam colchetes [ ], então não são afetados por isso.
+  txt = escHtml(txt||'');
   // Remove cabeçalhos markdown ## e ### que não ficam bem no fórum
   txt = txt.replace(/^#{1,4}\s*/gm, '');
   // Remove negrito markdown
