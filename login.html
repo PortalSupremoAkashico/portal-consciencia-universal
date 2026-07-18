@@ -131,12 +131,14 @@
 
     .row-links {
       display: flex; justify-content: space-between; align-items: center;
-      position: absolute; bottom: 32px; left: 44px; right: 44px;
+      flex-wrap: wrap; gap: 8px 16px;
+      margin-top: 8px;
     }
     .row-links span {
       font-size: .88rem; color: rgba(196,181,253,.6);
       cursor: pointer; text-decoration: underline;
       text-underline-offset: 3px; transition: color .2s;
+      white-space: nowrap;
     }
     .row-links span:hover { color: var(--accent-bright); }
 
