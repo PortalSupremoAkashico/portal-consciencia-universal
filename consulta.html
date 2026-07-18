@@ -89,12 +89,14 @@
 
     html { scroll-behavior: smooth; }
 
+    html { overscroll-behavior-y: none; }
     body {
       font-family: var(--font-body);
       color: var(--text);
       background-color: var(--bg-deep);
       min-height: 100vh;
       overflow-x: hidden;
+      overscroll-behavior-y: none;
       position: relative;
       font-size: 16px;
       line-height: 1.65;
@@ -1133,7 +1135,7 @@
     @media (max-width: 699px) {
       .grid-2 { grid-template-columns: 1fr; }
       .row-2  { grid-template-columns: 1fr 1fr; }
-      .container { padding: 12px 0 60px; }
+      .container { padding: 12px 0 8px; }
       .card-body { padding: 22px 18px; }
       h1 { font-size: 1.55rem; }
       h2 { font-size: 1.15rem; }
