@@ -211,19 +211,15 @@
     );
   }
 
-  // ---------- 6b. Modo app: remove botões "Voltar" e organiza o layout ----------
-  function ajustarModoApp() {
-    if (!isStandalone()) return;
-    document.documentElement.classList.add('pcu-app-mode');
-
+  // ---------- 6b. Remove botões "Voltar" — vale para o site todo (app e navegador) ----------
+  function removerBotoesVoltar() {
     var style2 = document.createElement('style');
     style2.textContent = [
-      '.pcu-app-mode .btn-voltar,',
-      '.pcu-app-mode a.nav-link,',
-      '.pcu-app-mode [id*="Voltar"],',
-      '.pcu-app-mode [class*="voltar"]{display:none !important;}',
-      '.pcu-app-mode #btnVoltarFormulario{display:none !important;padding:0 !important;margin:0 !important;height:0 !important;}',
-      '.pcu-app-mode body{padding-top:env(safe-area-inset-top) !important;}'
+      '.btn-voltar,',
+      'a.nav-link,',
+      '[id*="Voltar"],',
+      '[class*="voltar"]{display:none !important;}',
+      '#btnVoltarFormulario{display:none !important;padding:0 !important;margin:0 !important;height:0 !important;}'
     ].join('');
     document.head.appendChild(style2);
 
@@ -253,6 +249,17 @@
     // reaplica a checagem sempre que o conteúdo da página mudar.
     var observer = new MutationObserver(function () { esconderPorTexto(); });
     observer.observe(document.body || document.documentElement, { childList: true, subtree: true });
+  }
+  removerBotoesVoltar();
+
+  // ---------- 6c. Ajustes de layout exclusivos do modo app instalado ----------
+  function ajustarModoApp() {
+    if (!isStandalone()) return;
+    document.documentElement.classList.add('pcu-app-mode');
+
+    var style3 = document.createElement('style');
+    style3.textContent = '.pcu-app-mode body{padding-top:env(safe-area-inset-top) !important;}';
+    document.head.appendChild(style3);
   }
   ajustarModoApp();
 
