@@ -36,6 +36,7 @@
   var style = document.createElement('style');
   style.textContent = [
     ':root{--pcu-nav-h: 64px;}',
+    'html, body{overflow-x:hidden !important;max-width:100vw;}',
     'body{padding-bottom: calc(var(--pcu-nav-h) + env(safe-area-inset-bottom)) !important;}',
     '.pcu-navbar{position:fixed;left:0;right:0;bottom:0;z-index:9999;',
     '-webkit-transform:translateZ(0);transform:translateZ(0);will-change:transform;',
