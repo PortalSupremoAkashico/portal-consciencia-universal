@@ -2016,10 +2016,14 @@
       display: flex;
       flex-direction: column;
       gap: 24px;
+      width: 100%;
+      box-sizing: border-box;
     }
     
     .akashic-original {
-      padding: 24px;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 24px 14px;
       border-radius: 4px;
       background: linear-gradient(135deg, rgba(139, 92, 70, 0.2), rgba(101, 67, 33, 0.15));
       border: 2px solid rgba(184, 134, 11, 0.4);
@@ -2038,7 +2042,9 @@
     }
     
     .akashic-translation {
-      padding: 20px;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 20px 14px;
       border-radius: 12px;
       background: rgba(255, 255, 255, 0.02);
       border: 1px solid rgba(147, 109, 255, 0.15);
@@ -2053,6 +2059,7 @@
       color: #d4af37;
       text-transform: uppercase;
       text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+      overflow-wrap: break-word;
     }
     
     .akashic-subtitle {
