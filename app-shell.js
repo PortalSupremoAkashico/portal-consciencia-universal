@@ -43,19 +43,16 @@
     'display:flex;align-items:stretch;justify-content:space-around;',
     'height:var(--pcu-nav-h);padding-bottom:env(safe-area-inset-bottom);',
     'background:rgba(10,8,22,0.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);',
-    'border-top:1px solid rgba(147,109,255,0.18);font-family:"Inter",sans-serif;}',
+    'border-top:1px solid rgba(147,109,255,0.18);font-family:"Inter",sans-serif;padding:8px 8px;gap:8px;box-sizing:border-box;}',
     '.pcu-navbar a, .pcu-navbar button{flex:1;display:flex;flex-direction:column;align-items:center;',
-    'justify-content:center;gap:3px;background:none;border:none;color:#9b94c4;',
+    'justify-content:center;gap:3px;color:#9b94c4;',
     'text-decoration:none;font-size:11px;font-family:inherit;cursor:pointer;',
-    'position:relative;z-index:0;transition:color .2s ease;}',
-    '.pcu-navbar a::before, .pcu-navbar button::before{content:"";position:absolute;',
-    'top:50%;left:50%;width:46px;height:46px;border-radius:50%;transform:translate(-50%,-50%);',
-    'background:radial-gradient(circle, rgba(240,201,107,.55) 0%, rgba(240,201,107,.18) 55%, transparent 75%);',
-    'animation:pcuNavGlow 2.2s ease-in-out infinite;pointer-events:none;z-index:-1;}',
-    '@keyframes pcuNavGlow{0%,100%{opacity:.35;transform:translate(-50%,-50%) scale(.85);}',
-    '50%{opacity:1;transform:translate(-50%,-50%) scale(1.08);}}',
+    'position:relative;z-index:0;transition:all .2s ease;',
+    'background:rgba(255,255,255,.04);border:1.5px solid rgba(147,109,255,0.28);border-radius:14px;}',
+    '.pcu-navbar a:active, .pcu-navbar button:active{transform:scale(0.94);}',
     '.pcu-navbar svg{width:24px;height:24px;transition:transform .2s ease;}',
-    '.pcu-navbar a.active, .pcu-navbar button.active{color:#f0c96b;}',
+    '.pcu-navbar a.active, .pcu-navbar button.active{color:#f0c96b;border-color:rgba(240,201,107,0.55);',
+    'background:rgba(240,201,107,0.1);}',
     '.pcu-navbar a.active svg, .pcu-navbar button.active svg{transform:translateY(-1px);',
     'filter:drop-shadow(0 0 6px rgba(240,201,107,.6));}',
     '.pcu-navbar a:active svg, .pcu-navbar button:active svg{transform:scale(0.88);}',
@@ -163,13 +160,13 @@
   var elInicio = document.createElement('a');
   elInicio.href = '/consulta';
   if (currentPath === '/consulta') elInicio.classList.add('active');
-  elInicio.innerHTML = svgIcon('home') + '<span>Início</span>';
+  elInicio.innerHTML = svgIcon('home');
   nav.appendChild(elInicio);
 
   // Compartilhar
   var elShare = document.createElement('button');
   elShare.type = 'button';
-  elShare.innerHTML = svgIcon('share') + '<span>Compartilhar</span>';
+  elShare.innerHTML = svgIcon('share');
   elShare.addEventListener('click', function () {
     var texto = 'Encontrei um espaço lindo para quem busca autoconhecimento e conexão com o universo: ' +
       'o Portal da Consciência Universal. Tem Mentoria, Meditação Guiada, Análise de Sonhos, ' +
