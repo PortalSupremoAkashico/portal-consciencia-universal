@@ -826,8 +826,10 @@
 
     /* ===== SACRED PANEL (RESPONSE) ===== */
     .sacred-panel {
+      width: 100%;
+      box-sizing: border-box;
       border-radius: var(--radius);
-      padding: 24px;
+      padding: 24px 12px;
       background: linear-gradient(180deg, rgba(20,17,40,.6), rgba(10,8,22,.8));
       border: 1px solid rgba(147,109,255,.2);
       box-shadow: inset 0 0 40px rgba(0,0,0,.4);
@@ -2016,14 +2018,14 @@
       display: flex;
       flex-direction: column;
       gap: 24px;
-      width: 100%;
-      box-sizing: border-box;
+      width: 100% !important;
+      box-sizing: border-box !important;
     }
     
     .akashic-original {
-      width: 100%;
-      box-sizing: border-box;
-      padding: 24px 14px;
+      width: 100% !important;
+      box-sizing: border-box !important;
+      padding: 20px 10px;
       border-radius: 4px;
       background: linear-gradient(135deg, rgba(139, 92, 70, 0.2), rgba(101, 67, 33, 0.15));
       border: 2px solid rgba(184, 134, 11, 0.4);
@@ -2042,9 +2044,9 @@
     }
     
     .akashic-translation {
-      width: 100%;
-      box-sizing: border-box;
-      padding: 20px 14px;
+      width: 100% !important;
+      box-sizing: border-box !important;
+      padding: 20px 10px;
       border-radius: 12px;
       background: rgba(255, 255, 255, 0.02);
       border: 1px solid rgba(147, 109, 255, 0.15);
