@@ -196,6 +196,12 @@
       border: 1px solid rgba(240,201,107,.3);
     }
 
+    /* Modo app instalado no celular: remove os avatares (ícones redondos)
+       para dar mais largura ao campo de resposta */
+    .pcu-app-mode .msg-avatar { display: none; }
+    .pcu-app-mode .msg { max-width: 100%; gap: 0; }
+    .pcu-app-mode .msg-bubble { padding: 12px 6px; }
+
     .msg-bubble {
       padding: 12px 10px;
       border-radius: 16px;
