@@ -20,8 +20,8 @@
 
   // ---------- 2. Ícones SVG inline (sem dependência externa) ----------
   var ICONS = {
-    home: '<path d="M4 11.5 12 4l8 7.5" /><path d="M6 10v9h5v-5h2v5h5v-9" />',
-    share: '<circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="M8.3 10.7 15.7 6.6M8.3 13.3l7.4 4.1"/>',
+    home: '<path d="M3.5 11.5 12 4l8.5 7.5" /><path d="M5.5 10v9.5h5v-6h3v6h5V10" />',
+    share: '<path d="M12 2.5c2.6 2.4 4.2 4.9 4.2 8.3 0 3.5-1.9 6.4-4.2 10.7-2.3-4.3-4.2-7.2-4.2-10.7 0-3.4 1.6-5.9 4.2-8.3z"/><path d="M9 15.5c-2.2.8-3.6 1.8-3.6 2.9 0 1.8 2.9 3.2 6.6 3.2s6.6-1.4 6.6-3.2c0-1.1-1.4-2.1-3.6-2.9"/><circle cx="12" cy="10" r="1.6"/>',
     user: '<circle cx="12" cy="8.5" r="3.5"/><path d="M5 20c1.2-4 4-6 7-6s5.8 2 7 6"/>'
   };
 
@@ -47,7 +47,13 @@
     '.pcu-navbar a, .pcu-navbar button{flex:1;display:flex;flex-direction:column;align-items:center;',
     'justify-content:center;gap:3px;background:none;border:none;color:#9b94c4;',
     'text-decoration:none;font-size:11px;font-family:inherit;cursor:pointer;',
-    'transition:color .2s ease;}',
+    'position:relative;z-index:0;transition:color .2s ease;}',
+    '.pcu-navbar a::before, .pcu-navbar button::before{content:"";position:absolute;',
+    'top:50%;left:50%;width:46px;height:46px;border-radius:50%;transform:translate(-50%,-50%);',
+    'background:radial-gradient(circle, rgba(240,201,107,.55) 0%, rgba(240,201,107,.18) 55%, transparent 75%);',
+    'animation:pcuNavGlow 2.2s ease-in-out infinite;pointer-events:none;z-index:-1;}',
+    '@keyframes pcuNavGlow{0%,100%{opacity:.35;transform:translate(-50%,-50%) scale(.85);}',
+    '50%{opacity:1;transform:translate(-50%,-50%) scale(1.08);}}',
     '.pcu-navbar svg{width:24px;height:24px;transition:transform .2s ease;}',
     '.pcu-navbar a.active, .pcu-navbar button.active{color:#f0c96b;}',
     '.pcu-navbar a.active svg, .pcu-navbar button.active svg{transform:translateY(-1px);',
