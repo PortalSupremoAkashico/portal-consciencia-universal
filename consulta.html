@@ -1037,7 +1037,7 @@
 
     .response-box {
       position: relative; z-index: 1;
-      padding: 20px;
+      padding: 20px 4px;
       border-radius: var(--radius-sm);
       background: rgba(0,0,0,.88);
       border: 1px solid rgba(147,109,255,.15);
@@ -1050,6 +1050,7 @@
       overflow-x: hidden;
       word-break: break-word;
       max-width: 100%;
+      box-sizing: border-box;
       transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
       animation: revealFade 0.6s ease-out;
     }
@@ -2025,7 +2026,7 @@
     .akashic-original {
       width: 100% !important;
       box-sizing: border-box !important;
-      padding: 18px 3px;
+      padding: 18px 0;
       border-radius: 4px;
       background: linear-gradient(135deg, rgba(139, 92, 70, 0.2), rgba(101, 67, 33, 0.15));
       border: 2px solid rgba(184, 134, 11, 0.4);
@@ -2046,7 +2047,7 @@
     .akashic-translation {
       width: 100% !important;
       box-sizing: border-box !important;
-      padding: 20px 3px;
+      padding: 20px 0;
       border-radius: 12px;
       background: rgba(255, 255, 255, 0.02);
       border: 1px solid rgba(147, 109, 255, 0.15);
