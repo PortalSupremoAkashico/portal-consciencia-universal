@@ -211,6 +211,13 @@
     .pcu-app-mode .btn-send { width: 100%; height: 44px; border-radius: var(--radius-sm); }
     .pcu-app-mode .sacred-panel { padding-left: 0; padding-right: 0; }
     .pcu-app-mode .card-body { padding-left: 4px !important; padding-right: 4px !important; }
+    /* Modo app: remove todos os ícones/símbolos e clareia os campos de texto */
+    .pcu-app-mode svg { display: none !important; }
+    .pcu-app-mode .msg.mentor .msg-bubble,
+    .pcu-app-mode .msg.user .msg-bubble,
+    .pcu-app-mode .chat-input-row textarea {
+      background: rgba(28,22,48,.85) !important;
+    }
 
     .msg-bubble {
       padding: 12px 10px;
@@ -1465,7 +1472,7 @@ async function selectPastReading(index) {
   chatInput.disabled = false;
   chatInput.style.opacity = '1';
   chatInput.style.cursor  = 'text';
-  chatInput.placeholder   = 'Continue a mentoria sobre esta consulta...';
+  chatInput.placeholder   = 'Escreva Aqui: Continue a mentoria sobre esta consulta...';
   sendBtn.disabled = false;
   if (bloco) bloco.style.display = 'none';
 
