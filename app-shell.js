@@ -51,6 +51,8 @@
     'background:rgba(255,255,255,.04);border:1.5px solid rgba(147,109,255,0.28);border-radius:14px;}',
     '.pcu-navbar a:active, .pcu-navbar button:active{transform:scale(0.94);}',
     '.pcu-navbar svg{width:24px;height:24px;transition:transform .2s ease;}',
+    '.pcu-emoji-icon{font-size:24px;line-height:1;transition:transform .2s ease;}',
+    '.pcu-navbar a.active .pcu-emoji-icon, .pcu-navbar button.active .pcu-emoji-icon{transform:translateY(-1px);}',
     '.pcu-navbar a.active, .pcu-navbar button.active{color:#f0c96b;border-color:rgba(240,201,107,0.55);',
     'background:rgba(240,201,107,0.1);}',
     '.pcu-navbar a.active svg, .pcu-navbar button.active svg{transform:translateY(-1px);',
@@ -160,13 +162,13 @@
   var elInicio = document.createElement('a');
   elInicio.href = '/consulta';
   if (currentPath === '/consulta') elInicio.classList.add('active');
-  elInicio.innerHTML = svgIcon('home');
+  elInicio.innerHTML = '<span class="pcu-emoji-icon">🏛️</span>';
   nav.appendChild(elInicio);
 
   // Compartilhar
   var elShare = document.createElement('button');
   elShare.type = 'button';
-  elShare.innerHTML = svgIcon('share');
+  elShare.innerHTML = '<span class="pcu-emoji-icon">🚀</span>';
   elShare.addEventListener('click', function () {
     var texto = 'Encontrei um espaço lindo para quem busca autoconhecimento e conexão com o universo: ' +
       'o Portal da Consciência Universal. Tem Mentoria, Meditação Guiada, Análise de Sonhos, ' +
