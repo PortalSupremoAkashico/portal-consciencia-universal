@@ -3760,7 +3760,7 @@ if (new URLSearchParams(window.location.search).get('pagamento') === 'sucesso') 
   <!-- Player de música ambiente -->
 <!-- Botão de controle de som (canto inferior direito) -->
 <audio id="ambientAudio" loop preload="none" src="/soul-frequencies.mp3"></audio>
-<div style="position:fixed;top:14px;right:16px;z-index:998;">
+<div id="pcuSomWrap" style="position:fixed;top:14px;right:16px;z-index:998;">
   <button class="btn-som-inject" onclick="window.toggleSound && window.toggleSound()" title="Som" style="background:rgba(14,12,28,.8);border:1px solid rgba(196,181,253,.25);border-radius:20px;padding:5px 11px;cursor:pointer;display:flex;align-items:center;"></button>
 </div>
 <script>
@@ -3777,6 +3777,40 @@ if (new URLSearchParams(window.location.search).get('pagamento') === 'sucesso') 
   window.toggleSound = function(){ if(playing){ audio.pause(); updateBtn(false); playing=false; } else { tryPlay(); } };
   document.addEventListener('DOMContentLoaded', function(){ updateBtn(false); tryPlay(); });
 })();
+
+// ── Esconde o botão de som no Formulário da Consulta e na Leitura Akáshica ──
+(function(){
+  var wrap = document.getElementById('pcuSomWrap');
+  if (!wrap) return;
+  function estaVisivel(el){
+    return !!el && el.offsetParent !== null && getComputedStyle(el).display !== 'none';
+  }
+  function atualizar(){
+    var formulario = document.getElementById('abertura-consulta');
+    var leitura = document.getElementById('consulta');
+    if (estaVisivel(formulario) || estaVisivel(leitura)) {
+      wrap.style.display = 'none';
+    } else {
+      wrap.style.display = '';
+    }
+  }
+  document.addEventListener('DOMContentLoaded', atualizar);
+  var alvo = document.body || document.documentElement;
+  var observer = new MutationObserver(function(muts){
+    var relevante = muts.some(function(m){
+      return m.type === 'attributes' && m.target &&
+        (m.target.id === 'abertura-consulta' || m.target.id === 'consulta');
+    });
+    if (relevante) atualizar();
+  });
+  document.addEventListener('DOMContentLoaded', function(){
+    var formulario = document.getElementById('abertura-consulta');
+    var leitura = document.getElementById('consulta');
+    if (formulario) observer.observe(formulario, { attributes: true, attributeFilter: ['style','class'] });
+    if (leitura) observer.observe(leitura, { attributes: true, attributeFilter: ['style','class'] });
+  });
+})();
+
 </script>
   <main class="container">
 

@@ -120,8 +120,10 @@
       @keyframes buddhaFloat { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-6px);} }
 
   /* Modo app instalado: reduz símbolos e título para caber na tela do celular */
-  .pcu-app-mode .pcu-title-row { gap: 6px; flex-wrap: wrap; }
-  .pcu-app-mode .pcu-title-row img { width: 36px !important; height: 36px !important; }
+  .pcu-app-mode .pcu-title-row { flex-direction: column; gap: 4px; }
+  .pcu-app-mode .pcu-title-row img { width: 40px !important; height: 40px !important; }
+  .pcu-app-mode .pcu-title-row img:last-of-type { display: none; }
+  .pcu-app-mode .pcu-title-row h1 { order: 2; }
   .pcu-app-mode .hero-label { font-size: .68rem; letter-spacing: .08em; }
   </style>
 </head>

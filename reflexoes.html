@@ -857,8 +857,10 @@ input[type="submit"]:hover,
 .pcu-app-mode .hero-title,
 .pcu-app-mode .hero-sub { text-align: center; }
 .pcu-app-mode .pcu-symbol { display: none; }
-.pcu-app-mode .pcu-title-row { gap: 6px; flex-wrap: wrap; }
-.pcu-app-mode .pcu-title-row img { width: 36px !important; height: 36px !important; }
+.pcu-app-mode .pcu-title-row { flex-direction: column; gap: 4px; }
+.pcu-app-mode .pcu-title-row img { width: 40px !important; height: 40px !important; }
+.pcu-app-mode .pcu-title-row img:last-of-type { display: none; }
+.pcu-app-mode .pcu-title-row h1 { order: 2; }
 .pcu-app-mode .tab-bar { flex-direction: column; gap: 10px; }
 .pcu-app-mode .tab-btn { font-size: .82rem; padding: 8px 20px; }
 </style>
