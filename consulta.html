@@ -3778,20 +3778,31 @@ if (new URLSearchParams(window.location.search).get('pagamento') === 'sucesso') 
   document.addEventListener('DOMContentLoaded', function(){ updateBtn(false); tryPlay(); });
 })();
 
-// ── Esconde o botão de som no Formulário da Consulta e na Leitura Akáshica ──
+// ── Esconde o botão e PAUSA o som no Formulário da Consulta e na Leitura Akáshica ──
 (function(){
   var wrap = document.getElementById('pcuSomWrap');
   if (!wrap) return;
+  var pausadoAutomaticamente = false;
   function estaVisivel(el){
     return !!el && el.offsetParent !== null && getComputedStyle(el).display !== 'none';
   }
   function atualizar(){
     var formulario = document.getElementById('abertura-consulta');
     var leitura = document.getElementById('consulta');
-    if (estaVisivel(formulario) || estaVisivel(leitura)) {
+    var audio = document.getElementById('ambientAudio');
+    var deveEstarMudo = estaVisivel(formulario) || estaVisivel(leitura);
+    if (deveEstarMudo) {
       wrap.style.display = 'none';
+      if (audio && !audio.paused) {
+        audio.pause();
+        pausadoAutomaticamente = true;
+      }
     } else {
       wrap.style.display = '';
+      if (audio && pausadoAutomaticamente) {
+        audio.play().catch(function(){});
+        pausadoAutomaticamente = false;
+      }
     }
   }
   document.addEventListener('DOMContentLoaded', atualizar);
