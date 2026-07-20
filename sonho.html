@@ -104,7 +104,7 @@
     .sonho-titulo{font-family:var(--fd);font-size:1.4rem;font-weight:400;color:var(--gold);text-align:center;margin-bottom:28px;}
 
     .sonho-secao{background:rgba(14,12,28,.85);border:1px solid rgba(196,181,253,.1);border-radius:16px;padding:24px 28px;margin-bottom:16px;box-shadow:0 8px 24px rgba(0,0,0,.5), 0 0 40px rgba(240,201,107,.45), 0 0 80px rgba(240,201,107,.25), 0 0 140px rgba(184,142,40,.2), 0 0 0 1px rgba(240,201,107,.15);}
-    .sonho-secao-label{font-family:var(--fd);font-size:.62rem;letter-spacing:.18em;color:var(--gold-dim);text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;}
+    .sonho-secao-label{font-family:var(--fd);font-size:.62rem;letter-spacing:.18em;color:var(--gold-dim);text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
     .sonho-secao-texto{font-family:var(--fg);font-size:1.35rem;line-height:2.05;color:rgba(237,233,255,.95);}
 
     .btn-ouvir-sonho{display:inline-flex;align-items:center;gap:5px;padding:4px 14px;font-size:.68rem;background:rgba(109,40,217,.15);border:1px solid rgba(240,201,107,.3);color:rgba(240,201,107,.7);border-radius:20px;cursor:pointer;transition:all .2s;font-family:var(--fd);letter-spacing:.06em;animation:btnPulseGoldPage 2s ease-in-out infinite;}
@@ -121,6 +121,11 @@
   .pcu-app-mode .pcu-title-row img { width: 56px !important; height: 56px !important; }
   .pcu-app-mode .pcu-title-row img:last-of-type { display: none; }
   .pcu-app-mode .pcu-title-row h1 { order: 2; }
+
+  /* Modo app: alarga os cards do sonho */
+  .pcu-app-mode main { padding-left: 8px !important; padding-right: 8px !important; }
+  .pcu-app-mode .form-card { padding-left: 12px !important; padding-right: 12px !important; }
+  .pcu-app-mode .sonho-secao { padding-left: 8px !important; padding-right: 8px !important; }
   </style>
 </head>
 <body>
