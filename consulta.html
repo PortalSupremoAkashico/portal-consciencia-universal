@@ -3934,23 +3934,36 @@ if (new URLSearchParams(window.location.search).get('pagamento') === 'sucesso') 
       </div>
 
           <div id="pcuInstalarFaixa" style="display:none;margin-top:20px;padding:14px 16px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(240,201,107,.35);align-items:center;gap:12px;flex-wrap:wrap;justify-content:center;text-align:center;">
-            <span style="flex:1;min-width:180px;color:rgba(230,225,255,.9);font-size:.88rem;">Instale o Portal como aplicativo no seu celular.</span>
+            <span id="pcuInstalarTexto" style="flex:1;min-width:180px;color:rgba(230,225,255,.9);font-size:.88rem;">Instale o Portal como aplicativo.</span>
             <button type="button" onclick="window.pcuInstalarApp && window.pcuInstalarApp()" style="background:#f0c96b;color:#1a1440;border:none;border-radius:10px;padding:9px 20px;font-weight:700;font-size:.85rem;letter-spacing:.04em;cursor:pointer;white-space:nowrap;">Instalar</button>
           </div>
           <script>
           (function () {
             var faixa = document.getElementById('pcuInstalarFaixa');
+            var texto = document.getElementById('pcuInstalarTexto');
             if (!faixa) return;
-            function mostrarSeDisponivel() {
+            function ehIOS() { return /iphone|ipad|ipod/i.test(navigator.userAgent); }
+            function ehMobile() { return /android|iphone|ipad|ipod/i.test(navigator.userAgent); }
+            function mostrar() {
               if (window.pcuJaInstalado) { faixa.style.display = 'none'; return; }
-              var ehIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-              if (window.pcuPodeInstalar || ehIOS) {
-                faixa.style.display = 'flex';
+              if (window.pcuPodeInstalar) {
+                texto.textContent = 'Instale o Portal como aplicativo.';
+              } else if (ehIOS()) {
+                texto.textContent = 'Toque em Compartilhar e depois em "Adicionar à Tela de Início".';
+              } else if (!ehMobile()) {
+                texto.textContent = 'Instale o Portal: clique no ícone de instalar na barra de endereço, ou no menu ⋮ → "Instalar Portal da Consciência Universal".';
+              } else {
+                return; // Android sem o evento ainda: aguarda ficar disponível
               }
+              faixa.style.display = 'flex';
             }
-            document.addEventListener('pcu:pode-instalar', mostrarSeDisponivel);
-            document.addEventListener('DOMContentLoaded', mostrarSeDisponivel);
-            mostrarSeDisponivel();
+            document.addEventListener('pcu:pode-instalar', mostrar);
+            document.addEventListener('DOMContentLoaded', function () {
+              mostrar();
+              // Em computador, se o evento nativo não vier logo, mostra a instrução manual mesmo assim
+              setTimeout(mostrar, 2500);
+            });
+            mostrar();
           })();
           </script>
 
