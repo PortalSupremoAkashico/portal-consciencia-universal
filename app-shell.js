@@ -294,10 +294,24 @@
   window.addEventListener('beforeinstallprompt', function (e) {
     e.preventDefault();
     deferredPrompt = e;
+    window.pcuPodeInstalar = true;
     if (!isStandalone() && !localStorage.getItem('pcu_install_dismissed')) {
       showBanner(false);
     }
   });
+  window.pcuInstalarApp = function () {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.finally(function () {
+        deferredPrompt = null;
+        window.pcuPodeInstalar = false;
+      });
+    } else if (isIos()) {
+      alert('Para instalar: toque no ícone de Compartilhar do Safari e escolha "Adicionar à Tela de Início".');
+    } else {
+      alert('Para instalar o app, abra o menu do seu navegador e escolha "Instalar aplicativo" ou "Adicionar à tela inicial".');
+    }
+  };
 
   function showBanner(iosMode) {
     var banner = document.createElement('div');
