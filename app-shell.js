@@ -50,15 +50,15 @@
     'position:relative;z-index:0;transition:all .2s ease;',
     'background:rgba(255,255,255,.04);border:1.5px solid rgba(147,109,255,0.28);border-radius:14px;}',
     '.pcu-navbar a:active, .pcu-navbar button:active{transform:scale(0.94);}',
-    '.pcu-navbar svg{width:24px;height:24px;transition:transform .2s ease;}',
-    '.pcu-custom-icon{width:26px;height:26px;object-fit:contain;transition:transform .2s ease;}',
+    '.pcu-navbar svg{width:29px;height:29px;transition:transform .2s ease;}',
+    '.pcu-custom-icon{width:32px;height:32px;object-fit:contain;transition:transform .2s ease;}',
     '.pcu-navbar a.active .pcu-custom-icon, .pcu-navbar button.active .pcu-custom-icon{transform:translateY(-1px);filter:drop-shadow(0 0 5px rgba(240,201,107,.7));}',
     '.pcu-navbar a.active, .pcu-navbar button.active{color:#f0c96b;border-color:rgba(240,201,107,0.55);',
     'background:rgba(240,201,107,0.1);}',
     '.pcu-navbar a.active svg, .pcu-navbar button.active svg{transform:translateY(-1px);',
     'filter:drop-shadow(0 0 6px rgba(240,201,107,.6));}',
     '.pcu-navbar a:active svg, .pcu-navbar button:active svg{transform:scale(0.88);}',
-    '.pcu-navbar .pcu-avatar-icon{width:24px;height:24px;border-radius:50%;object-fit:cover;',
+    '.pcu-navbar .pcu-avatar-icon{width:29px;height:29px;border-radius:50%;object-fit:cover;',
     'border:1.5px solid rgba(155,148,196,0.5);transition:border-color .2s ease, transform .2s ease;}',
     '.pcu-navbar a.active .pcu-avatar-icon{border-color:#f0c96b;transform:translateY(-1px);',
     'box-shadow:0 0 6px rgba(240,201,107,.6);}',
@@ -188,7 +188,7 @@
   var elPerfil = document.createElement('a');
   elPerfil.href = '/perfil';
   if (currentPath === '/perfil') elPerfil.classList.add('active');
-  elPerfil.innerHTML = svgIcon('user') + '<span>Perfil</span>';
+  elPerfil.innerHTML = svgIcon('user');
   nav.appendChild(elPerfil);
 
   getAvatarUrl(user, function (url) {
