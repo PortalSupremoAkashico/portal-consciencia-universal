@@ -66,7 +66,7 @@
     .sonho-input{min-height:130px;}
     .emocao-input{min-height:70px;margin-top:8px;}
 
-    .emocoes-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px;max-width:520px;margin-left:auto;margin-right:auto;}
+    .emocoes-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:24px;max-width:520px;margin-left:auto;margin-right:auto;width:100%;box-sizing:border-box;}
     @keyframes neonPulse{
       0%,100%{box-shadow:0 0 6px rgba(240,201,107,.25),0 0 14px rgba(240,201,107,.12),0 0 24px rgba(109,40,217,.2);border-color:rgba(240,201,107,.5);}
       50%{box-shadow:0 0 16px rgba(240,201,107,.6),0 0 34px rgba(240,201,107,.28),0 0 55px rgba(109,40,217,.3);border-color:rgba(240,201,107,.9);}
@@ -75,7 +75,7 @@
       0%,100%{box-shadow:0 0 6px rgba(240,201,107,.25),0 0 14px rgba(240,201,107,.12),0 0 24px rgba(109,40,217,.2);border-color:rgba(240,201,107,.5);}
       50%{box-shadow:0 0 16px rgba(240,201,107,.6),0 0 34px rgba(240,201,107,.28),0 0 55px rgba(109,40,217,.3);border-color:rgba(240,201,107,.9);}
     }
-    .emocao-tag{padding:28px 6px;height:80px;display:flex;align-items:center;justify-content:center;background:rgba(14,12,28,.92);border:2px solid rgba(240,201,107,.5);border-radius:12px;color:rgba(240,201,107,.95);font-size:.85rem;text-shadow:0 0 10px rgba(240,201,107,.7),0 0 24px rgba(240,201,107,.35);font-weight:600;cursor:pointer;transition:all .2s;text-align:center;font-family:var(--fd);letter-spacing:.04em;animation:btnPulseGoldPage 1.6s ease-in-out infinite;}
+    .emocao-tag{padding:20px 4px;height:80px;display:flex;align-items:center;justify-content:center;background:rgba(14,12,28,.92);border:2px solid rgba(240,201,107,.5);border-radius:12px;color:rgba(240,201,107,.95);font-size:.85rem;text-shadow:0 0 10px rgba(240,201,107,.7),0 0 24px rgba(240,201,107,.35);font-weight:600;cursor:pointer;transition:all .2s;text-align:center;font-family:var(--fd);letter-spacing:.04em;animation:btnPulseGoldPage 1.6s ease-in-out infinite;min-width:0;box-sizing:border-box;overflow-wrap:break-word;word-break:break-word;}
     .emocoes-grid .emocao-tag:nth-child(1){animation-delay:0s;}
     .emocoes-grid .emocao-tag:nth-child(2){animation-delay:.3s;}
     .emocoes-grid .emocao-tag:nth-child(3){animation-delay:.6s;}
