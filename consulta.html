@@ -3825,6 +3825,40 @@ if (new URLSearchParams(window.location.search).get('pagamento') === 'sucesso') 
   });
 })();
 
+// ── Força (via JS) o tamanho da letra das respostas, só em telas de computador ──
+(function(){
+  function ehComputador(){ return window.innerWidth >= 700; }
+  function aplicarFonte(){
+    if (!ehComputador()) return;
+    var box = document.getElementById('responseBox');
+    if (!box) return;
+    box.style.setProperty('font-size', '1.9rem', 'important');
+    box.style.setProperty('line-height', '2.15', 'important');
+    var trad = box.querySelector('.translation-text');
+    if (trad) {
+      trad.style.setProperty('font-size', '1.85rem', 'important');
+      trad.style.setProperty('line-height', '2.1', 'important');
+    }
+    var label = box.querySelector('.akashic-label');
+    if (label) label.style.setProperty('font-size', '1.3rem', 'important');
+  }
+  document.addEventListener('DOMContentLoaded', aplicarFonte);
+  window.addEventListener('resize', aplicarFonte);
+  var box2 = document.getElementById('responseBox');
+  if (box2) {
+    var mo = new MutationObserver(aplicarFonte);
+    mo.observe(box2, { childList: true, subtree: true, characterData: true });
+  } else {
+    document.addEventListener('DOMContentLoaded', function(){
+      var b = document.getElementById('responseBox');
+      if (b) {
+        var mo2 = new MutationObserver(aplicarFonte);
+        mo2.observe(b, { childList: true, subtree: true, characterData: true });
+      }
+    });
+  }
+})();
+
 </script>
   <main class="container">
 
