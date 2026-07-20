@@ -315,14 +315,6 @@
     }
   };
 
-  window.addEventListener('appinstalled', function () {
-    window.pcuPodeInstalar = false;
-    var isMobile = /android|iphone|ipad|ipod/i.test(navigator.userAgent);
-    if (isMobile) {
-      alert('Portal instalado com sucesso! Toque no ícone "Portal" que apareceu na sua tela inicial para abrir o app.');
-    }
-  });
-
   function showBanner(iosMode) {
     var banner = document.createElement('div');
     banner.className = 'pcu-install-banner';
