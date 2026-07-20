@@ -6,7 +6,34 @@
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Portal">\n  <!-- Proteção de sessão: fallback no navegador -->\n  <style id="pcu-auth-style">html.pcu-auth-pending body{visibility:hidden!important}</style>\n  <script id="pcu-auth-guard">\n  document.documentElement.classList.add('pcu-auth-pending');\n  (async function(){\n    try {\n      const response = await fetch('/api/session', {\n        method: 'POST',\n        credentials: 'same-origin',\n        headers: {'Content-Type':'application/json'},\n        body: JSON.stringify({action:'verify'})\n      });\n      const data = await response.json().catch(function(){return {};});\n      if (!response.ok || !data.valid || !data.user) {\n        window.location.replace('/?acesso=restrito');\n        return;\n      }\n      try {\n        const old = JSON.parse(localStorage.getItem('akashic_user') || '{}');\n        localStorage.setItem('akashic_user', JSON.stringify(Object.assign({}, old, data.user)));\n      } catch(e) {}\n      document.documentElement.classList.remove('pcu-auth-pending');\n    } catch(e) {\n      window.location.replace('/?acesso=restrito');\n    }\n  })();\n  </script>
+<meta name="apple-mobile-web-app-title" content="Portal">
+  <!-- Proteção de sessão: fallback no navegador -->
+  <style id="pcu-auth-style">html.pcu-auth-pending body{visibility:hidden!important}</style>
+  <script id="pcu-auth-guard">
+  document.documentElement.classList.add('pcu-auth-pending');
+  (async function(){
+    try {
+      const response = await fetch('/api/session', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({action:'verify'})
+      });
+      const data = await response.json().catch(function(){return {};});
+      if (!response.ok || !data.valid || !data.user) {
+        window.location.replace('/?acesso=restrito');
+        return;
+      }
+      try {
+        const old = JSON.parse(localStorage.getItem('akashic_user') || '{}');
+        localStorage.setItem('akashic_user', JSON.stringify(Object.assign({}, old, data.user)));
+      } catch(e) {}
+      document.documentElement.classList.remove('pcu-auth-pending');
+    } catch(e) {
+      window.location.replace('/?acesso=restrito');
+    }
+  })();
+  </script>
   <meta charset="UTF-8">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -92,10 +119,6 @@
 </head>
 <body>
 <script>console.log("SONHO v3 - arquivo correto carregado");</script>
-<audio id="ambientAudio" loop preload="none" src="/soul-frequencies.mp3"></audio>
-<div style="position:fixed;top:14px;right:16px;z-index:998;">
-  <button class="btn-som-inject" onclick="window.toggleSound && window.toggleSound()" title="Som" style="background:rgba(14,12,28,.8);border:1px solid rgba(196,181,253,.25);border-radius:20px;padding:5px 11px;cursor:pointer;display:flex;align-items:center;"></button>
-</div>
 <canvas id="universeCanvas"></canvas>
 <main>
   <div class="hero">
@@ -1094,21 +1117,6 @@ function ouvirSecaoSonho(btn, key) {
   })();
   </script>
 
-<script>
-// ── Som ambiente ──
-(function(){
-  var audio = document.getElementById('ambientAudio');
-  if(!audio) return;
-  var playing = false;
-  var SOM_MUDO = '<svg width="18" height="18" viewBox="-28 -24 56 48" style="display:inline-block;vertical-align:middle;"><polygon points="-18,-12 -18,12 -6,12 8,22 8,-22 -6,-12" fill="rgba(196,181,253,0.65)" stroke="rgba(196,181,253,0.5)" stroke-width="1"/><line x1="12" y1="-12" x2="22" y2="12" stroke="rgba(255,100,100,0.9)" stroke-width="2.5" stroke-linecap="round"/><line x1="22" y1="-12" x2="12" y2="12" stroke="rgba(255,100,100,0.9)" stroke-width="2.5" stroke-linecap="round"/></svg>';
-  var SOM_ATIVO = '<svg width="18" height="18" viewBox="-28 -28 56 56" style="display:inline-block;vertical-align:middle;"><polygon points="-18,-12 -18,12 -6,12 8,22 8,-22 -6,-12" fill="rgba(196,181,253,0.85)" stroke="rgba(196,181,253,0.5)" stroke-width="1"/><path d="M12,-14 Q22,0 12,14" fill="none" stroke="rgba(240,201,107,0.9)" stroke-width="2.2" stroke-linecap="round"/><path d="M18,-22 Q34,0 18,22" fill="none" stroke="rgba(240,201,107,0.55)" stroke-width="1.5" stroke-linecap="round"/></svg>';
-  function updateBtn(ativo){ document.querySelectorAll('.btn-som-inject').forEach(function(b){ b.innerHTML = ativo ? SOM_ATIVO : SOM_MUDO; }); }
-  function fadeIn(){ var v=0; var t=setInterval(function(){ v=Math.min(0.35,v+0.015); audio.volume=v; if(v>=0.35)clearInterval(t); },100); }
-  function tryPlay(){ audio.volume=0; audio.play().then(function(){ fadeIn(); updateBtn(true); playing=true; }).catch(function(){ updateBtn(false); }); }
-  window.toggleSound = function(){ if(playing){ audio.pause(); updateBtn(false); playing=false; } else { tryPlay(); } };
-  document.addEventListener('DOMContentLoaded', function(){ updateBtn(false); tryPlay(); });
-})();
-</script>
 <script src="/heartbeat.js"></script>
 <script src="/app-shell.js" defer></script>
 </body>
