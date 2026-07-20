@@ -6,7 +6,34 @@
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Portal">\n  <!-- Proteção de sessão: fallback no navegador -->\n  <style id="pcu-auth-style">html.pcu-auth-pending body{visibility:hidden!important}</style>\n  <script id="pcu-auth-guard">\n  document.documentElement.classList.add('pcu-auth-pending');\n  (async function(){\n    try {\n      const response = await fetch('/api/session', {\n        method: 'POST',\n        credentials: 'same-origin',\n        headers: {'Content-Type':'application/json'},\n        body: JSON.stringify({action:'verify'})\n      });\n      const data = await response.json().catch(function(){return {};});\n      if (!response.ok || !data.valid || !data.user) {\n        window.location.replace('/?acesso=restrito');\n        return;\n      }\n      try {\n        const old = JSON.parse(localStorage.getItem('akashic_user') || '{}');\n        localStorage.setItem('akashic_user', JSON.stringify(Object.assign({}, old, data.user)));\n      } catch(e) {}\n      document.documentElement.classList.remove('pcu-auth-pending');\n    } catch(e) {\n      window.location.replace('/?acesso=restrito');\n    }\n  })();\n  </script>
+<meta name="apple-mobile-web-app-title" content="Portal">
+  <!-- Proteção de sessão: fallback no navegador -->
+  <style id="pcu-auth-style">html.pcu-auth-pending body{visibility:hidden!important}</style>
+  <script id="pcu-auth-guard">
+  document.documentElement.classList.add('pcu-auth-pending');
+  (async function(){
+    try {
+      const response = await fetch('/api/session', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({action:'verify'})
+      });
+      const data = await response.json().catch(function(){return {};});
+      if (!response.ok || !data.valid || !data.user) {
+        window.location.replace('/?acesso=restrito');
+        return;
+      }
+      try {
+        const old = JSON.parse(localStorage.getItem('akashic_user') || '{}');
+        localStorage.setItem('akashic_user', JSON.stringify(Object.assign({}, old, data.user)));
+      } catch(e) {}
+      document.documentElement.classList.remove('pcu-auth-pending');
+    } catch(e) {
+      window.location.replace('/?acesso=restrito');
+    }
+  })();
+  </script>
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
@@ -811,6 +838,28 @@ input[type="submit"]:hover,
 </style>
 
 <style id="btns-principais-acesos">
+</style>
+
+<style id="pcu-app-center">
+/* Modo app instalado: centraliza os elementos da página de Reflexões */
+.pcu-app-mode .tab-bar { justify-content: center; }
+.pcu-app-mode .tl-header { flex-direction: column; text-align: center; }
+.pcu-app-mode .tl-meta { text-align: center; }
+.pcu-app-mode .tl-texto {
+  text-align: center;
+  border-left: none;
+  padding-left: 0;
+  border-top: 2px solid rgba(240,201,107,.3);
+  padding-top: 10px;
+}
+.pcu-app-mode .tl-actions { justify-content: center; }
+.pcu-app-mode .reflexao-autor,
+.pcu-app-mode .reflexao-origem { text-align: center; }
+.pcu-app-mode .rodape { text-align: center; }
+.pcu-app-mode .hero,
+.pcu-app-mode .hero-badge,
+.pcu-app-mode .hero-title,
+.pcu-app-mode .hero-sub { text-align: center; }
 </style>
 
 <script>
