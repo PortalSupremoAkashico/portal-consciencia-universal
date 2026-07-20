@@ -222,6 +222,7 @@
       window.navigator.standalone === true
     );
   }
+  window.pcuJaInstalado = isStandalone();
 
   // ---------- 6b. Remove botões "Voltar" — vale para o site todo (app e navegador) ----------
   function removerBotoesVoltar() {
@@ -295,6 +296,7 @@
     e.preventDefault();
     deferredPrompt = e;
     window.pcuPodeInstalar = true;
+    document.dispatchEvent(new CustomEvent('pcu:pode-instalar'));
     if (!isStandalone() && !localStorage.getItem('pcu_install_dismissed')) {
       showBanner(false);
     }
