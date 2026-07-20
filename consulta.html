@@ -7464,6 +7464,7 @@ input[type="submit"]:hover,
   function tocarBemVindo(){
     if(!window._deveTocBV) return;
     var bv  = new Audio('/audio/bem-vindo.mp3');
+    bv.playbackRate = 1.2;
     bv.volume = 1;
     bv.addEventListener('ended', function(){
     });
