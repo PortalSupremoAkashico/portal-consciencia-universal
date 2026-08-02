@@ -282,11 +282,7 @@
     document.documentElement.classList.add('pcu-app-mode');
 
     var style3 = document.createElement('style');
-    style3.textContent = [
-      '.pcu-app-mode body{padding-top:env(safe-area-inset-top) !important;',
-      'padding-left:max(env(safe-area-inset-left), 6px) !important;',
-      'padding-right:max(env(safe-area-inset-right), 6px) !important;}'
-    ].join('');
+    style3.textContent = '.pcu-app-mode body{padding-top:env(safe-area-inset-top) !important;}';
     document.head.appendChild(style3);
   }
   ajustarModoApp();
