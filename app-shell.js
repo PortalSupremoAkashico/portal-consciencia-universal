@@ -290,7 +290,16 @@
   ajustarModoApp();
 
   function isIos() {
-    return /iphone|ipad|ipod/i.test(window.navigator.userAgent);
+    // iPhone/iPad "normais"
+    if (/iphone|ipad|ipod/i.test(window.navigator.userAgent)) return true;
+    // iPad (ou iPhone) com "Solicitar Site para Desktop" ativado no Safari:
+    // o user-agent passa a se identificar como Mac, mas o dispositivo é touch.
+    if (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) return true;
+    return false;
+  }
+
+  function isAndroid() {
+    return /android/i.test(window.navigator.userAgent);
   }
 
   var deferredPrompt = null;
@@ -311,9 +320,11 @@
         window.pcuPodeInstalar = false;
       });
     } else if (isIos()) {
-      alert('Para instalar: toque no ícone de Compartilhar do Safari e escolha "Adicionar à Tela de Início".');
+      alert('Para instalar: toque no ícone de Compartilhar do Safari (o quadrado com a seta para cima) e depois em "Adicionar à Tela de Início".');
+    } else if (isAndroid()) {
+      alert('Para instalar o app, toque no menu (⋮) do navegador e escolha "Instalar aplicativo" ou "Adicionar à tela inicial".');
     } else {
-      alert('Para instalar o app, abra o menu do seu navegador e escolha "Instalar aplicativo" ou "Adicionar à tela inicial".');
+      alert('Para instalar o app, clique no ícone de instalar (⊕) na barra de endereço do navegador, ou abra o menu (⋮) e escolha "Instalar Portal da Consciência Universal".');
     }
   };
 
